@@ -333,7 +333,7 @@ vp1_BPLCON2BITS                      EQU TRUE
 vp1_BPLCON3BITS1                     EQU BPLCON3BITS1
 vp1_BPLCON3BITS2                     EQU vp1_BPLCON3BITS1+BPLCON3F_LOCT
 vp1_BPLCON4BITS                      EQU BPLCON4BITS
-vp1_FMODEBITS                        EQU FMODEF_BPL32+FMODEF_BPAGEM+FMODEF_SPR32+FMODEF_SPAGEM
+vp1_FMODEBITS                        EQU FMODEBITS+FMODEF_BPL32+FMODEF_BPAGEM
 vp1_COLOR00BITS                      EQU COLOR00BITS
 
 vp2_BPLCON0BITS1                     EQU BPLCON0F_ECSENA+(((extra_pf2_depth*2)>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+BPLCON0F_DPF+(((extra_pf2_depth*2)&$07)*BPLCON0F_BPU0) ;lores, dual playfield
@@ -343,7 +343,7 @@ vp2_BPLCON2BITS                      EQU BPLCON2F_PF2P2
 vp2_BPLCON3BITS1                     EQU BPLCON3BITS1+BPLCON3F_PF2OF1
 vp2_BPLCON3BITS2                     EQU vp2_BPLCON3BITS1+BPLCON3F_LOCT
 vp2_BPLCON4BITS                      EQU (BPLCON4F_OSPRM4*vp2_spr_odd_color_table_select)+(BPLCON4F_ESPRM4*vp2_spr_even_color_table_select)
-vp2_FMODEBITS                        EQU FMODEF_BPL32+FMODEF_BPAGEM+FMODEF_SPR32+FMODEF_SPAGEM
+vp2_FMODEBITS                        EQU FMODEBITS+FMODEF_BPL32+FMODEF_BPAGEM
 vp2_COLOR00BITS                      EQU COLOR00BITS
 
 cl2_display_x_size                   EQU 320
