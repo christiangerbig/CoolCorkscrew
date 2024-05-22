@@ -307,6 +307,8 @@ vp2_pf_pixel_per_datafetch           EQU 64 ;4x
 vp2_DDFSTRTBITS                      EQU DDFSTART_320_pixel
 vp2_DDFSTOPBITS                      EQU DDFSTOP_320_pixel_4x
 
+vp2_pf1_colors_number                EQU 4
+
 
 extra_pf1_plane_width                EQU extra_pf1_x_size/8
 extra_pf2_plane_width                EQU extra_pf2_x_size/8
