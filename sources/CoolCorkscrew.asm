@@ -69,9 +69,12 @@
 ; V.1.1
 ; Credits erneut geändert und luNix auf eigenen Wunsch wieder herausgenommen.
 ; Im Icon ab den Offset $3a und $3e die Werte $80000000 eingetragen, damit
-; es keine Fixe Position mehr hat
+; es keine fixe Position mehr hat
 ; überarbeitetete Include-Files integriert
 ; Move-Spaceship optimiert
+
+; V.1.2
+; Fader-Code optimiert
 
 
 ; PT 8xy-Befehl
@@ -520,6 +523,7 @@ rfo_delay_speed                      EQU 1
 rfo_speed                            EQU 1
 
 ; **** Image-Fader ****
+if_start_color                       EQU 01
 if_colors_number                     EQU vp1_pf1_colors_number-1
 
 ; **** Image-Fader-In ****
@@ -535,6 +539,7 @@ ifo_fader_center                     EQU ifo_fader_speed_max+1
 ifo_fader_angle_speed                EQU 1
 
 ; **** Sprite-Fader ****
+sprf_start_color                     EQU 01
 sprf_colors_number                   EQU spr_colors_number-1
 
 ; **** Sprite-Fader-In ****
@@ -1583,10 +1588,10 @@ init_second_copperlist
   bsr     cl2_vp2_set_bitplane_pointers
   bsr     scs_set_vert_compression
   IFEQ scs_pipe_effect
-    bsr     scs_set_colorgradients
+    bsr     scs_set_color_gradients
     bsr     scs_set_pipe
   ELSE
-    bsr     scs_set_colorgradients
+    bsr     scs_set_color_gradients
   ENDC
   bsr     copy_second_copperlist
   bra     swap_second_copperlist
@@ -1805,18 +1810,18 @@ scs_set_vert_compression_loop
   rts
 
   CNOP 0,4
-scs_set_colorgradients
+scs_set_color_gradients
   movem.l a4-a5,-(a7)
   MOVEF.W COLOR00HIGHBITS,d2
   MOVEF.W COLOR00LOWBITS,d3
-  lea     scs_colorgradient_front(pc),a0 ;Zeiger auf Farbtabelle
-  lea     scs_colorgradient_back(pc),a1
+  lea     scs_color_gradient_front(pc),a0 ;Zeiger auf Farbtabelle
+  lea     scs_color_gradient_back(pc),a1
   move.l  cl2_construction2(a3),a2 ;CL
   ADDF.W  cl2_extension6_entry+cl2_ext6_COLOR00_high+2,a2
-  lea     scs_colorgradient_outline(pc),a4
+  lea     scs_color_gradient_outline(pc),a4
   move.w  #cl2_extension6_SIZE,a5
   moveq   #vp2_visible_lines_number-1,d7 ;Anzahl der Farbwerte
-scs_set_colorgradients_loop
+scs_set_color_gradients_loop
   move.w  d2,(a2)            ;COLOR00 ;High-Bits
   move.w  d3,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ;COLOR00 ;Low-Bits
   move.w  (a0)+,cl2_ext6_COLOR01_high-cl2_ext6_COLOR00_high(a2) ;COLOR01 High-Bits
@@ -1830,7 +1835,7 @@ scs_set_colorgradients_loop
   move.w  d0,cl2_ext6_COLOR02_high-cl2_ext6_COLOR00_high(a2) ;COLOR02 High-Bits
   add.l   a5,a2              ;nächste Zeile
   move.w  d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_SIZE(a2) ;COLOR06 High-Bits
-  dbf     d7,scs_set_colorgradients_loop
+  dbf     d7,scs_set_color_gradients_loop
   movem.l (a7)+,a4-a5
   rts
 
@@ -1898,7 +1903,7 @@ beam_routines
   bsr     hcs_calculate_planes_x_step
   bsr     hcs_calculate_last_plane_x_speed
   bsr     horiz_characterscrolling
-  bsr     scs_set_colorgradients
+  bsr     scs_set_color_gradients
   bsr     scs_character_vert_scroll
   bsr     radius_fader_in
   bsr     radius_fader_out
@@ -1911,15 +1916,15 @@ beam_routines
   bsr     move_spaceship_left
   bsr     move_spaceship_right
   bsr     control_counters
-  bsr     if_copy_color_table
   bsr     image_fader_in
   bsr     image_fader_out
-  bsr     sprf_copy_color_table
+  bsr     if_copy_color_table
   bsr     sprite_fader_in
   bsr     sprite_fader_out
-  bsr     bf_convert_color_table
+  bsr     sprf_copy_color_table
   bsr     bar_fader_in
   bsr     bar_fader_out
+  bsr     bf_convert_color_table
   bsr     mouse_handler
   tst.w   fx_state(a3)       ;Effekte beendet ?
   bne     beam_routines      ;Nein -> verzweige
@@ -1984,7 +1989,7 @@ scs_no_horiz_scrolltext
 
 ; ** Neues Image für Character ermitteln **
 ; -----------------------------------------
-  GET_NEW_CHARACTER_IMAGE scs,scs_check_control_codes,NORESTART
+  GET_NEW_CHARACTER_IMAGE.W scs,scs_check_control_codes,NORESTART
 
   CNOP 0,4
 scs_check_control_codes
@@ -2764,8 +2769,8 @@ ifi_no_restart_fader_angle
   MULUF.L ifi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifi_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(1*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifi_color_table+(1*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     ifi_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2803,8 +2808,8 @@ ifo_no_restart_fader_angle
   MULUF.L ifo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifo_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(1*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifo_color_table+(1*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     ifo_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2823,75 +2828,7 @@ no_image_fader_out
 
   COLOR_FADER if
 
-; ** Farbwerte in Copperliste kopieren **
-; ---------------------------------------
-  CNOP 0,4
-if_copy_color_table
-  IFNE cl2_size2
-    move.l  a4,-(a7)
-  ENDC
-  tst.w   if_copy_colors_state(a3) ;Kopieren der Farbwerte beendet ?
-  bne.s   if_no_copy_color_table ;Ja -> verzweige
-  move.w  #$0f0f,d3          ;Maske für RGB-Nibbles
-  IFGT if_colors_number-32
-    moveq   #1*8,d4          ;Color-Bank Farbregisterzähler
-  ENDC
-  lea     pf1_color_table+(1*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  move.l  cl2_display(a3),a1 ;CL
-  ADDF.W  cl2_extension2_entry+cl2_ext2_COLOR01_high1+2,a1
-  IFNE cl2_size1
-    move.l  cl2_construction1(a3),a2 ;CL
-    ADDF.W  cl2_extension2_entry+cl2_ext2_COLOR01_high1+2,a2
-  ENDC
-  IFNE cl2_size2
-    move.l  cl2_construction2(a3),a4 ;CL
-    ADDF.W  cl2_extension2_entry+cl2_ext2_COLOR01_high1+2,a4
-  ENDC
-  MOVEF.W if_colors_number-1,d7 ;Anzahl der Farben
-if_copy_color_table_loop
-  move.l  (a0)+,d0           ;RGB8-Farbwert
-  move.l  d0,d2              ;retten
-  RGB8_TO_RGB4HI d0,d1,d3
-  move.w  d0,(a1)            ;COLORxx High-Bits
-  IFNE cl2_size1
-    move.w  d0,(a2)          ;COLORxx High-Bits
-  ENDC
-  IFNE cl2_size2
-    move.w  d0,(a4)          ;COLORxx High-Bits
-  ENDC
-  RGB8_TO_RGB4LO d2,d1,d3
-  move.w  d2,cl2_ext2_COLOR01_low1-cl2_ext2_COLOR01_high1(a1) ;Low-Bits COLORxx
-  addq.w  #4,a1              ;nächstes Farbregister
-  IFNE cl2_size1
-    move.w  d2,cl2_ext2_COLOR01_low1-cl2_ext2_COLOR01_high1(a2) ;Low-Bits COLORxx
-    addq.w  #4,a2            ;nächstes Farbregister
-  ENDC
-  IFNE cl2_size2
-    move.w  d2,cl2_ext2_COLOR01_low1-cl2_ext2_COLOR01_high1(a4) ;Low-Bits COLORxx
-    addq.w  #4,a4            ;nächstes Farbregister
-  ENDC
-  IFGT if_colors_number-32
-    addq.b  #1*8,d4          ;Farbregister-Zähler erhöhen
-    bne.s   if_no_restart_color_bank ;Nein -> verzweige
-    addq.w  #4,a1            ;CMOVE überspringen
-    IFNE cl2_size1
-      addq.w  #4,a2          ;CMOVE überspringen
-    ENDC
-    IFNE cl2_size2
-      addq.w  #4,a4          ;CMOVE überspringen
-    ENDC
-if_no_restart_color_bank
-  ENDC
-  dbf     d7,if_copy_color_table_loop
-  tst.w   if_colors_counter(a3) ;Fading beendet ?
-  bne.s   if_no_copy_color_table ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,if_copy_colors_state(a3) ;Kopieren beendet
-if_no_copy_color_table
-  IFNE cl2_size2
-    move.l  (a7)+,a4
-  ENDC
-  rts
+  COPY_COLOR_TABLE_TO_COPPERLIST if,pf1,cl2,cl2_ext2_COLOR01_high1,cl2_ext2_COLOR01_low1,cl2_extension2_entry
 
 ; ** Sprites einblenden **
 ; ------------------------
@@ -2914,8 +2851,8 @@ sprfi_no_restart_fader_angle
   MULUF.L sprfi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  sprfi_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     spr_color_table+(1*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     sprfi_color_table+(1*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     spr_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     sprfi_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2953,8 +2890,8 @@ sprfo_no_restart_fader_angle
   MULUF.L sprfo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  sprfo_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     spr_color_table+(1*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     sprfo_color_table+(1*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     spr_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     sprfo_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2971,75 +2908,7 @@ sprfo_no_restart_fader_angle
 no_sprite_fader_out
   rts
 
-; ** Farbwerte in Copperliste kopieren **
-; ---------------------------------------
-  CNOP 0,4
-sprf_copy_color_table
-  IFNE cl1_size2
-    move.l  a4,-(a7)
-  ENDC
-  tst.w   sprf_copy_colors_state(a3)  ;Kopieren der Farbwerte beendet ?
-  bne.s   sprf_no_copy_color_table ;Ja -> verzweige
-  move.w  #$0f0f,d3          ;Maske für RGB-Nibbles
-  IFGT sprf_colors_number-32
-    moveq   #1*8,d4          ;Color-Bank Farbregisterzähler
-  ENDC
-  lea     spr_color_table+(1*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  move.l  cl1_display(a3),a1 ;CL
-  ADDF.W  cl1_COLOR17_high1+2,a1
-  IFNE cl1_size1
-    move.l  cl1_construction1(a3),a2 ;CL
-    ADDF.W  cl1_COLOR17_high1+2,a2
-  ENDC
-  IFNE cl1_size2
-    move.l  cl1_construction2(a3),a4 ;CL
-    ADDF.W  cl1_COLOR17_high1+2,a4
-  ENDC
-  MOVEF.W sprf_colors_number-1,d7 ;Anzahl der Farben
-sprf_copy_color_table_loop
-  move.l  (a0)+,d0           ;RGB8-Farbwert
-  move.l  d0,d2              ;retten
-  RGB8_TO_RGB4HI d0,d1,d3
-  move.w  d0,(a1)            ;COLORxx High-Bits
-  IFNE cl1_size1
-    move.w  d0,(a2)          ;COLORxx High-Bits
-  ENDC
-  IFNE cl1_size2
-    move.w  d0,(a4)          ;COLORxx High-Bits
-  ENDC
-  RGB8_TO_RGB4LO d2,d1,d3
-  move.w  d2,cl1_COLOR17_low1-cl1_COLOR17_high1(a1) ;Low-Bits COLORxx
-  addq.w  #4,a1              ;nächstes Farbregister
-  IFNE cl1_size1
-    move.w  d2,cl1_COLOR17_low1-cl1_COLOR17_high1(a2) ;Low-Bits COLORxx
-    addq.w  #4,a2            ;nächstes Farbregister
-  ENDC
-  IFNE cl1_size2
-    move.w  d2,cl1_COLOR17_low1-cl1_COLOR17_high1(a4) ;Low-Bits COLORxx
-    addq.w  #4,a4            ;nächstes Farbregister
-  ENDC
-  IFGT sprf_colors_number-32
-    addq.b  #1*8,d4          ;Farbregister-Zähler erhöhen
-    bne.s   sprf_no_restart_color_bank ;Nein -> verzweige
-    addq.w  #4,a1            ;CMOVE überspringen
-    IFNE cl1_size1
-      addq.w  #4,a2          ;CMOVE überspringen
-    ENDC
-    IFNE cl1_size2
-      addq.w  #4,a4          ;CMOVE überspringen
-    ENDC
-sprf_no_restart_color_bank
-  ENDC
-  dbf     d7,sprf_copy_color_table_loop
-  tst.w   sprf_colors_counter(a3) ;Fading beendet ?
-  bne.s   sprf_no_copy_color_table ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,sprf_copy_colors_state(a3) ;Kopieren beendet
-sprf_no_copy_color_table
-  IFNE cl1_size2
-    move.l  (a7)+,a4
-  ENDC
-  rts
+  COPY_COLOR_TABLE_TO_COPPERLIST sprf,spr,cl1,cl1_COLOR17_high1,cl1_COLOR17_low1
 
 ; ** Bars einblenden **
 ; ---------------------
@@ -3244,7 +3113,7 @@ VERTB_int_server
 ; ** PT-replay routine **
 ; -----------------------
   IFD pt_v2.3a
-    PT2_REPLAY
+    PT2_REPLAY pt_trigger_fx
   ENDC
   IFD pt_v3.0b
     PT3_REPLAY pt_trigger_fx
@@ -3435,13 +3304,13 @@ hcs_objects_x_coordinates
 
 ; **** Single-Corkscrew-Scroll ****
   CNOP 0,4
-scs_colorgradient_front
+scs_color_gradient_front
   INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/2x32-Colorgradient-Blue.hlct"
 
-scs_colorgradient_back
+scs_color_gradient_back
   INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/2x32-Colorgradient-Orchid.hlct"
 
-scs_colorgradient_outline
+scs_color_gradient_outline
   INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/2x32-Colorgradient-Grey.hlct"
 
 ; ** Center-Bar **
