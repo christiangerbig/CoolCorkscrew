@@ -1,8 +1,8 @@
 ; ###############################
 ; # Programm: CoolCorkscrew.asm #
 ; # Autor:    Christian Gerbig  #
-; # Datum:    23.04.2024        #
-; # Version:  1.1               #
+; # Datum:    02.06.2024        #
+; # Version:  1.2               #
 ; # CPU:      68020+            #
 ; # FASTMEM:  -                 #
 ; # Chipset:  AGA               #
@@ -312,15 +312,21 @@ vp2_DDFSTOPBITS                      EQU DDFSTOP_320_pixel_4x
 
 vp2_pf1_colors_number                EQU 4
 
-
+; **** Viewport 1 ****
 extra_pf1_plane_width                EQU extra_pf1_x_size/8
+; **** Viewport 2 ****
 extra_pf2_plane_width                EQU extra_pf2_x_size/8
+; **** Viewport 1 ****
 vp1_data_fetch_width                 EQU vp1_pixel_per_line/8
+; **** Viewport 2 ****
 vp2_data_fetch_width                 EQU vp2_pixel_per_line/8
+; **** Viewport 1 ****
 vp1_pf1_plane_moduli                 EQU (extra_pf1_plane_width*(extra_pf1_depth-1))+extra_pf1_plane_width-vp1_data_fetch_width
+; **** Viewport 2 ****
 vp2_pf1_plane_moduli                 EQU (extra_pf2_plane_width*(extra_pf2_depth-1))+extra_pf2_plane_width-vp2_data_fetch_width
 vp2_pf2_plane_moduli                 EQU -((extra_pf2_plane_width*(extra_pf2_depth-1))+(extra_pf2_plane_width-vp2_data_fetch_width)+(2*vp2_data_fetch_width))
 
+; **** View ****
 BPLCON0BITS                          EQU BPLCON0F_ECSENA+((pf_depth>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+((pf_depth&$07)*BPLCON0F_BPU0) ;lores
 BPLCON3BITS1                         EQU BPLCON3F_SPRES0
 BPLCON3BITS2                         EQU BPLCON3BITS1+BPLCON3F_LOCT
@@ -330,7 +336,7 @@ FMODEBITS                            EQU FMODEF_SPR32+FMODEF_SPAGEM
 COLOR00BITS                          EQU $0e111d
 COLOR00HIGHBITS                      EQU $011
 COLOR00LOWBITS                       EQU $e1d
-
+; **** Viewport 1 ****
 vp1_BPLCON0BITS1                     EQU BPLCON0F_ECSENA+((extra_pf1_depth>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+((extra_pf1_depth&$07)*BPLCON0F_BPU0) ;lores
 vp1_BPLCON0BITS2                     EQU BPLCON0F_ECSENA+BPLCON0F_COLOR ;blank
 vp1_BPLCON1BITS                      EQU TRUE
@@ -340,7 +346,7 @@ vp1_BPLCON3BITS2                     EQU vp1_BPLCON3BITS1+BPLCON3F_LOCT
 vp1_BPLCON4BITS                      EQU BPLCON4BITS
 vp1_FMODEBITS                        EQU FMODEBITS+FMODEF_BPL32+FMODEF_BPAGEM
 vp1_COLOR00BITS                      EQU COLOR00BITS
-
+; **** Viewport 2 ****
 vp2_BPLCON0BITS1                     EQU BPLCON0F_ECSENA+(((extra_pf2_depth*2)>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+BPLCON0F_DPF+(((extra_pf2_depth*2)&$07)*BPLCON0F_BPU0) ;lores, dual playfield
 vp2_BPLCON0BITS2                     EQU BPLCON0F_ECSENA+BPLCON0F_COLOR ;blank
 vp2_BPLCON1BITS                      EQU TRUE
@@ -354,16 +360,21 @@ vp2_COLOR00BITS                      EQU COLOR00BITS
 cl2_display_x_size                   EQU 320
 cl2_display_width                    EQU cl2_display_x_size/8
 cl2_display_y_size                   EQU vp1_visible_lines_number
-cl2_HSTART1                          EQU display_window_HSTART-(1*CMOVE_slot_period)
-cl2_VSTART1                          EQU vb1_VSTART
-cl2_HSTART2                          EQU display_window_HSTART+(1*CMOVE_slot_period)
-cl2_VSTART2                          EQU vp1_VSTART
-cl2_HSTART3                          EQU display_window_HSTART-(1*CMOVE_slot_period)
-cl2_VSTART3                          EQU vb2_VSTART
-cl2_HSTART4                          EQU $00
-cl2_VSTART4                          EQU vp2_VSTART
-cl2_HSTART5                          EQU $00
-cl2_VSTART5                          EQU beam_position&$ff
+; **** Vertical Blank  1 ****
+cl2_vb1_HSTART                       EQU display_window_HSTART-(1*CMOVE_slot_period)
+cl2_vb1_VSTART                       EQU vb1_VSTART
+; **** Viewport 1 ****
+cl2_vp1_HSTART                       EQU display_window_HSTART+(1*CMOVE_slot_period)
+cl2_vp1_VSTART                       EQU vp1_VSTART
+; **** Vertical-Blank 2 ****
+cl2_vb2_HSTART                       EQU display_window_HSTART-(1*CMOVE_slot_period)
+cl2_vb2_VSTART                       EQU vb2_VSTART
+; **** Viewport 2 ****
+cl2_vp2_HSTART                       EQU $00
+cl2_vp2_VSTART                       EQU vp2_VSTART
+; **** Copper-Interrupt ****
+cl2_HSTART                           EQU $00
+cl2_VSTART                           EQU beam_position&$ff
 
 sine_table_length                    EQU 256
 sine_table_length2                   EQU 512
@@ -523,7 +534,8 @@ rfo_delay_speed                      EQU 1
 rfo_speed                            EQU 1
 
 ; **** Image-Fader ****
-if_start_color                       EQU 01
+if_start_color                       EQU 1
+if_color_table_offset                EQU 1
 if_colors_number                     EQU vp1_pf1_colors_number-1
 
 ; **** Image-Fader-In ****
@@ -539,7 +551,8 @@ ifo_fader_center                     EQU ifo_fader_speed_max+1
 ifo_fader_angle_speed                EQU 1
 
 ; **** Sprite-Fader ****
-sprf_start_color                     EQU 01
+sprf_start_color                     EQU 1
+sprf_color_table_offset              EQU 1
 sprf_colors_number                   EQU spr_colors_number-1
 
 ; **** Sprite-Fader-In ****
@@ -555,6 +568,7 @@ sprfo_fader_center                   EQU sprfo_fader_speed_max+1
 sprfo_fader_angle_speed              EQU 1
 
 ; **** Bar-Fader ****
+bf_color_table_offset                EQU 0
 bf_colors_number                     EQU sb_bar_height
 
 ; **** Bar-Fader-In ****
@@ -1599,7 +1613,7 @@ init_second_copperlist
 ; **** Vertical Blank 1 ****
   CNOP 0,4
 cl2_vb1_init_BPLDAT_registers
-  move.l  #(((cl2_VSTART1<<24)|(((cl2_HSTART1/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
+  move.l  #(((cl2_vb1_VSTART<<24)|(((cl2_vb1_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
   move.w  #BPL1DAT,d1
   moveq   #1,d2
   ror.l   #8,d2            ;$01000000 = Additionswert
@@ -1647,12 +1661,12 @@ cl2_vp1_set_bitplane_pointers_loop
   dbf     d7,cl2_vp1_set_bitplane_pointers_loop
   rts
 
-  COP_INIT_BPLCON1_CHUNKY_SCREEN cl2,cl2_HSTART2,cl2_VSTART2,cl2_display_x_size,vp1_visible_lines_number,vp1_BPLCON1BITS
+  COP_INIT_BPLCON1_CHUNKY_SCREEN cl2,cl2_vp1_HSTART,cl2_vp1_VSTART,cl2_display_x_size,vp1_visible_lines_number,vp1_BPLCON1BITS
 
 ; **** Vertical-Blank 2 ****
   CNOP 0,4
 cl2_vb2_init_BPLDAT_registers
-  move.l  #(((cl2_VSTART3<<24)|(((cl2_HSTART3/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
+  move.l  #(((cl2_vb2_VSTART<<24)|(((cl2_vb2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
   move.w  #BPL1DAT,d1
   moveq   #1,d2
   ror.l   #8,d2            ;$01000000 = Additionswert
@@ -1692,7 +1706,7 @@ cl2_vp2_init_bitplane_pointers_loop
   CNOP 0,4
 cl2_init_roller
   movem.l a4-a6,-(a7)
-  move.l  #(((cl2_VSTART4<<24)|(((cl2_HSTART4/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
+  move.l  #(((cl2_vp2_VSTART<<24)|(((cl2_vp2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
   move.l  #(BPLCON3<<16)+vp2_BPLCON3BITS1,d1 ;Low-RGB-Werte
   move.l  #COLOR01<<16,d2
   move.l  #(BPLCON3<<16)+vp2_BPLCON3BITS2,d3 ;Low-RGB-Werte
@@ -1735,7 +1749,7 @@ cl2_init_roller_loop
   move.l  d4,(a0)+           ;COLOR02
   move.l  d5,(a0)+           ;COLOR05
   move.l  a6,(a0)+           ;COLOR06
-  cmp.l   #(((cl_y_wrap<<24)|(((cl2_HSTART4/4)*2)<<16))|$10000)|$fffe,d0 ;Rasterzeile $ff erreicht ?
+  cmp.l   #(((cl_y_wrap<<24)|(((cl2_vp2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ;Rasterzeile $ff erreicht ?
   bne.s   no_patch_copperlist2 ;Nein -> verzweige
 patch_copperlist2
   COPWAIT cl_x_wrap,cl_y_wrap ;Copperliste patchen
@@ -1750,7 +1764,7 @@ cl2_init_roller_skip
   rts
 
 ; **** Copper-Interrupt ****
-  COP_INIT_COPINT cl2,cl2_HSTART5,cl2_VSTART5
+  COP_INIT_COPINT cl2,cl2_HSTART,cl2_VSTART
 
   CNOP 0,4
 cl2_vp2_set_bitplane_pointers
@@ -2593,7 +2607,6 @@ msl_finished
   move.w  #sine_table_length2/4,msr_x_angle(a3) ;X-Winkel auf 180 Grad zurücksetzen
   rts
 
-
 ; ** Spaceship-Grafik kopieren **
 ; -------------------------------
   CNOP 0,4
@@ -2686,6 +2699,7 @@ ms_copy_image_data_loop
   movem.l (a7)+,d1/a0/a4-a6
   rts
 
+
 ; ** Verzögerungszähler **
 ; ------------------------
   CNOP 0,4
@@ -2769,8 +2783,8 @@ ifi_no_restart_fader_angle
   MULUF.L ifi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifi_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifi_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     ifi_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2808,8 +2822,8 @@ ifo_no_restart_fader_angle
   MULUF.L ifo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  ifo_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     pf1_color_table+(if_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     ifo_color_table+(if_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     pf1_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     ifo_color_table+(if_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2828,6 +2842,8 @@ no_image_fader_out
 
   COLOR_FADER if
 
+; ** Farbwerte in Copperliste kopieren **
+; ---------------------------------------
   COPY_COLOR_TABLE_TO_COPPERLIST if,pf1,cl2,cl2_ext2_COLOR01_high1,cl2_ext2_COLOR01_low1,cl2_extension2_entry
 
 ; ** Sprites einblenden **
@@ -2851,8 +2867,8 @@ sprfi_no_restart_fader_angle
   MULUF.L sprfi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  sprfi_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     spr_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     sprfi_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     spr_color_table+(sprf_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     sprfi_color_table+(sprf_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2890,8 +2906,8 @@ sprfo_no_restart_fader_angle
   MULUF.L sprfo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  sprfo_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     spr_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
-  lea     sprfo_color_table+(sprf_start_color*LONGWORDSIZE)(pc),a1 ;Sollwerte
+  lea     spr_color_table+(sprf_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     sprfo_color_table+(sprf_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2908,6 +2924,8 @@ sprfo_no_restart_fader_angle
 no_sprite_fader_out
   rts
 
+; ** Farbwerte in Copperliste kopieren **
+; ---------------------------------------
   COPY_COLOR_TABLE_TO_COPPERLIST sprf,spr,cl1,cl1_COLOR17_high1,cl1_COLOR17_low1
 
 ; ** Bars einblenden **
@@ -2931,8 +2949,8 @@ bfi_no_restart_fader_angle
   MULUF.L bfi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  bfi_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     bf_color_cache(pc),a0 ;Puffer für Farbwerte
-  lea     bfi_color_table(pc),a1 ;Sollwerte
+  lea     bf_color_cache+(bf_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     bfi_color_table+(bf_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2970,8 +2988,8 @@ bfo_no_restart_fader_angle
   MULUF.L bfo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
   ADDF.W  bfo_fader_center,d0 ;+ Fader-Mittelpunkt
-  lea     bf_color_cache(pc),a0 ;Puffer für Farbwerte
-  lea     bfo_color_table(pc),a1 ;Sollwerte
+  lea     bf_color_cache+(bf_color_table_offset*LONGWORDSIZE)(pc),a0 ;Puffer für Farbwerte
+  lea     bfo_color_table+(bf_color_table_offset*LONGWORDSIZE)(pc),a1 ;Sollwerte
   move.w  d0,a5              ;Additions-/Subtraktionswert für Blau
   swap    d0                 ;WORDSHIFT
   clr.w   d0                 ;Bits 0-15 löschen
@@ -2997,8 +3015,8 @@ bf_convert_color_table
 bf_convert_color_table2
   move.w  #$0f0f,d3          ;Maske für RGB-Nibbles
   lea     bf_color_cache(pc),a0 ;Quelle: Puffer für Farbwerte
-  lea     scs_bar_color_table(pc),a1 ;Ziel: Bar-Farbtabelle
-  lea     scs_bar_color_table+(bf_colors_number*LONGWORDSIZE)(pc),a2 ;Ziel: Ende der Bar-Farbtabelle
+  lea     scs_bar_color_table+(bf_color_table_offset*LONGWORDSIZE)(pc),a1 ;Ziel: Bar-Farbtabelle
+  lea     scs_bar_color_table+(bf_color_table_offset*LONGWORDSIZE)+(bf_colors_number*LONGWORDSIZE)(pc),a2 ;Ziel: Ende der Bar-Farbtabelle
   MOVEF.W (bf_colors_number/2)-1,d7 ;Anzahl der Farben
 bf_convert_color_table_loop
   move.l  (a0)+,d0           ;RGB8-Farbwert
@@ -3416,7 +3434,7 @@ bf_color_cache
 
 ; ** Programmversion für Version-Befehl **
 ; ----------------------------------------
-prg_version DC.B "$VER: RSE-CoolCorkscrew 1.1 (23.4.24)",TRUE
+prg_version DC.B "$VER: RSE-CoolCorkscrew 1.2 (2.6.24)",TRUE
   EVEN
 
 ; **** Single-Corkscrew-Scroll ****
