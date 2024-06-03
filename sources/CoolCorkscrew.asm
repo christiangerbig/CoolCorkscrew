@@ -313,16 +313,17 @@ vp2_DDFSTOPBITS                      EQU DDFSTOP_320_pixel_4x
 vp2_pf1_colors_number                EQU 4
 
 ; **** Viewport 1 ****
+; ** Playfield 1 **
 extra_pf1_plane_width                EQU extra_pf1_x_size/8
 ; **** Viewport 2 ****
+; ** Playfield 1 **
 extra_pf2_plane_width                EQU extra_pf2_x_size/8
+
 ; **** Viewport 1 ****
 vp1_data_fetch_width                 EQU vp1_pixel_per_line/8
-; **** Viewport 2 ****
-vp2_data_fetch_width                 EQU vp2_pixel_per_line/8
-; **** Viewport 1 ****
 vp1_pf1_plane_moduli                 EQU (extra_pf1_plane_width*(extra_pf1_depth-1))+extra_pf1_plane_width-vp1_data_fetch_width
 ; **** Viewport 2 ****
+vp2_data_fetch_width                 EQU vp2_pixel_per_line/8
 vp2_pf1_plane_moduli                 EQU (extra_pf2_plane_width*(extra_pf2_depth-1))+extra_pf2_plane_width-vp2_data_fetch_width
 vp2_pf2_plane_moduli                 EQU -((extra_pf2_plane_width*(extra_pf2_depth-1))+(extra_pf2_plane_width-vp2_data_fetch_width)+(2*vp2_data_fetch_width))
 
