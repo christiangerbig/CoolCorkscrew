@@ -1651,7 +1651,7 @@ cl2_vp1_init_bitplane_pointers_loop
 
   CNOP 0,4
 cl2_vp1_set_bitplane_pointers
-  move.l  cl2_construction2(a3),a0 ;CL
+  move.l  cl2_construction2(a3),a0 
   ADDF.W  cl2_extension2_entry+cl2_ext2_BPL1PTH+2,a0
   move.l  extra_pf1(a3),a1    ;Zeiger auf erste Plane
   moveq   #extra_pf1_depth-1,d7 ;Anzahl der Bitplanes
@@ -1809,7 +1809,7 @@ scs_set_vert_compression
   moveq   #cl2_extension6_SIZE,d6
   lea     sine_table(pc),a0    ;Sinus-Tabelle
   move.l  cl2_construction2(a3),a1
-  ADDF.W  cl2_extension6_entry,a1 ;CL
+  ADDF.W  cl2_extension6_entry,a1 
   moveq   #extra_pf2_plane_width*extra_pf2_depth,d7
 scs_set_vert_compression_loop
   move.w  2(a0,d1.w*4),d0    ;sin(w)
@@ -1831,7 +1831,7 @@ scs_set_color_gradients
   MOVEF.W COLOR00LOWBITS,d3
   lea     scs_color_gradient_front(pc),a0 ;Zeiger auf Farbtabelle
   lea     scs_color_gradient_back(pc),a1
-  move.l  cl2_construction2(a3),a2 ;CL
+  move.l  cl2_construction2(a3),a2 
   ADDF.W  cl2_extension6_entry+cl2_ext6_COLOR00_high+2,a2
   lea     scs_color_gradient_outline(pc),a4
   move.w  #cl2_extension6_SIZE,a5
@@ -1860,7 +1860,7 @@ scs_set_pipe
     moveq   #scs_pipe_shift_x_center,d2
     MOVEF.W $ff,d3             ;Scroll-Maske H0-H7
     lea     scs_pipe_shift_x_table(pc),a0 ;Tabelle mit X-Shift-Werten
-    move.l  cl2_construction2(a3),a1 ;CL
+    move.l  cl2_construction2(a3),a1 
     ADDF.W  cl2_extension6_entry+cl2_ext6_BPLCON1+2,a1
     move.w  #cl2_extension6_SIZE,a2
     moveq   #vp2_visible_lines_number-1,d7 ;Anzahl der Zeilen
@@ -2139,7 +2139,7 @@ hsi_calculate_BPLCON1_values
   move.w  hsi_x_radius_angle(a3),d4 ;1. X-Radius-Winkel
   move.w  d4,d0
   addq.b  #hsi_x_radius_angle_speed,d0 ;nächster X-Radius-Winkel
-  move.w  d0,hsi_x_radius_angle(a3) ;retten
+  move.w  d0,hsi_x_radius_angle(a3) 
   move.w  hsi_variable_x_radius_angle_step(a3),d5
   lea     sine_table(pc),a0  
   lea     hsi_radius_table(pc),a1
@@ -2361,7 +2361,7 @@ sb232_get_y_coordinates
   move.w  d0,sb232_y_angle(a3) ;Y-Winkel retten
   lea     sine_table(pc),a0  
   move.w  #sb232_y_center,a1
-  move.l  cl2_construction2(a3),a5 ;CL
+  move.l  cl2_construction2(a3),a5 
   ADDF.W  cl2_extension6_entry+cl2_ext6_COLOR00_high+2,a5
   move.w  #cl2_extension6_SIZE,a6
   moveq   #sb232_bars_number-1,d7 ;Anzahl der Stangen
@@ -2405,13 +2405,13 @@ sb36_get_yz_coordinates
   beq.s   sb36_no_get_yz_coordinates
   move.l  a4,-(a7)
   move.w  sb36_y_angle(a3),d2 ;1. Y-Winkel
-  move.w  d2,d0              ;retten
+  move.w  d2,d0              
   move.w  sb36_y_distance_angle(a3),d4 ;1. Y-Distance-Winkel
   addq.b  #sb36_y_angle_speed,d0
-  move.w  d0,sb36_y_angle(a3) ;retten
+  move.w  d0,sb36_y_angle(a3) 
   move.w  d4,d0
   addq.b  #sb36_y_distance_speed,d0
-  move.w  d0,sb36_y_distance_angle(a3) ;retten
+  move.w  d0,sb36_y_distance_angle(a3) 
   lea     sine_table(pc),a0  
   lea     sb36_yz_coordinates(pc),a1 ;Zeiger auf Y+Z-Koords-Tabelle
   move.w  #sb36_y_center,a2
@@ -2450,7 +2450,7 @@ sb36_set_background_bars
   move.l  a4,-(a7)
   MOVEF.L cl2_extension6_SIZE,d5
   lea     sb36_yz_coordinates(pc),a0 ;Zeiger auf YZ-Koords
-  move.l  cl2_construction2(a3),a2 ;CL
+  move.l  cl2_construction2(a3),a2 
   ADDF.W  cl2_extension6_entry+cl2_ext6_COLOR00_high+2,a2
   moveq   #sb36_bars_number-1,d7 ;Anzahl der Stangen
 sb36_set_background_bars_loop1
@@ -2488,7 +2488,7 @@ sb36_set_foreground_bars
   move.l  a4,-(a7)
   MOVEF.L cl2_extension6_SIZE,d5
   lea     sb36_yz_coordinates(pc),a0 ;Zeiger auf YZ-Koords
-  move.l  cl2_construction2(a3),a2 ;CL
+  move.l  cl2_construction2(a3),a2 
   ADDF.W  cl2_extension6_entry+cl2_ext6_COLOR00_high+2,a2
   moveq   #sb36_bars_number-1,d7 ;Anzahl der Stangen
 sb36_set_foreround_bars_loop1
@@ -2522,7 +2522,7 @@ scs_set_center_bar
   tst.w   sb_variable_y_radius(a3) ;Y-Radius Null ?
   bne.s   scs_no_set_center_bar ;Nein -> verzweige
   lea     scs_bar_color_table(pc),a0 ;Zeiger auf Farbtabelle
-  move.l  cl2_construction2(a3),a1 ;CL
+  move.l  cl2_construction2(a3),a1 
   ADDF.W  (cl2_extension6_entry+cl2_ext6_COLOR00_high+2)+(((vp2_visible_lines_number-scs_center_bar_height)/2)*cl2_extension6_SIZE),a1 ;Zentrierung
   move.w  #cl2_extension6_SIZE,a2
   moveq   #scs_center_bar_height-1,d7 ;Anzahl der Farbwerte
@@ -2550,7 +2550,7 @@ hsi_shrink_logo_x_size
   move.w  (a0)+,d0
   BITPLANE_SOFTSCROLL_64PIXEL_LORES d0,d1,d2
   move.w  d0,cl2_extension2_entry+cl2_ext2_BPLCON1+2(a1) ;BPLCON1
-  ADDF.W  cl2_extension3_entry+cl2_ext3_BPLCON1_1+2,a1 ;CL
+  ADDF.W  cl2_extension3_entry+cl2_ext3_BPLCON1_1+2,a1 
   moveq   #hsi_lines_number-1,d7 ;Anzahl der Zeilen
 hsi_shrink_logo_x_size_loop1
   moveq   #cl2_display_width-1,d6 ;Anzahl der Spalten
@@ -2713,7 +2713,7 @@ scs_disable_text_delay_counter
   clr.w   scs_text_move_state(a3) ;Laufschrift-Bewegung an
   moveq   #FALSE,d0          ;Zähler stoppen
 scs_save_text_delay_counter
-  move.w  d0,scs_text_delay_counter(a3) ;retten
+  move.w  d0,scs_text_delay_counter(a3) 
 scs_no_text_delay_counter
   rts
 
@@ -2732,7 +2732,7 @@ radius_fader_in
   cmp.w   #rf_max_y_radius,d0 ;Maximalwert erreicht ?
   bge.s   rfi_finished       ;Ja -> verzweige
   addq.w  #rfi_speed,d0      ;Y-Radius erhöhen
-  move.w  d0,sb_variable_y_radius(a3) ;retten
+  move.w  d0,sb_variable_y_radius(a3) 
 no_radius_fader_in
   rts
   CNOP 0,4
@@ -2754,7 +2754,7 @@ radius_fader_out
   move.w  sb_variable_y_radius(a3),d0 ;Y-Radius holen
   ble.s   rfo_finished       ;Wenn Minimalwert erreicht -> verzweige
   subq.w  #rfo_speed,d0      ;Y-Radius verringern
-  move.w  d0,sb_variable_y_radius(a3) ;retten
+  move.w  d0,sb_variable_y_radius(a3) 
 no_radius_fader_out
   rts
   CNOP 0,4
@@ -3021,7 +3021,7 @@ bf_convert_color_table2
   MOVEF.W (bf_colors_number/2)-1,d7 ;Anzahl der Farben
 bf_convert_color_table_loop
   move.l  (a0)+,d0           ;RGB8-Farbwert
-  move.l  d0,d2              ;retten
+  move.l  d0,d2              
   RGB8_TO_RGB4HI d0,d1,d3
   move.w  d0,(a1)+           ;COLORxx High-Bits
   RGB8_TO_RGB4LO d2,d1,d3
