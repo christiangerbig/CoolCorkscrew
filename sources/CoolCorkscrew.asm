@@ -1930,7 +1930,6 @@ beam_routines
   bsr     hsi_shrink_logo_x_size
   bsr     move_spaceship_left
   bsr     move_spaceship_right
-  bsr     control_counters
   bsr     image_fader_in
   bsr     image_fader_out
   bsr     if_copy_color_table
@@ -1940,6 +1939,7 @@ beam_routines
   bsr     bar_fader_in
   bsr     bar_fader_out
   bsr     bf_convert_color_table
+  bsr     control_counters
   bsr     mouse_handler
   tst.w   fx_state(a3)       ;Effekte beendet ?
   bne     beam_routines      ;Nein -> verzweige
@@ -2701,23 +2701,6 @@ ms_copy_image_data_loop
   rts
 
 
-; ** Verzögerungszähler **
-; ------------------------
-  CNOP 0,4
-control_counters
-  move.w  scs_text_delay_counter(a3),d0 ;Zählerwert holen
-  bmi.s   scs_no_text_delay_counter ;Wenn negativ -> verzweige
-  subq.w  #1,d0              ;Wert verringern
-  bpl.s   scs_save_text_delay_counter ;Wenn positiv -> verzweige
-scs_disable_text_delay_counter
-  clr.w   scs_text_move_state(a3) ;Laufschrift-Bewegung an
-  moveq   #FALSE,d0          ;Zähler stoppen
-scs_save_text_delay_counter
-  move.w  d0,scs_text_delay_counter(a3) 
-scs_no_text_delay_counter
-  rts
-
-
 ; ** Radius-Fader-In **
 ; ---------------------
   CNOP 0,4
@@ -2774,9 +2757,9 @@ image_fader_in
   move.w  d2,d0
   ADDF.W  ifi_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
-  ble.s   ifi_no_restart_fader_angle ;Ja -> verzweige
+  ble.s   ifi_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
-ifi_no_restart_fader_angle
+ifi_save_fader_angle
   move.w  d0,ifi_fader_angle(a3) ;Fader-Winkel retten
   MOVEF.W if_colors_number*3,d6 ;Zähler
   lea     sine_table(pc),a0  ;Sinus-Tabelle
@@ -2813,9 +2796,9 @@ image_fader_out
   move.w  d2,d0
   ADDF.W  ifo_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
-  ble.s   ifo_no_restart_fader_angle ;Ja -> verzweige
+  ble.s   ifo_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
-ifo_no_restart_fader_angle
+ifo_save_fader_angle
   move.w  d0,ifo_fader_angle(a3) ;Fader-Winkel retten
   MOVEF.W if_colors_number*3,d6 ;Zähler
   lea     sine_table(pc),a0  ;Sinus-Tabelle
@@ -2858,9 +2841,9 @@ sprite_fader_in
   move.w  d2,d0
   ADDF.W  sprfi_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
-  ble.s   sprfi_no_restart_fader_angle ;Ja -> verzweige
+  ble.s   sprfi_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
-sprfi_no_restart_fader_angle
+sprfi_save_fader_angle
   move.w  d0,sprfi_fader_angle(a3) ;Fader-Winkel retten
   MOVEF.W sprf_colors_number*3,d6 ;Zähler
   lea     sine_table(pc),a0  ;Sinus-Tabelle
@@ -2897,9 +2880,9 @@ sprite_fader_out
   move.w  d2,d0
   ADDF.W  sprfo_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
-  ble.s   sprfo_no_restart_fader_angle ;Ja -> verzweige
+  ble.s   sprfo_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
-sprfo_no_restart_fader_angle
+sprfo_save_fader_angle
   move.w  d0,sprfo_fader_angle(a3) ;Fader-Winkel retten
   MOVEF.W sprf_colors_number*3,d6 ;Zähler
   lea     sine_table(pc),a0  ;Sinus-Tabelle
@@ -2940,9 +2923,9 @@ bar_fader_in
   move.w  d2,d0
   ADDF.W  bfi_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
-  ble.s   bfi_no_restart_fader_angle ;Ja -> verzweige
+  ble.s   bfi_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
-bfi_no_restart_fader_angle
+bfi_save_fader_angle
   move.w  d0,bfi_fader_angle(a3) ;Fader-Winkel retten
   MOVEF.W bf_colors_number*3,d6 ;Zähler
   lea     sine_table(pc),a0  ;Sinus-Tabelle
@@ -2979,9 +2962,9 @@ bar_fader_out
   move.w  d2,d0
   ADDF.W  bfo_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
-  ble.s   bfo_no_restart_fader_angle ;Ja -> verzweige
+  ble.s   bfo_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
-bfo_no_restart_fader_angle
+bfo_save_fader_angle
   move.w  d0,bfo_fader_angle(a3) ;Fader-Winkel retten
   MOVEF.W bf_colors_number*3,d6 ;Zähler
   lea     sine_table(pc),a0  ;Sinus-Tabelle
@@ -3036,6 +3019,22 @@ bf_convert_color_table_loop
 bf_no_convert_color_table
   rts
 
+
+; ** Verzögerungszähler **
+; ------------------------
+  CNOP 0,4
+control_counters
+  move.w  scs_text_delay_counter(a3),d0 ;Zählerwert holen
+  bmi.s   scs_no_text_delay_counter ;Wenn negativ -> verzweige
+  subq.w  #1,d0              ;Wert verringern
+  bpl.s   scs_save_text_delay_counter ;Wenn positiv -> verzweige
+scs_disable_text_delay_counter
+  clr.w   scs_text_move_state(a3) ;Laufschrift-Bewegung an
+  moveq   #FALSE,d0          ;Zähler stoppen
+scs_save_text_delay_counter
+  move.w  d0,scs_text_delay_counter(a3) 
+scs_no_text_delay_counter
+  rts
 
 ; ** Mouse-Handler **
 ; -------------------
