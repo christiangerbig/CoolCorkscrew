@@ -67,14 +67,21 @@
 ; - Fader optimiert
 
 ; V.1.1
-; Credits erneut geändert und luNix auf eigenen Wunsch wieder herausgenommen.
-; Im Icon ab den Offset $3a und $3e die Werte $80000000 eingetragen, damit
-; es keine fixe Position mehr hat
-; überarbeitetete Include-Files integriert
-; Move-Spaceship optimiert
+; - Credits erneut geändert und luNix auf eigenen Wunsch wieder herausgenommen.
+; - Im Icon ab den Offset $3a und $3e die Werte $80000000 eingetragen, damit
+;   es keine fixe Position mehr hat
+; - überarbeitetete Include-Files integriert
+; - Move-Spaceship optimiert
 
 ; V.1.2
-; Fader-Code optimiert
+; - Fader-Code optimiert
+
+; V.1.3
+; - Abfrage der Raumschiff-Animation geändert: Die Animation kann nur gestartet
+;   werden, wenn der Corkscrew-Scrolltext aktiv ist und das Intro nicht bereits
+;   beendet wird
+; - Neuer 8xy-Befehl: Ship-Animation wird jetzt seaparat über den 840-Befehl
+;   aktiviert
 
 
 ; PT 8xy-Befehl
@@ -82,6 +89,7 @@
 ; 810 Increase x_radius_angle_step
 ; 820 Start calculate z_planes_step
 ; 830 Start scrolltext
+; 840 Enable ship animation
 
 ; Ausführungszeit 68020: 277 Rasterzeilen
 
@@ -1180,6 +1188,7 @@ bfo_state                              RS.W 1
 bfo_fader_angle                        RS.W 1
 
 ; **** Main ****
+mh_start_ship_animation_state          RS.W 1
 fx_state                               RS.W 1
 quit_state                             RS.W 1
 
@@ -1314,6 +1323,7 @@ init_own_variables
   move.w  d2,bfo_fader_angle(a3) ;90 Grad
 
 ; **** Main ****
+  move.w  d1,mh_start_ship_animation_state(a3)
   move.w  d1,fx_state(a3)
   move.w  d1,quit_state(a3)
   rts
@@ -1419,7 +1429,7 @@ scs_init_x_shift_table
     moveq   #scs_pipe_shift_x_radius*2,d2
     MOVEF.L sine_table_length/2,d3 ;Länge der Tabelle (180 Grad)
     divu.w  #scs_roller_y_radius*2,d3 ;Schrittweite in Sinus-Tabelle berechnen
-    lea     sine_table(pc),a0    ;Sinus-Tabelle
+    lea     sine_table(pc),a0    
     lea     scs_pipe_shift_x_table(pc),a1 ;Tabelle mit X-Shift-Werten
     moveq   #(scs_roller_y_radius*2)-1,d7 ;Anzahl der Zeilen
 scs_init_x_shift_table_loop
@@ -1521,7 +1531,7 @@ hcs_init_sprites_bitmaps_loop1
 hcs_init_sprites_bitmaps_loop2
   ADDF.W  (spr_pixel_per_datafetch/8)*2,a0 ;Header überspringen
   ADDF.W  (spr_pixel_per_datafetch/8)*2,a1
-  move.l  a4,a2              ;Zeiger auf Image-Daten holen
+  move.l  a4,a2              ;Zeiger auf Image-Daten 
   moveq   #hcs_image_y_size-1,d5   ;Anzahl der Zeilen
 hcs_init_sprites_bitmaps_loop3
   move.w  (a2),(a0)          ;Plane0 gerades Sprite
@@ -1778,7 +1788,7 @@ cl2_vp2_set_bitplane_pointers
   ADDF.W  cl2_extension5_entry+cl2_ext5_BPL1PTH+2,a0
   moveq   #extra_pf2_depth-1,d7 ;Anzahl der Bitplanes
 cl2_vp2_set_bitplane_pointers_loop1
-  move.l  (a2)+,d0           ;Bitplaneadresse holen
+  move.l  (a2)+,d0           ;Bitplaneadresse 
   add.l   d1,d0
   move.w  d0,4(a0)           ;BPLxPTL
   swap    d0                 ;High
@@ -1791,7 +1801,7 @@ cl2_vp2_set_bitplane_pointers_loop1
   move.l  extra_pf2(a3),a2   ;Zeiger auf erste Plane
   moveq   #extra_pf2_depth-1,d7 ;Anzahl der Bitplanes
 cl2_vp2_set_bitplane_pointers_loop2
-  move.l  (a2)+,d0           ;Bitplaneadresse holen
+  move.l  (a2)+,d0           ;Bitplaneadresse 
   add.l   d1,d0
   move.w  d0,4(a1)           ;BPLxPTL
   swap    d0                 ;High
@@ -1807,7 +1817,7 @@ scs_set_vert_compression
   moveq   #scs_roller_y_center,d4 ;Y-Mittelpunkt
   MOVEF.W (sine_table_length/4)*3,d5 ;270 Grad
   moveq   #cl2_extension6_SIZE,d6
-  lea     sine_table(pc),a0    ;Sinus-Tabelle
+  lea     sine_table(pc),a0    
   move.l  cl2_construction2(a3),a1
   ADDF.W  cl2_extension6_entry,a1 
   moveq   #extra_pf2_plane_width*extra_pf2_depth,d7
@@ -2214,7 +2224,7 @@ scs_no_vert_scroll
 hcs_calculate_last_plane_x_speed
   tst.w   hcs_calculate_last_plane_x_speed_state(a3) ;Berechnung an ?
   bne.s   hcs_no_calculate_last_plane_x_speed ;Nein -> verzweige
-  move.w  hcs_last_plane_x_speed_angle(a3),d2  ;X-Speed-Winkel holen
+  move.w  hcs_last_plane_x_speed_angle(a3),d2  ;X-Speed-Winkel 
   lea     sine_table(pc),a0
   move.l  (a0,d2.w*4),d0     ;cos(w)
   MULUF.L hcs_last_plane_x_speed_max*2*2,d0,d1 s'=(cos(w)*r)/2^15
@@ -2237,7 +2247,7 @@ hcs_no_calculate_last_plane_x_speed
 hcs_calculate_planes_x_step
   tst.w   hcs_calculate_planes_x_step_state(a3) ;Berechnung an ?
   bne.s   hcs_no_calculate_planes_x_step ;Nein -> verzweige
-  move.w  hcs_planes_x_step_angle(a3),d2 ;X-Step-Winkel holen
+  move.w  hcs_planes_x_step_angle(a3),d2 ;X-Step-Winkel 
   lea     sine_table(pc),a0
   move.l  (a0,d2.w*4),d0     ;cos(w)
   MULUF.L hcs_planes_x_step_max*2*2,d0,d1 ;s'=(cos(w)*r)/2^15
@@ -2281,7 +2291,7 @@ hcs_horiz_ballscrolling_loop1
 hcs_horiz_ballscrolling_loop2
   move.b  spr_pixel_per_datafetch/8(a0),d1 ;SPRxCTL Lowbyte lesen
   and.b   d2,d1              ;SH0,SH1,SH2-Bits löschen
-  move.w  (a5),d0            ;X-Koord. holen
+  move.w  (a5),d0            ;X-Koord. 
   add.w   d3,d0              ;X erhöhen
   IFEQ hcs_quick_x_max_restart
     and.w  d5,d0             ;Überlauf entfernen
@@ -2291,7 +2301,7 @@ hcs_horiz_ballscrolling_loop2
     sub.w   a4,d0            ;X zurücksetzen
 hcs_x_ok
   ENDC
-  move.w  d0,(a5)+           ;X retten
+  move.w  d0,(a5)+           
   lsl.w   #5,d0              ;%SH10 SH9 SH8 SH7 SH6 SH5 SH4 SH3 SH2 SH1 SH0 --- --- --- --- ---
   add.b   d0,d0              ;% SH1 SH0 --- --- --- --- --- ---
   addx.b  d4,d1              ;% --- --- --- --- --- SV8 EV8 SH2
@@ -2358,7 +2368,7 @@ sb232_get_y_coordinates
   move.w  d0,sb232_y_radius_angle(a3) ;Y-Radius-Winkel retten
   move.w  d4,d0
   addq.b  #sb232_y_angle_speed,d0 ;nächster Y-Winkel
-  move.w  d0,sb232_y_angle(a3) ;Y-Winkel retten
+  move.w  d0,sb232_y_angle(a3) 
   lea     sine_table(pc),a0  
   move.w  #sb232_y_center,a1
   move.l  cl2_construction2(a3),a5 
@@ -2570,7 +2580,7 @@ hsi_shrink_logo_x_size_loop2
 move_spaceship_left
   tst.w   msl_state(a3)      ;Bewegung nach links an ?
   bne.s   no_move_spaceship_left ;Nein -> verzweige
-  move.w  msl_x_angle(a3),d2 ;X-Winkel holen
+  move.w  msl_x_angle(a3),d2 ;X-Winkel
   lea     sine_table_512(pc),a0
   move.w  (a0,d2.w*2),d1     ;cos(w)
   muls.w  #ms_x_radius*4*2,d1 x'=(cos(w)*rx)/2^15
@@ -2580,7 +2590,7 @@ move_spaceship_left
   cmp.w   #sine_table_length2/2,d2 ;180 Grad erreicht ?
   bgt.s   msl_finished      ;Ja -> verzweige
 msl_save_x_angle
-  move.w  d2,msl_x_angle(a3) ;X-Winkel retten
+  move.w  d2,msl_x_angle(a3) 
   move.w  #display_window_HSTOP*4,d0
   sub.w   d1,d0              ;HSTART: X-Zentrierung
   MOVEF.W msl_spaceship_y_position,d1 ;VSTART
@@ -2621,7 +2631,7 @@ msl_copy_bitmaps
 move_spaceship_right
   tst.w   msr_state(a3)      ;Bewegung nach rechts an ?
   bne.s   no_move_spaceship_right ;Nein -> verzweige
-  move.w  msr_x_angle(a3),d2 ;X-Winkel holen
+  move.w  msr_x_angle(a3),d2 ;X-Winkel
   lea     sine_table_512(pc),a0
   move.w  (a0,d2.w*2),d1     ;cos(w)
   muls.w  #ms_x_radius*4*2,d1 x'=(cos(w)*rx)/2^15
@@ -2631,7 +2641,7 @@ move_spaceship_right
   cmp.w   #sine_table_length2/2,d2 ;180 Grad erreicht ?
   bgt.s   msr_finished       ;Ja -> verzweige
 msr_save_x_angle
-  move.w  d2,msr_x_angle(a3) ;X-Winkel retten
+  move.w  d2,msr_x_angle(a3) 
   move.w  #(display_window_HSTART-ms_image_x_size)*4,d0
   add.w   d1,d0              ;HSTOP: X-Zentrierung
   MOVEF.W msl_spaceship_y_position,d1 ;VSTART
@@ -2711,7 +2721,7 @@ radius_fader_in
   bgt.s   no_radius_fader_in ;Wenn > 0 -> verzweige
   moveq   #rfi_delay,d2
   move.w  d2,rfi_delay_counter(a3) ;Verzögerungszähler zurücksetzen
-  move.w  sb_variable_y_radius(a3),d0 ;Y-Radius holen
+  move.w  sb_variable_y_radius(a3),d0 ;Y-Radius 
   cmp.w   #rf_max_y_radius,d0 ;Maximalwert erreicht ?
   bge.s   rfi_finished       ;Ja -> verzweige
   addq.w  #rfi_speed,d0      ;Y-Radius erhöhen
@@ -2734,7 +2744,7 @@ radius_fader_out
   bgt.s   no_radius_fader_out ;Wenn > 0 -> verzweige
   moveq   #rfo_delay,d2
   move.w  d2,rfo_delay_counter(a3) ;Verzögerungszähler zurücksetzen
-  move.w  sb_variable_y_radius(a3),d0 ;Y-Radius holen
+  move.w  sb_variable_y_radius(a3),d0 ;Y-Radius 
   ble.s   rfo_finished       ;Wenn Minimalwert erreicht -> verzweige
   subq.w  #rfo_speed,d0      ;Y-Radius verringern
   move.w  d0,sb_variable_y_radius(a3) 
@@ -2753,16 +2763,16 @@ image_fader_in
   tst.w   ifi_state(a3)      ;Image-Fader-In an ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifi_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  ifi_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  ifi_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifi_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 ifi_save_fader_angle
-  move.w  d0,ifi_fader_angle(a3) ;Fader-Winkel retten
+  move.w  d0,ifi_fader_angle(a3) 
   MOVEF.W if_colors_number*3,d6 ;Zähler
-  lea     sine_table(pc),a0  ;Sinus-Tabelle
+  lea     sine_table(pc),a0  
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L ifi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
@@ -2792,16 +2802,16 @@ image_fader_out
   tst.w   ifo_state(a3)      ;Image-Fader-Out an ?
   bne.s   no_image_fader_out ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  ifo_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  ifo_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  ifo_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   ifo_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 ifo_save_fader_angle
-  move.w  d0,ifo_fader_angle(a3) ;Fader-Winkel retten
+  move.w  d0,ifo_fader_angle(a3) 
   MOVEF.W if_colors_number*3,d6 ;Zähler
-  lea     sine_table(pc),a0  ;Sinus-Tabelle
+  lea     sine_table(pc),a0  
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L ifo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
@@ -2837,16 +2847,16 @@ sprite_fader_in
   tst.w   sprfi_state(a3)    ;Sprite-Fader-In an ?
   bne.s   no_sprite_fader_in ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  sprfi_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  sprfi_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  sprfi_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   sprfi_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 sprfi_save_fader_angle
-  move.w  d0,sprfi_fader_angle(a3) ;Fader-Winkel retten
+  move.w  d0,sprfi_fader_angle(a3) 
   MOVEF.W sprf_colors_number*3,d6 ;Zähler
-  lea     sine_table(pc),a0  ;Sinus-Tabelle
+  lea     sine_table(pc),a0  
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L sprfi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
@@ -2876,16 +2886,16 @@ sprite_fader_out
   tst.w   sprfo_state(a3)    ;Sprite-Fader-Out an ?
   bne.s   no_sprite_fader_out ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  sprfo_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  sprfo_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  sprfo_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   sprfo_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 sprfo_save_fader_angle
-  move.w  d0,sprfo_fader_angle(a3) ;Fader-Winkel retten
+  move.w  d0,sprfo_fader_angle(a3) 
   MOVEF.W sprf_colors_number*3,d6 ;Zähler
-  lea     sine_table(pc),a0  ;Sinus-Tabelle
+  lea     sine_table(pc),a0  
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L sprfo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
@@ -2919,16 +2929,16 @@ bar_fader_in
   tst.w   bfi_state(a3)      ;Bar-Fader-In an ?
   bne.s   no_bar_fader_in    ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  bfi_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  bfi_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  bfi_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   bfi_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 bfi_save_fader_angle
-  move.w  d0,bfi_fader_angle(a3) ;Fader-Winkel retten
+  move.w  d0,bfi_fader_angle(a3) 
   MOVEF.W bf_colors_number*3,d6 ;Zähler
-  lea     sine_table(pc),a0  ;Sinus-Tabelle
+  lea     sine_table(pc),a0  
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L bfi_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
@@ -2958,16 +2968,16 @@ bar_fader_out
   tst.w   bfo_state(a3)      ;Bar-Fader-Out an ?
   bne.s   no_bar_fader_out   ;Nein -> verzweige
   movem.l a4-a6,-(a7)
-  move.w  bfo_fader_angle(a3),d2 ;Fader-Winkel holen
+  move.w  bfo_fader_angle(a3),d2 ;Fader-Winkel 
   move.w  d2,d0
   ADDF.W  bfo_fader_angle_speed,d0 ;nächster Fader-Winkel
   cmp.w   #sine_table_length/2,d0 ;Y-Winkel <= 180 Grad ?
   ble.s   bfo_save_fader_angle ;Ja -> verzweige
   MOVEF.W sine_table_length/2,d0 ;180 Grad
 bfo_save_fader_angle
-  move.w  d0,bfo_fader_angle(a3) ;Fader-Winkel retten
+  move.w  d0,bfo_fader_angle(a3) 
   MOVEF.W bf_colors_number*3,d6 ;Zähler
-  lea     sine_table(pc),a0  ;Sinus-Tabelle
+  lea     sine_table(pc),a0  
   move.l  (a0,d2.w*4),d0     ;sin(w)
   MULUF.L bfo_fader_radius*2,d0,d1 ;y'=(yr*sin(w))/2^15
   swap    d0
@@ -3024,7 +3034,7 @@ bf_no_convert_color_table
 ; ------------------------
   CNOP 0,4
 control_counters
-  move.w  scs_text_delay_counter(a3),d0 ;Zählerwert holen
+  move.w  scs_text_delay_counter(a3),d0 ;Zählerwert 
   bmi.s   scs_no_text_delay_counter ;Wenn negativ -> verzweige
   subq.w  #1,d0              ;Wert verringern
   bpl.s   scs_save_text_delay_counter ;Wenn positiv -> verzweige
@@ -3050,6 +3060,7 @@ mh_quit
   moveq   #FALSE,d1
   move.w  d1,pt_trigger_fx_state(a3) ;FX-Abfrage aus
   moveq   #TRUE,d0
+  move.w  d1,mh_start_ship_animation_state(a3) ;Ship-Animation deaktivieren
   tst.w   scs_state(a3)      ;Scrolltext aktiv ?
   beq.s   mh_quit_with_scrolltext ;Ja -> verzweige
 mh_quit_without_scrolltext
@@ -3083,18 +3094,16 @@ mh_quit_with_scrolltext
   rts
   CNOP 0,4
 mh_start_ship_animation
-  tst.w   bfi_state(a3)      ;Werden die Bars noch eingeblendet ?
-  beq.s   mh_no_start_ship_animation_left ;Ja -> verzweige
-  tst.w   pt_fade_out_music_state(a3) ;Wird Modul bereits ausgeblendet ?
-  beq.s   mh_no_start_ship_animation_left ;Ja -> verzweige
-  tst.w   msl_state(a3)      ;Ist die Animation nach links aktiv ?
-  beq.s   mh_no_start_ship_animation_left ;Ja -> verzweige
-  tst.w   msr_state(a3)      ;Ist die Animation nach rechts aktiv ?
-  beq.s   mh_no_start_ship_animation_left ;Ja -> verzweige
+  tst.w   mh_start_ship_animation_state(a3) ;Ship-Animation aktiv ?
+  bne.s   mh_no_start_ship_animation ;Nein -> verzweige
+  tst.w   msl_state(a3)      ;Ist die Animation nach links bereits aktiv ?
+  beq.s   mh_no_start_ship_animation ;Ja -> verzweige
+  tst.w   msr_state(a3)      ;Ist die Animation nach rechts noch aktiv ?
+  beq.s   mh_no_start_ship_animation ;Ja -> verzweige
   bsr     msl_copy_bitmaps
   clr.w   msl_state(a3)      ;Animation nach links starten
   move.w  #sine_table_length2/4,msl_x_angle(a3) ;X-Winkel auf 90 Grad zurücksetzen
-mh_no_start_ship_animation_left
+mh_no_start_ship_animation
   rts
 
 
@@ -3150,6 +3159,8 @@ pt_trigger_fx
   beq.s   pt_start_calculate_z_planes_step
   cmp.b   #$30,d0
   beq.s   pt_start_scrolltext
+  cmp.b   #$40,d0
+  beq.s   pt_enable_ship_animation
 pt_no_trigger_fx
   rts
   CNOP 0,4
@@ -3180,6 +3191,10 @@ pt_start_scrolltext
   moveq   #TRUE,d0
   move.w  d0,scs_state(a3)   ;Scrolltext an
   move.w  d0,scs_text_table_start(a3) ;Textanfang
+  rts
+  CNOP 0,4
+pt_enable_ship_animation
+  clr.w   mh_start_ship_animation_state(a3) ;Ship-Animation aktivieren
   rts
 
 ; ** CIA-B Timer B interrupt server **
