@@ -2022,17 +2022,17 @@ scs_check_control_codes
   beq.s   scs_start_sine_bars232
   cmp.b   #"²",d0
   beq.s   scs_start_sine_bars36
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_F,d0
   beq.s   scs_start_radius_fader_out
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_A,d0
   beq.s   scs_start_spaceship_animation
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_C,d0
   beq     scs_start_corkscrew
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_N,d0
   beq     scs_start_normal_scrolltext
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_P,d0
   beq     scs_pause_scrolltext
-  cmp.b   #"",d0
+  cmp.b   #ASCII_CTRL_S,d0
   beq     scs_stop_scrolltext
   rts
   CNOP 0,4
@@ -3456,13 +3456,13 @@ prg_version DC.B "$VER: RSE-CoolCorkscrew 1.2 (2.6.24)",TRUE
 ; ** Text für Laufschrift **
 ; --------------------------
 scs_text
-  DC.B "RESISTANCE PRESENTS A NEW INTRO CALLED          COOL¹             CORKSCREW           "
+  DC.B ASCII_CTRL_C,"RESISTANCE",ASCII_CTRL_P," PRESENTS A NEW INTRO CALLED          COOL¹   ",ASCII_CTRL_P,"          CORKSCREW ",ASCII_CTRL_P,ASCII_CTRL_F,"          "
 
-  DC.B "THIS IS OUR CONTRIBUTION TO DEADLINE 2024           "
+  DC.B "THIS IS OUR CONTRIBUTION TO ",ASCII_CTRL_A,"DEADLINE 2024           "
 
-  DC.B "PRESS RMB TO START SPACESHIP               "
+  DC.B "PRESS RMB TO START ",ASCII_CTRL_A,"SPACESHIP               "
 
-  DC.B "²GREETINGS FLY TO           "
+  DC.B ASCII_CTRL_C,"²GREETINGS ",ASCII_CTRL_A,"FLY TO           ",ASCII_CTRL_N
   DC.B "# DESIRE #         "
   DC.B "# EPHIDRENA #         "
   DC.B "# FOCUS DESIGN #         "
@@ -3471,19 +3471,19 @@ scs_text
   DC.B "# PLANET JAZZ #         "
   DC.B "# SOFTWARE FAILURE #         "
   DC.B "# TEK #         "
-  DC.B "# WANTED TEAM #           "
+  DC.B "# WANTED TEAM #",ASCII_CTRL_F,"           "
 
-  DC.B "¹THE CREDITS          "
+  DC.B ASCII_CTRL_C,"¹THE CREDITS          "
   DC.B "CODING AND MUSIC          "
-  DC.B "DISSIDENT           "
+  DC.B "DISSIDENT ",ASCII_CTRL_A,ASCII_CTRL_P,"          "
   DC.B "GRAPHICS          "
-  DC.B "  GRASS            "
+  DC.B "  GRASS   ",ASCII_CTRL_A,ASCII_CTRL_P,ASCII_CTRL_F,"         "
 
 scs_stop_text
   REPT ((scs_text_characters_number)/(scs_origin_character_x_size/scs_text_character_x_size))-2
     DC.B " "
   ENDR
-  DC.B " "
+  DC.B ASCII_CTRL_S," "
   EVEN
 
 
