@@ -3262,7 +3262,7 @@ spr_color_table
     DC.L COLOR00BITS
   ENDR
 vp2_spr_color_table
-  INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/64x32x16-Spaceship.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/64x32x16-Spaceship.ct"
 
 ; ** Adressen der Sprites **
 ; --------------------------
@@ -3338,13 +3338,13 @@ hcs_objects_x_coordinates
 ; **** Single-Corkscrew-Scroll ****
   CNOP 0,4
 scs_color_gradient_front
-  INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/2x32-Colorgradient-Blue.hlct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/2x32-Colorgradient-Blue.hlct"
 
 scs_color_gradient_back
-  INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/2x32-Colorgradient-Orchid.hlct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/2x32-Colorgradient-Orchid.hlct"
 
 scs_color_gradient_outline
-  INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/2x32-Colorgradient-Grey.hlct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/2x32-Colorgradient-Grey.hlct"
 
 ; ** Center-Bar **
   IFEQ scs_center_bar
@@ -3385,7 +3385,7 @@ sb36_yz_coordinates
 ; --------------------------------------
   CNOP 0,4
 ifi_color_table
-  INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/256x30x16-Resistance.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/256x30x16-Resistance.ct"
 
 ; ** Zielfarbwerte für Image-Fader-Out **
 ; ---------------------------------------
@@ -3399,7 +3399,7 @@ ifo_color_table
 ; ---------------------------------------
   CNOP 0,4
 sprfi_color_table
-  INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/16x15x16-3D-RSE.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/16x15x16-3D-RSE.ct"
 
 ; ** Zielfarbwerte für Sprite-Fader-Out **
 ; ----------------------------------------
@@ -3413,7 +3413,7 @@ sprfo_color_table
 ; ------------------------------------
   CNOP 0,4
 bfi_color_table
-  INCLUDE "Daten:Asm-Sources.AGA/CoolCorkscrew/colortables/5-Colorgradient-Orchid.ct"
+  INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/5-Colorgradient-Orchid.ct"
 
 ; ** Zielfarbwerte für Bar-Fader-Out **
 ; -------------------------------------                                           p
@@ -3493,12 +3493,12 @@ scs_stop_text
 ; **** PT-Replay ****
   IFEQ pt_split_module
 pt_auddata SECTION audio,DATA
-    INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/modules/mod.RetroDisco(remix).song"
+    INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/modules/mod.RetroDisco(remix).song"
 pt_audsmps SECTION audio2,DATA_C
-    INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/modules/mod.RetroDisco(remix).smps"
+    INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/modules/mod.RetroDisco(remix).smps"
   ELSE
 pt_auddata SECTION audio,DATA_C
-    INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/modules/mod.RetroDisco(remix)"
+    INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/modules/mod.RetroDisco(remix)"
   ENDC
 
 
@@ -3507,21 +3507,21 @@ pt_auddata SECTION audio,DATA_C
 
 ; **** Background-Image ****
 bg_image_data SECTION bg_gfx,DATA
-  INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/graphics/256x30x16-Resistance.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/graphics/256x30x16-Resistance.rawblit"
 
 ; **** Horiz-Charactersrolling ****
 hcs_image_data SECTION hcs_gfx,DATA
-  INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/graphics/16x15x16-3D-RSE.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/graphics/16x15x16-3D-RSE.rawblit"
 
 ; **** Single-Corkscrew-Scroll ****
 scs_image_data SECTION scs_gfx,DATA_C
-  INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/fonts/32x32x4-Font.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/fonts/32x32x4-Font.rawblit"
 
 ; **** Spaceship-Image ****
 msl_image_data SECTION msl_gfx,DATA
-  INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/graphics/64x32x16-Spaceship-Left.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/graphics/64x32x16-Spaceship-Left.rawblit"
 
 msr_image_data SECTION msr_gfx,DATA
-  INCBIN "Daten:Asm-Sources.AGA/CoolCorkscrew/graphics/64x32x16-Spaceship-Right.rawblit"
+  INCBIN "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/graphics/64x32x16-Spaceship-Right.rawblit"
 
   END
