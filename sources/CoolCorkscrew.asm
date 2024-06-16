@@ -151,17 +151,17 @@ pt_v3.0b
   IFD pt_v3.0b
     INCLUDE "music-tracker/pt3-equals.i"
   ENDC
-pt_ciatiming_enabled                 EQU TRUE
-pt_usedfx                            EQU %1111110101011010
-pt_usedefx                           EQU %0000110000000000
-pt_finetune_enabled                  EQU FALSE
+pt_ciatiming_enabled EQU TRUE
+pt_finetune_enabled  EQU FALSE
   IFD pt_v3.0b
-pt_metronome_enabled                 EQU FALSE
+pt_metronome_enabled EQU FALSE
   ENDC
 pt_track_volumes_enabled             EQU FALSE
 pt_track_periods_enabled             EQU FALSE
 pt_music_fader_enabled               EQU TRUE
 pt_split_module_enabled              EQU TRUE
+pt_usedfx                            EQU %1111110101011010
+pt_usedefx                           EQU %0000110000000000
 
 hcs_quick_x_max_restart              EQU FALSE
 
@@ -241,9 +241,6 @@ disk_memory_size                     EQU 0
 extra_memory_size                    EQU 0
 
 chip_memory_size                     EQU 0
-
-AGA_OS_Version                       EQU 39
-
   IFEQ pt_ciatiming_enabled
 CIABCRABITS                          EQU CIACRBF_LOAD
   ENDC
@@ -1097,7 +1094,7 @@ spr7_y_size2     EQU sprite7_SIZE/(spr_x_size2/8)
     INCLUDE "music-tracker/pt3-variables-offsets.i"
   ENDC
 
-pt_trigger_fx_enabled              RS.W 1
+pt_effects_handler_active               RS.W 1
 
 ; **** Horiz-Scaling-Image ****
 hsi_x_radius_angle                 RS.W 1
@@ -1114,7 +1111,7 @@ hcs_variable_planes_x_step         RS.W 1
 
 ; **** Single-Corkscrew-Scroll ****
 scs_image                          RS.L 1
-scs_enabled                         RS.W 1
+scs_enabled                        RS.W 1
 scs_text_table_start               RS.W 1
 scs_text_character_x_shift         RS.W 1
 scs_text_character_y_offset        RS.W 1
@@ -1224,7 +1221,7 @@ init_own_variables
   ENDC
 
   moveq   #0,d0
-  move.w  d0,pt_trigger_fx_enabled(a3)
+  move.w  d0,pt_effects_handler_active(a3)
 
 ; **** Horiz-Scaling-Image ****
   move.w  d0,hsi_x_radius_angle(a3) ;0 Grad
@@ -3066,7 +3063,7 @@ mouse_handler
   CNOP 0,4
 mh_quit
   moveq   #FALSE,d1
-  move.w  d1,pt_trigger_fx_enabled(a3) ;FX-Abfrage aus
+  move.w  d1,pt_effects_handler_active(a3) ;FX-Abfrage aus
   moveq   #0,d0
   move.w  d1,mh_start_ship_animation_active(a3) ;Ship-Animation deaktivieren
   tst.w   scs_enabled(a3)     ;Scrolltext aktiv ?
@@ -3148,18 +3145,18 @@ VERTB_int_server
 ; ** PT-replay routine **
 ; -----------------------
   IFD pt_v2.3a
-    PT2_REPLAY pt_trigger_fx
+    PT2_REPLAY pt_effects_handler
   ENDC
   IFD pt_v3.0b
-    PT3_REPLAY pt_trigger_fx
+    PT3_REPLAY pt_effects_handler
   ENDC
 
 ;--> 8xy "Not used/custom" <--
   CNOP 0,4
-pt_trigger_fx
-  tst.w   pt_trigger_fx_enabled(a3) ;Check enabled?
-  bne.s   pt_no_trigger_fx   ;No -> skip
-  move.b  n_cmdlo(a2),d0     ;Get command data x = Effekt y = TRUE/FALSE
+pt_effects_handler
+  tst.w   pt_effects_handler_active(a3) ;Fx-Handler an ?
+  bne.s   pt_no_trigger_fx   ;Nein -> verzweige
+  move.b  n_cmdlo(a2),d0     ;Command data x = Effekt y = TRUE/FALSE
   beq.s   pt_start_intro
   cmp.b   #$10,d0
   beq.s   pt_increase_x_radius_angle_step
