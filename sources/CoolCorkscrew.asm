@@ -103,22 +103,23 @@
 
 ; ** Library-Includes V.3.x nachladen **
 ; --------------------------------------
-  ;INCDIR  "OMA:include/"
   INCDIR "Daten:include3.5/"
-
-  INCLUDE "dos/dos.i"
-  INCLUDE "dos/dosextens.i"
-  INCLUDE "libraries/dos_lib.i"
 
   INCLUDE "exec/exec.i"
   INCLUDE "exec/exec_lib.i"
 
-  INCLUDE "graphics/GFXBase.i"
-  INCLUDE "graphics/videocontrol.i"
+  INCLUDE "dos/dos.i"
+  INCLUDE "dos/dos_lib.i"
+  INCLUDE "dos/dosextens.i"
+
+  INCLUDE "graphics/gfxbase.i"
   INCLUDE "graphics/graphics_lib.i"
+  INCLUDE "graphics/videocontrol.i"
 
   INCLUDE "intuition/intuition.i"
   INCLUDE "intuition/intuition_lib.i"
+
+  INCLUDE "libraries/any_lib.i"
 
   INCLUDE "resources/cia_lib.i"
 
@@ -3437,7 +3438,7 @@ bf_color_cache
 
 ; ** Programmversion für Version-Befehl **
 ; ----------------------------------------
-prg_version DC.B "$VER: RSE-CoolCorkscrew 1.2 (2.6.24)",TRUE
+program_version DC.B "$VER: RSE-CoolCorkscrew 1.2 (2.6.24)",TRUE
   EVEN
 
 ; **** Single-Corkscrew-Scroll ****
