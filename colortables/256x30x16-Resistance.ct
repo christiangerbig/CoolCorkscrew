@@ -1,5 +1,5 @@
 
-		dc.l	COLOR00BITS,$00711a67,$008d3777,$00aa5587
+		dc.l	color00_bits,$00711a67,$008d3777,$00aa5587
 		dc.l	$00c77397,$00e491a7,$00ebabb8,$00f3c5c9
 		dc.l	$00fbdfdb,$00e9c3d2,$00d6a7c9,$00c38bbf
 		dc.l	$00a874b2,$008e5da5,$00744698,$005a2f8b
