@@ -1194,7 +1194,7 @@ mh_start_ship_animation_active     RS.W 1
 fx_active                          RS.W 1
 quit_active                        RS.W 1
 
-variables_SIZE                     RS.B 0
+variables_size                     RS.B 0
 
 
 ; **** PT-Replay ****
@@ -1571,7 +1571,7 @@ init_first_copperlist
   bsr.s   cl1_init_playfield_registers
   bsr     cl1_init_sprite_pointers
   bsr     cl1_init_color_registers
-  COP_MOVE_QUICK TRUE,COPJMP2
+  COP_MOVEQ TRUE,COPJMP2
   bra     cl1_set_sprite_pointers
 
   COP_INIT_PLAYFIELD_REGISTERS cl1,NOBITPLANESSPR
@@ -1600,10 +1600,10 @@ init_second_copperlist
   bsr     cl2_vp1_init_color_registers
   bsr     cl2_vp1_init_bitplane_pointers
   COP_WAIT 0,vp1_VSTART
-  COP_MOVE_QUICK vp1_bplcon0_bits1,BPLCON0
+  COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
   bsr     cl2_init_bplcon1_registers
   COP_WAIT 0,vp1_VSTOP
-  COP_MOVE_QUICK vp1_bplcon0_bits2,BPLCON0
+  COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
 ; **** Vertical-Blank 2 ****
   bsr     cl2_vb2_init_BPLDAT_registers
 ; **** Viewport 2 ****
@@ -1611,11 +1611,11 @@ init_second_copperlist
   bsr     cl2_vp2_init_color_registers
   bsr     cl2_vp2_init_bitplane_pointers
   COP_WAIT 0,vp2_VSTART
-  COP_MOVE_QUICK vp2_bplcon0_bits1,BPLCON0
+  COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
   bsr     cl2_init_roller
 ; **** Copper-Interrupt ****
   bsr     cl2_init_copper_interrupt
-  COP_LIST_END
+  COP_LISTEND
   bsr     cl2_vp1_set_bitplane_pointers
   bsr     cl2_vp2_set_bitplane_pointers
   bsr     scs_set_vert_compression
@@ -1774,7 +1774,7 @@ patch_copperlist2
   bra.s   cl2_init_roller_skip
   CNOP 0,4
 no_patch_copperlist2
-  COP_MOVE_QUICK TRUE,NOOP
+  COP_MOVEQ TRUE,NOOP
 cl2_init_roller_skip
   add.l   d6,d0              ;nächste Zeile
   dbf     d7,cl2_init_roller_loop
@@ -1782,7 +1782,7 @@ cl2_init_roller_skip
   rts
 
 ; **** Copper-Interrupt ****
-  COP_INIT_COPPER_INTERRUPT cl2,cl2_HSTART,cl2_VSTART
+  COP_INIT_COPINT cl2,cl2_HSTART,cl2_VSTART
 
   CNOP 0,4
 cl2_vp2_set_bitplane_pointers
