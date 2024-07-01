@@ -1928,7 +1928,7 @@ scs_horiz_scrolltext
   add.w   d3,d1              ;+ Y-Offset
   add.l   (a0),d1            ;+ Playfieldadresse
   move.w  #DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6) ;BLTPRI an
-  WAIT_BLITTER
+  WAITBLIT
   move.l  #(BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16,BLTCON0-DMACONR(a6) ;Minterm D=A
   moveq   #FALSE,d5
   move.l  d5,BLTAFWM-DMACONR(a6) ;Ausmaskierung
@@ -1936,7 +1936,7 @@ scs_horiz_scrolltext
   move.l  d1,BLTDPT-DMACONR(a6) ;Playfield
   move.l  #((scs_image_plane_width-scs_text_character_width)<<16)+(extra_pf2_plane_width-scs_text_character_width),BLTAMOD-DMACONR(a6) ;A-Mod + D-Mod
   move.w  #((scs_text_character_y_size/2)*scs_text_character_depth*64)+(scs_text_character_x_size/16),BLTSIZE-DMACONR(a6) ;Blitter starten
-  WAIT_BLITTER
+  WAITBLIT
   cmp.w   #(scs_vert_scroll_window_y_size-(scs_text_character_y_size/2))*extra_pf2_plane_width*extra_pf2_depth,d3 ;Befindet sich der Buchstabe außerhalb des Playfieldes ?
   blt.s   scs_normal_blit    ;Nein -> verzweige
   moveq   #scs_text_character_x_restart/8,d1
@@ -2069,7 +2069,7 @@ scs_horiz_scroll
   move.l  extra_pf2(a3),a0
   move.l  (a0),a0
   add.l   #(scs_text_x_position/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ;Zielbild 48 Pixel später beginnen
-  WAIT_BLITTER
+  WAITBLIT
   move.l  #((-scs_horiz_scroll_speed<<12)+BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16,BLTCON0-DMACONR(a6) ;Minterm D=A
   moveq   #FALSE,d0
   move.l  d0,BLTAFWM-DMACONR(a6) ;keine Ausmaskierung
@@ -2134,7 +2134,7 @@ scs_vert_scroll
 
 ; ** vertikaler Umlaufeffekt für die Laufschrift **
   move.w  #DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6) ;BLTPRI an
-  WAIT_BLITTER
+  WAITBLIT
   move.w  #BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC,BLTCON0-DMACONR(a6) ;Minterm D=A
   move.l  a0,BLTAPT-DMACONR(a6) ;Quelle
   move.l  a1,BLTDPT-DMACONR(a6) ;Ziel
@@ -2149,7 +2149,7 @@ scs_vert_scroll
   MULUF.W extra_pf2_plane_width*extra_pf2_depth,d0,d1
   lea     (vp2_pf_pixel_per_datafetch/8)(a2,d0.w),a0 ;Zweite oder dritte Zeile, 64 Pixel späterbeginnen
   lea     (vp2_pf_pixel_per_datafetch/8)(a2),a1 ;Erste Zeile, 64 Pixel späterbeginnen
-  WAIT_BLITTER
+  WAITBLIT
   move.w  #DMAF_BLITHOG,DMACON-DMACONR(a6) ;BLTPRI aus
   move.l  a0,BLTAPT-DMACONR(a6) ;Quelle
   move.l  a1,BLTDPT-DMACONR(a6) ;Ziel
@@ -2269,7 +2269,7 @@ scs_character_vert_scroll
   lea     ((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_vert_scroll_window_y_size*extra_pf2_plane_width*extra_pf2_depth)(a2),a1 ;Letzte Zeile rechter Rand abzüglich 64 Pixel
 ; ** vertikaler Umlaufeffekt für Zeichen **
   move.w  #DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6) ;BLTPRI an
-  WAIT_BLITTER
+  WAITBLIT
   move.w  #BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC,BLTCON0-DMACONR(a6) ;Minterm D=A
   move.l  a0,BLTAPT-DMACONR(a6) ;Quelle
   move.l  a1,BLTDPT-DMACONR(a6) ;Ziel
@@ -2280,7 +2280,7 @@ scs_character_vert_scroll
 ; ** Buchstaben vertikal bewegen **
   lea     ((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_text_character_vert_scroll_speed*extra_pf2_plane_width*extra_pf2_depth)(a2),a0 ;Zweite Zeile, rechter Rand abzüglich 64 Pixel
   lea     (extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8(a2),a1 ;Erste, Zeile rechter Rand abzüglich 64 Pixel
-  WAIT_BLITTER
+  WAITBLIT
   move.w  #DMAF_BLITHOG,DMACON-DMACONR(a6) ;BLTPRI aus
   move.l  a0,BLTAPT-DMACONR(a6) ;Quelle
   move.l  a1,BLTDPT-DMACONR(a6) ;Ziel
