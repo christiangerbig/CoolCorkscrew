@@ -135,9 +135,9 @@
 ; ** Konstanten **
   INCLUDE "equals.i"
 
-requires_68030                       EQU FALSE  
-requires_68040                       EQU FALSE
-requires_68060                       EQU FALSE
+requires_030_cpu                     EQU FALSE  
+requires_040_cpu                     EQU FALSE
+requires_060_cpu                     EQU FALSE
 requires_fast_memory                 EQU FALSE
 requires_multiscan_monitor           EQU FALSE
 
@@ -272,10 +272,10 @@ MINROW                               EQU VSTART_256_LINES
 
 display_window_hstart                EQU HSTART_320_PIXEL
 display_window_vstart                EQU MINROW
-diwstrt_bits                         EQU ((display_window_VSTART&$ff)*DIWSTRTF_V0)+(display_window_HSTART&$ff)
+diwstrt_bits                         EQU ((display_window_vstart&$ff)*DIWSTRTF_V0)+(display_window_hstart&$ff)
 display_window_hstop                 EQU HSTOP_320_pixel
 display_window_vstop                 EQU VSTOP_256_lines
-diwstop_bits                         EQU ((display_window_VSTOP&$ff)*DIWSTOPF_V0)+(display_window_HSTOP&$ff)
+diwstop_bits                         EQU ((display_window_vstop&$ff)*DIWSTOPF_V0)+(display_window_hstop&$ff)
 
 spr_pixel_per_datafetch              EQU 64 ;4x
 
@@ -339,14 +339,14 @@ bplcon0_bits                         EQU BPLCON0F_ECSENA+((pf_depth>>3)*BPLCON0F
 bplcon3_bits1                        EQU BPLCON3F_SPRES0
 bplcon3_bits2                        EQU bplcon3_bits1+BPLCON3F_LOCT
 bplcon4_bits                         EQU (BPLCON4F_OSPRM4*spr_odd_color_table_select)+(BPLCON4F_ESPRM4*spr_even_color_table_select)
-diwhigh_bits                         EQU (((display_window_HSTOP&$100)>>8)*DIWHIGHF_HSTOP8)+(((display_window_VSTOP&$700)>>8)*DIWHIGHF_VSTOP8)+(((display_window_HSTART&$100)>>8)*DIWHIGHF_HSTART8)+((display_window_VSTART&$700)>>8)
+diwhigh_bits                         EQU (((display_window_hstop&$100)>>8)*DIWHIGHF_HSTOP8)+(((display_window_vstop&$700)>>8)*DIWHIGHF_VSTOP8)+(((display_window_hstart&$100)>>8)*DIWHIGHF_HSTART8)+((display_window_vstart&$700)>>8)
 fmode_bits                           EQU FMODEF_SPR32+FMODEF_SPAGEM
 color00_bits                         EQU $0e111d
 color00_high_bits                    EQU $011
 color00_low_bits                     EQU $e1d
 ; **** Viewport 1 ****
 vp1_bplcon0_bits1                    EQU BPLCON0F_ECSENA+((extra_pf1_depth>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+((extra_pf1_depth&$07)*BPLCON0F_BPU0) 
-vp1_bplcon0_bits2                    EQU BPLCON0F_ECSENA+BPLCON0F_COLOR ;blank
+vp1_bplcon0_bits2                    EQU BPLCON0F_ECSENA+BPLCON0F_COLOR
 vp1_bplcon1_bits                     EQU 0
 vp1_bplcon2_bits                     EQU 0
 vp1_bplcon3_bits1                    EQU bplcon3_bits1
@@ -355,8 +355,8 @@ vp1_bplcon4_bits                     EQU bplcon4_bits
 vp1_fmode_bits                       EQU fmode_bits+FMODEF_BPL32+FMODEF_BPAGEM
 vp1_color00_bits                     EQU color00_bits
 ; **** Viewport 2 ****
-vp2_bplcon0_bits1                    EQU BPLCON0F_ECSENA+(((extra_pf2_depth*2)>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+BPLCON0F_DPF+(((extra_pf2_depth*2)&$07)*BPLCON0F_BPU0) , dual playfield
-vp2_bplcon0_bits2                    EQU BPLCON0F_ECSENA+BPLCON0F_COLOR ;blank
+vp2_bplcon0_bits1                    EQU BPLCON0F_ECSENA+(((extra_pf2_depth*2)>>3)*BPLCON0F_BPU3)+(BPLCON0F_COLOR)+BPLCON0F_DPF+(((extra_pf2_depth*2)&$07)*BPLCON0F_BPU0)
+vp2_bplcon0_bits2                    EQU BPLCON0F_ECSENA+BPLCON0F_COLOR
 vp2_bplcon1_bits                     EQU 0
 vp2_bplcon2_bits                     EQU BPLCON2F_PF2P2
 vp2_bplcon3_bits1                    EQU bplcon3_bits1+BPLCON3F_PF2OF1
@@ -369,13 +369,13 @@ cl2_display_x_size                   EQU 320
 cl2_display_width                    EQU cl2_display_x_size/8
 cl2_display_y_size                   EQU vp1_visible_lines_number
 ; **** Vertical Blank  1 ****
-cl2_vb1_hstart                       EQU display_window_HSTART-(1*CMOVE_SLOT_PERIOD)
+cl2_vb1_hstart                       EQU display_window_hstart-(1*CMOVE_SLOT_PERIOD)
 cl2_vb1_vstart                       EQU vb1_VSTART
 ; **** Viewport 1 ****
-cl2_vp1_hstart                       EQU display_window_HSTART+(1*CMOVE_SLOT_PERIOD)
+cl2_vp1_hstart                       EQU display_window_hstart+(1*CMOVE_SLOT_PERIOD)
 cl2_vp1_vstart                       EQU vp1_VSTART
 ; **** Vertical-Blank 2 ****
-cl2_vb2_hstart                       EQU display_window_HSTART-(1*CMOVE_SLOT_PERIOD)
+cl2_vb2_hstart                       EQU display_window_hstart-(1*CMOVE_SLOT_PERIOD)
 cl2_vb2_vstart                       EQU vb2_VSTART
 ; **** Viewport 2 ****
 cl2_vp2_hstart                       EQU $00
@@ -419,10 +419,10 @@ hcs_random_x_max                     EQU (512*4)-1
 hcs_x_min                            EQU 0
 hcs_x_max                            EQU hcs_random_x_max
   ELSE
-hcs_random_x_max                     EQU (display_window_HSTOP-display_window_HSTART)*4
-hcs_x_min                            EQU (display_window_HSTART-hcs_image_x_size)*4
-hcs_x_max                            EQU display_window_HSTOP*4
-hcs_sprite_x_restart                 EQU ((display_window_HSTOP-display_window_HSTART)+hcs_image_x_size)*4
+hcs_random_x_max                     EQU (display_window_hstop-display_window_hstart)*4
+hcs_x_min                            EQU (display_window_hstart-hcs_image_x_size)*4
+hcs_x_max                            EQU display_window_hstop*4
+hcs_sprite_x_restart                 EQU ((display_window_hstop-display_window_hstart)+hcs_image_x_size)*4
   ENDC
 
 hcs_planes_number                    EQU 3
@@ -1423,7 +1423,7 @@ hcs_init_xy_coordinates_loop1
   move.w  VHPOSR-DMACONR(a6),d5    ;f(x)
   move.l  (a2)+,a0           ;1. Sprite-Struktur
   move.l  (a2)+,a1           ;2. Sprite-Struktur
-  move.w  #display_window_VSTART,a4 ;1. Y-Koordinate
+  move.w  #display_window_vstart,a4 ;1. Y-Koordinate
   moveq   #hcs_objects_per_sprite_number-1,d6 ;Anzahl der Sterne pro Sprite
 hcs_init_xy_coordinates_loop2
   mulu.w  VHPOSR-DMACONR(a6),d5    ;f(x)*a
@@ -2521,7 +2521,7 @@ move_spaceship_left
   bgt.s   msl_finished      ;Ja -> verzweige
 msl_save_x_angle
   move.w  d2,msl_x_angle(a3) 
-  move.w  #display_window_HSTOP*4,d0
+  move.w  #display_window_hstop*4,d0
   sub.w   d1,d0              ;HSTART: X-Zentrierung
   MOVEF.W msl_spaceship_y_position,d1 ;VSTART
   moveq   #ms_image_y_size,d2 ;Höhe
@@ -2570,7 +2570,7 @@ move_spaceship_right
   bgt.s   msr_finished       ;Ja -> verzweige
 msr_save_x_angle
   move.w  d2,msr_x_angle(a3) 
-  move.w  #(display_window_HSTART-ms_image_x_size)*4,d0
+  move.w  #(display_window_hstart-ms_image_x_size)*4,d0
   add.w   d1,d0              ;HSTOP: X-Zentrierung
   MOVEF.W msl_spaceship_y_position,d1 ;VSTART
   moveq   #ms_image_y_size,d2 ;Höhe
