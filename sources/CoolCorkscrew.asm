@@ -1953,8 +1953,7 @@ scs_check_control_codes
   rts
   CNOP 0,4
 scs_start_sine_bars232
-  moveq   #FALSE,d0
-  move.w  d0,sb36_active(a3) ;Sine-Bars 3.6 aus
+  move.w  #FALSE,sb36_active(a3) ;Sine-Bars 3.6 aus
   moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
   move.w  d0,sb232_y_angle(a3) ;Y-Winkel auf 0 Grad zurücksetzen
   move.w  d0,sb232_active(a3) ;Sine-Bars 2.3.2 an
@@ -1964,8 +1963,7 @@ scs_start_sine_bars232
   rts
   CNOP 0,4
 scs_start_sine_bars36
-  moveq   #FALSE,d0
-  move.w  d0,sb232_active(a3) ;Sine-Bars 2.3.2 aus
+  move.w  #FALSE,sb232_active(a3) ;Sine-Bars 2.3.2 aus
   moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
   move.w  d0,sb36_y_angle(a3) ;Y-Winkel auf 0 Grad zurücksetzen
   move.w  d0,sb36_active(a3) ;Sine-Bars 3.6 an
@@ -2005,16 +2003,14 @@ scs_start_normal_scrolltext
   rts
   CNOP 0,4
 scs_pause_scrolltext
-  moveq   #FALSE,d0
-  move.w  d0,scs_text_move_active(a3) ;Text pausieren
+  move.w  #FALSE,scs_text_move_active(a3) ;Text pausieren
   MOVEF.W scs_text_delay,d2
   move.w  d2,scs_text_delay_counter(a3) ;Delay-Counter starten
   moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
   rts
   CNOP 0,4
 scs_stop_scrolltext
-  moveq   #FALSE,d0
-  move.w  d0,scs_enabled(a3)  ;Text stoppen
+  move.w  #FALSE,scs_enabled(a3)  ;Text stoppen
   moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
   tst.w   quit_active(a3)    ;Soll Intro beendet werden?
   bne.s   scs_normal_stop_scrolltext ;Nein -> verzweige
@@ -2147,8 +2143,7 @@ hcs_calculate_plane_x_speed
   addq.w  #hcs_last_plane_x_speed_angle_speed,d2 ;nächster Winkel
   cmp.w   #sine_table_length/2,d2 ;180 Grad erreicht ?
   ble.s   hcs_proceed_calculate_last_plane_x_speed ;Ja -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,hcs_calculate_plane_x_speed_active(a3) ;Berechnung aus
+  move.w  #FALSE,hcs_calculate_plane_x_speed_active(a3) ;Berechnung aus
 hcs_proceed_calculate_last_plane_x_speed
   move.w  d2,hcs_last_plane_x_speed_angle(a3) ;X-Speed-Winkel retten
 hcs_no_calculate_last_plane_x_speed
@@ -2169,8 +2164,7 @@ hcs_calculate_planes_x_step
   addq.w  #hcs_planes_x_step_angle_speed,d2 ;nächster Winkel
   cmp.w   #sine_table_length/2,d2 ;180 Grad erreicht ?
   ble.s   hcs_proceed_calculate_planes_x_step ;Ja -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,hcs_calculate_planes_x_step_active(a3) ;Berechnung aus
+  move.w  #FALSE,hcs_calculate_planes_x_step_active(a3) ;Berechnung aus
 hcs_proceed_calculate_planes_x_step
   move.w  d2,hcs_planes_x_step_angle(a3) ;X-Step-Winkel retten
 hcs_no_calculate_planes_x_step
@@ -2515,8 +2509,7 @@ no_move_spaceship_left
   rts
   CNOP 0,4
 msl_finished
-  moveq   #FALSE,d0
-  move.w  d0,msl_active(a3)  ;Bewegung nach links aus
+  move.w  #FALSE,msl_active(a3)  ;Bewegung nach links aus
   bsr     msr_copy_bitmaps
   clr.w   msr_active(a3)     ;Bewegung nach rechts an
   move.w  #sine_table_length2/4,msr_x_angle(a3) ;X-Winkel auf 180 Grad zurücksetzen
@@ -2564,8 +2557,7 @@ no_move_spaceship_right
   rts
   CNOP 0,4
 msr_finished
-  moveq   #FALSE,d0
-  move.w  d0,msr_active(a3)  ;Bewegung nach rechts aus
+  move.w  #FALSE,msr_active(a3)  ;Bewegung nach rechts aus
   rts
 
 ; ** Spaceship-Grafik kopieren **
@@ -2630,8 +2622,7 @@ no_radius_fader_in
   rts
   CNOP 0,4
 rfi_finished
-  moveq   #FALSE,d0
-  move.w  d0,rfi_active(a3)  ;Radius-Fader-In aus
+  move.w  #FALSE,rfi_active(a3)  ;Radius-Fader-In aus
   rts
 
 ; ** Radius-Fader-Out **
@@ -2651,8 +2642,7 @@ no_radius_fader_out
   rts
   CNOP 0,4
 rfo_finished
-  moveq   #FALSE,d0
-  move.w  d0,rfo_active(a3)  ;Berechnung aus
+  move.w  #FALSE,rfo_active(a3)  ;Berechnung aus
   rts
 
 ; ** Logo einblenden **
@@ -2688,8 +2678,7 @@ ifi_save_fader_angle
   movem.l (a7)+,a4-a6
   move.w  d6,if_colors_counter(a3) ;Image-Fader-In fertig ?
   bne.s   no_image_fader_in  ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,ifi_active(a3)  ;Image-Fader-In aus
+  move.w  #FALSE,ifi_active(a3)  ;Image-Fader-In aus
 no_image_fader_in
   rts
 
@@ -2726,8 +2715,7 @@ ifo_save_fader_angle
   movem.l (a7)+,a4-a6
   move.w  d6,if_colors_counter(a3) ;Image-Fader-Out fertig ?
   bne.s   no_image_fader_out ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,ifo_active(a3)  ;Image-Fader-Out aus
+  move.w  #FALSE,ifo_active(a3)  ;Image-Fader-Out aus
 no_image_fader_out
   rts
 
@@ -2768,8 +2756,7 @@ sprfi_save_fader_angle
   movem.l (a7)+,a4-a6
   move.w  d6,sprf_colors_counter(a3) ;Image-Fader-In fertig ?
   bne.s   no_sprite_fader_in  ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,sprfi_active(a3) ;Sprite-Fader-In aus
+  move.w  #FALSE,sprfi_active(a3) ;Sprite-Fader-In aus
 no_sprite_fader_in
   rts
 
@@ -2806,8 +2793,7 @@ sprfo_save_fader_angle
   movem.l (a7)+,a4-a6
   move.w  d6,sprf_colors_counter(a3) ;Image-Fader-Out fertig ?
   bne.s   no_sprite_fader_out ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,sprfo_active(a3) ;Sprite-Fader-Out aus
+  move.w  #FALSE,sprfo_active(a3) ;Sprite-Fader-Out aus
 no_sprite_fader_out
   rts
 
@@ -2846,8 +2832,7 @@ bfi_save_fader_angle
   movem.l (a7)+,a4-a6
   move.w  d6,bf_colors_counter(a3) ;Image-Fader-In fertig ?
   bne.s   no_bar_fader_in  ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,bfi_active(a3)  ;Bar-Fader-In aus
+  move.w  #FALSE,bfi_active(a3)  ;Bar-Fader-In aus
 no_bar_fader_in
   rts
 
@@ -2884,8 +2869,7 @@ bfo_save_fader_angle
   movem.l (a7)+,a4-a6
   move.w  d6,bf_colors_counter(a3) ;Image-Fader-Out fertig ?
   bne.s   no_bar_fader_out   ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,bfo_active(a3)  ;Bar-Fader-Out aus
+  move.w  #FALSE,bfo_active(a3)  ;Bar-Fader-Out aus
 no_bar_fader_out
   rts
 
@@ -2912,8 +2896,7 @@ bf_convert_colors_loop
   dbf     d7,bf_convert_colors_loop
   tst.w   bf_colors_counter(a3) ;Fading beendet ?
   bne.s   bf_no_convert_colors ;Nein -> verzweige
-  moveq   #FALSE,d0
-  move.w  d0,bf_convert_colors_active(a3) ;Konvertieren beendet
+  move.w  #FALSE,bf_convert_colors_active(a3) ;Konvertieren beendet
 bf_no_convert_colors
   rts
 
