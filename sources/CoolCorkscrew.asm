@@ -1,8 +1,8 @@
 ; ###############################
 ; # Programm: CoolCorkscrew.asm #
 ; # Autor:    Christian Gerbig  #
-; # Datum:    02.06.2024        #
-; # Version:  1.2               #
+; # Datum:    31.08.2024        #
+; # Version:  1.4               #
 ; # CPU:      68020+            #
 ; # FASTMEM:  -                 #
 ; # Chipset:  AGA               #
@@ -83,8 +83,9 @@
 ; - Neuer 8xy-Befehl: Ship-Animation wird jetzt seaparat über den 840-Befehl
 ;   aktiviert
 
-;V.1.4
+; V.1.4
 ; - überarbeitetete Include-Files integriert
+; - mit leicht überarbeitetem Code
 
 
 ; PT 8xy-Befehl
@@ -147,7 +148,7 @@ requires_fast_memory                 EQU FALSE
 requires_multiscan_monitor           EQU FALSE
 
 workbench_start_enabled              EQU TRUE
-workbench_fade_enabled               EQU TRUE
+screen_fader_enabled               EQU TRUE
 text_output_enabled                  EQU FALSE
 
   IFD PROTRACKER_VERSION_2.3A 
@@ -215,7 +216,7 @@ pf2_colors_number                    EQU 0
 pf_colors_number                     EQU pf1_colors_number+pf2_colors_number
 pf_depth                             EQU pf1_depth3+pf2_depth3
 
-extra_pf_number                      EQU 2
+pf_extra_number                      EQU 2
 extra_pf1_x_size                     EQU 320
 extra_pf1_y_size                     EQU 30
 extra_pf1_depth                      EQU 4
@@ -605,10 +606,10 @@ extra_pf2_2_bitplane_y_offset        EQU vp2_visible_lines_number-1
   INCLUDE "except-vectors-offsets.i"
 
 
-  INCLUDE "extra-pf-attributes-structure.i"
+  INCLUDE "extra-pf-attributes.i"
 
 
-  INCLUDE "sprite-attributes-structure.i"
+  INCLUDE "sprite-attributes.i"
 
 
   RSRESET
@@ -1161,10 +1162,10 @@ variables_size                     RS.B 0
 
 ; **** PT-Replay ****
 ; ** PT-Song-Structure **
-  INCLUDE "music-tracker/pt-song-structure.i"
+  INCLUDE "music-tracker/pt-song.i"
 
 ; ** Temporary channel structure **
-  INCLUDE "music-tracker/pt-temp-channel-structure.i"
+  INCLUDE "music-tracker/pt-temp-channel.i"
 
 
   INCLUDE "sys-wrapper.i"
@@ -1323,7 +1324,7 @@ init_all
 
   IFEQ pt_finetune_enabled
 ; ** FineTuning-Offset-Tabelle initialisieren **
-    PT_INIT_FINETUNING_PERIOD_TABLE_STARTS
+    PT_INIT_FINETUNE_TABLE_STARTS
   ENDC
 
 ; **** Background-Image ****
@@ -1818,7 +1819,7 @@ scs_set_pipe_loop
     moveq   #scs_pipe_shift_x_center,d1
     sub.w   d0,d1              ;X-Mittelpunkt - x'
     add.w   d2,d0              ;X-Mittelpunkt + x'
-    SEPARATE_PLAYFIELD_SOFTSCROLL_64PIXEL_LORES d1,d0,d3
+    DUALPF_SOFTSCROLL_64PIXEL_LORES d1,d0,d3
     move.w  d1,(a1)            ;BPLCON1
     add.l   a2,a1              ;nächste Zeile in CL
     dbf     d7,scs_set_pipe_loop
@@ -2457,7 +2458,7 @@ hsi_shrink_logo_x_size
   lea     hsi_BPLCON1_table(pc),a0 ;Tabelle mit Shiftwerten
   move.l  cl2_construction2(a3),a1
   move.w  (a0)+,d0
-  BITPLANE_SOFTSCROLL_64PIXEL_LORES d0,d1,d2
+  PF_SOFTSCROLL_64PIXEL_LORES d0,d1,d2
   move.w  d0,cl2_extension2_entry+cl2_ext2_BPLCON1+2(a1) ;BPLCON1
   ADDF.W  cl2_extension3_entry+cl2_ext3_BPLCON1_1+2,a1 
   moveq   #hsi_lines_number-1,d7 ;Anzahl der Zeilen
@@ -2465,7 +2466,7 @@ hsi_shrink_logo_x_size_loop1
   moveq   #cl2_display_width-1,d6 ;Anzahl der Spalten
 hsi_shrink_logo_x_size_loop2
   move.w  (a0)+,d0           ;Shiftwert lesen
-  BITPLANE_SOFTSCROLL_64PIXEL_LORES d0,d1,d2
+  PF_SOFTSCROLL_64PIXEL_LORES d0,d1,d2
   move.w  d0,(a1)            ;BPLCON1
   addq.w  #4,a1
   dbf     d6,hsi_shrink_logo_x_size_loop2
@@ -3289,7 +3290,7 @@ scs_stop_text
   EVEN
 
 
-  DC.B "$VER: RSE-CoolCorkscrew 1.2 (2.6.24)",0
+  DC.B "$VER: RSE-CoolCorkscrew 1.4 (31.8.24)",0
   EVEN
 
 
