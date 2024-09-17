@@ -1335,7 +1335,7 @@ init_all
 ; ** Tabelle mit Shiftwerten initialisieren **
   CNOP 0,4
 hsi_init_shift_table
-  moveq   #0,d0           ;1. Shiftwert
+  moveq   #0,d0              ;1. Shiftwert
   lea     hsi_shift_table(pc),a0 ;Zeiger auf Tabelle mit Shiftwerten
   moveq   #hsi_shift_values_number-1,d7 ;Anzahl der Einträge
 hsi_init_shift_table_loop
@@ -1955,7 +1955,7 @@ scs_check_control_codes
   CNOP 0,4
 scs_start_sine_bars232
   move.w  #FALSE,sb36_active(a3) ;Sine-Bars 3.6 aus
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   move.w  d0,sb232_y_angle(a3) ;Y-Winkel auf 0 Grad zurücksetzen
   move.w  d0,sb232_active(a3) ;Sine-Bars 2.3.2 an
   move.w  d0,rfi_active(a3)  ;Radius-Fader-In an
@@ -1965,7 +1965,7 @@ scs_start_sine_bars232
   CNOP 0,4
 scs_start_sine_bars36
   move.w  #FALSE,sb232_active(a3) ;Sine-Bars 2.3.2 aus
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   move.w  d0,sb36_y_angle(a3) ;Y-Winkel auf 0 Grad zurücksetzen
   move.w  d0,sb36_active(a3) ;Sine-Bars 3.6 an
   move.w  d0,rfi_active(a3)  ;Radius-Fader-In an
@@ -1974,7 +1974,7 @@ scs_start_sine_bars36
   rts
   CNOP 0,4
 scs_start_radius_fader_out
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   move.w  d0,rfo_active(a3)  ;Radius-Fader-Out an
   moveq   #1,d2
   move.w  d2,rfo_delay_counter(a3) ;Verzögerungszähler aktivieren
@@ -1986,7 +1986,7 @@ scs_start_spaceship_animation
   move.w  #sine_table_length2/2,msr_x_angle(a3) ;180 Grad
 scs_no_stop_move_spaceship_right
   bsr     msl_copy_bitmaps
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   move.w  d0,msl_active(a3)  ;Animation nach links starten
   move.w  #sine_table_length2/4,msl_x_angle(a3) ;X-Winkel auf 90 Grad zurücksetzen
   rts
@@ -1994,29 +1994,29 @@ scs_no_stop_move_spaceship_right
 scs_start_corkscrew
   moveq   #scs_vert_scroll_speed1,d2
   move.w  d2,scs_variable_vert_scroll_speed(a3) ;Vertikale Geschwindigkeit setzen
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   rts
   CNOP 0,4
 scs_start_normal_scrolltext
   moveq   #scs_vert_scroll_speed2,d2
   move.w  d2,scs_variable_vert_scroll_speed(a3) ;Vertikale Geschwindigkeit setzen
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   rts
   CNOP 0,4
 scs_pause_scrolltext
   move.w  #FALSE,scs_text_move_active(a3) ;Text pausieren
   MOVEF.W scs_text_delay,d2
   move.w  d2,scs_text_delay_counter(a3) ;Delay-Counter starten
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   rts
   CNOP 0,4
 scs_stop_scrolltext
   move.w  #FALSE,scs_enabled(a3)  ;Text stoppen
-  moveq   #0,d0           ;Rückgabewert TRUE = Steuerungscode gefunden
+  moveq   #TRUE,d0           ;Steuerungscode gefunden
   tst.w   quit_active(a3)    ;Soll Intro beendet werden?
   bne.s   scs_normal_stop_scrolltext ;Nein -> verzweige
 scs_quit_and_stop_scrolltext
-  move.w  d0,pt_fade_out_music_active(a3) ;Musik ausfaden
+  move.w  d0,pt_music_fader_active(a3) ;Musik ausfaden
   move.w  #if_colors_number*3,if_colors_counter(a3)
   move.w  d0,ifo_active(a3)  ;Image-Fader-Out an
   move.w  d0,if_copy_colors_active(a3) ;Kopieren der Farben an
@@ -2927,12 +2927,12 @@ mouse_handler
 mh_quit
   moveq   #FALSE,d1
   move.w  d1,pt_effects_handler_active(a3) ;FX-Abfrage aus
-  moveq   #0,d0
+  moveq   #TRUE,d0
   move.w  d1,mh_start_ship_animation_active(a3) ;Ship-Animation deaktivieren
   tst.w   scs_enabled(a3)     ;Scrolltext aktiv ?
   beq.s   mh_quit_with_scrolltext ;Ja -> verzweige
 mh_quit_without_scrolltext
-  move.w  d0,pt_fade_out_music_active(a3) ;Musik ausfaden
+  move.w  d0,pt_music_fader_active(a3) ;Musik ausfaden
   move.w  #if_colors_number*3,if_colors_counter(a3)
   move.w  d0,ifo_active(a3)  ;Image-Fader-Out an
   move.w  d0,if_copy_colors_active(a3) ;Kopieren der Farben an
@@ -2990,7 +2990,7 @@ VERTB_int_server
   ENDC
 
   IFEQ pt_music_fader_enabled
-    bsr.s   pt_fade_out_music
+    bsr.s   pt_music_fader
     bra.s   pt_PlayMusic
 
 ; ** Musik ausblenden **
@@ -3027,7 +3027,7 @@ pt_no_trigger_fx
   CNOP 0,4
 pt_start_intro
   move.w  #if_colors_number*3,if_colors_counter(a3)
-  moveq   #0,d0
+  moveq   #TRUE,d0
   move.w  d0,ifi_active(a3)  ;Image-Fader-In an
   move.w  d0,if_copy_colors_active(a3) ;Kopieren der Farben an
 
@@ -3049,7 +3049,7 @@ pt_increase_x_radius_angle_step
   rts
   CNOP 0,4
 pt_start_scrolltext
-  moveq   #0,d0
+  moveq   #TRUE,d0
   move.w  d0,scs_enabled(a3) ;Scrolltext an
   move.w  d0,scs_text_table_start(a3) ;Textanfang
   rts
