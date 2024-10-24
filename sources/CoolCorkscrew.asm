@@ -4,8 +4,8 @@
 ; # Datum:    31.08.2024        #
 ; # Version:  1.4               #
 ; # CPU:      68020+            #
-; # FASTMEM:  -                 #
-; # Chipset:  AGA               #
+; # Fast-Memory: -              #
+; # Chipset:  AGA PAL           #
 ; # OS:       3.0+              #
 ; ###############################
 
@@ -1439,7 +1439,7 @@ hcs_init_sprite_header
   move.w  d1,(a0)            ;SPRxPOS
   move.w  d2,spr_pixel_per_datafetch/8(a0) ;SPRxCTL
   move.w  d1,(a1)            ;SPRxPOS
-  tas     d2                 ;Attached-Bit setzen
+  or.b    #SPRCTLF_ATT,d2                 ;Attached-Bit setzen
   move.w  d2,spr_pixel_per_datafetch/8(a1) ;SPRxCTL
   rts
 
@@ -2204,7 +2204,7 @@ hcs_x_ok
   move.b  d1,spr_pixel_per_datafetch/8(a0) ;SPRxCTL Lowbyte setzen
   lsr.w   #8,d0              ;% --- --- --- --- --- --- --- --- SH10 SH9 SH8 SH7 SH6 SH5 SH4 SH3: SH10-SH3 = SPRxPOS Lowbyte
   move.b  d0,(a0)            ;SPRxPOS Lowbyte setzen
-  tas     d1                 ;% ATT --- --- SH1 SH0 SV8 EV8 SH2: ATT-Bit setzen
+  or.b    #SPRCTLF_ATT,d1 ;% ATT --- --- SH1 SH0 SV8 EV8 SH2: ATT-Bit setzen
   move.b  d0,(a1)            ;SPRxPOS Lowbyte setzen
   add.l   a6,a0              ;nächstes Sprite
   move.b  d1,spr_pixel_per_datafetch/8(a1) ;SPRxCTL Lowbyte setzen
@@ -2491,7 +2491,7 @@ msl_save_x_angle
   SET_SPRITE_POSITION d0,d1,d2
   move.w  d1,(a0)            ;SPRxPOS
   move.w  d2,spr_pixel_per_datafetch/8(a0) ;SPRxCTL
-  tas     d2                 ;Attached-Bit setzen
+  or.b    #SPRCTLF_ATT,d2                 ;Attached-Bit setzen
   move.w  d1,(a1)            ;SPRxPOS
   move.w  d2,spr_pixel_per_datafetch/8(a1) ;SPRxCTL
 no_move_spaceship_left
@@ -2539,7 +2539,7 @@ msr_save_x_angle
   SET_SPRITE_POSITION d0,d1,d2
   move.w  d1,(a0)            ;SPRxPOS
   move.w  d2,spr_pixel_per_datafetch/8(a0) ;SPRxCTL
-  tas     d2                 ;Attached-Bit setzen
+  or.b    #SPRCTLF_ATT,d2                 ;Attached-Bit setzen
   move.w  d1,(a1)            ;SPRxPOS
   move.w  d2,spr_pixel_per_datafetch/8(a1) ;SPRxCTL
 no_move_spaceship_right
