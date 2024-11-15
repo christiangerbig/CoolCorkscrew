@@ -2942,6 +2942,7 @@ VERTB_int_server
 	IFD PROTRACKER_VERSION_2.3A 
 		PT2_REPLAY pt_effects_handler
 	ENDC
+
 	IFD PROTRACKER_VERSION_3.0B
 		PT3_REPLAY pt_effects_handler
 	ENDC
@@ -2964,17 +2965,17 @@ pt_effects_handler_quit
 	rts
 	CNOP 0,4
 pt_start_intro
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	moveq	#TRUE,d0
 	move.w	d0,ifi_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
 
-	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprfi_rgb8_active(a3)
+	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprf_rgb8_copy_colors_active(a3)
 
-	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
 	move.w	d0,bfi_rgb8_active(a3)
+	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
 	move.w	d0,bf_rgb8_convert_colors_active(a3)
 	rts
 	CNOP 0,4
@@ -3037,6 +3038,7 @@ spr_rgb8_color_table
 	REPT spr_colors_number
 		DC.L color00_bits
 	ENDR
+
 	CNOP 0,4
 vp2_spr_rgb8_color_table
 	INCLUDE "Daten:Asm-Sources.AGA/projects/CoolCorkscrew/colortables/64x32x16-Spaceship.ct"
@@ -3065,6 +3067,7 @@ sine_table_512
 	IFD PROTRACKER_VERSION_2.3A 
 		INCLUDE "music-tracker/pt2-period-table.i"
 	ENDC
+
 	IFD PROTRACKER_VERSION_3.0B
 		INCLUDE "music-tracker/pt3-period-table.i"
 	ENDC
