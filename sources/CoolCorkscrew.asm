@@ -1712,7 +1712,7 @@ cl2_vp2_set_plane_ptrs_loop1
 	move.w	d0,4(a0)		; BPLxPTL
 	swap	d0			; High
 	move.w	d0,(a0)			; BPLxPTH
-	ADDF.W	2*QUADWORD_SIZE,a0	; übernächster Playfieldzeiger
+	ADDF.W	QUADWORD_SIZE*2,a0	; übernächster Playfieldzeiger
 	dbf	d7,cl2_vp2_set_plane_ptrs_loop1
 
 ; ** Zeiger auf Playfield 2 eintragen **
@@ -1725,7 +1725,7 @@ cl2_vp2_set_plane_ptrs_loop2
 	move.w	d0,4(a1)		; BPLxPTL
 	swap	d0			; High
 	move.w	d0,(a1)			; BPLxPTH
-	ADDF.W	2*QUADWORD_SIZE,a1	; übernächster Playfieldzeiger
+	ADDF.W	QUADWORD_SIZE*2,a1	; übernächster Playfieldzeiger
 	dbf	d7,cl2_vp2_set_plane_ptrs_loop2
 	rts
 
@@ -3005,7 +3005,7 @@ EXTER_int_server
 	rts
 
 	CNOP 0,4
-NMI_int_server
+nmi_int_server
 	rts
 
 
