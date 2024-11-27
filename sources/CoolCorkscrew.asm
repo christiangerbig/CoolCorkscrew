@@ -1,9 +1,3 @@
-; Programm:	CoolCorkscrew.asm
-; Autor:	Christian Gerbig
-; Datum:	31.08.2024
-; Version:	1.4
-
-
 ; Reuirements
 ; CPU:		68020+
 ; Fast-Memory:	-
