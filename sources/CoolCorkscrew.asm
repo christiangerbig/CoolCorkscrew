@@ -149,7 +149,6 @@ screen_fader_enabled		EQU TRUE
 text_output_enabled		EQU FALSE
 
 pt_ciatiming_enabled		EQU TRUE
-pt_finetune_enabled		EQU FALSE
 pt_metronome_enabled		EQU FALSE
 pt_mute_enabled			EQU FALSE
 pt_track_notes_played_enabled	EQU FALSE
@@ -1283,9 +1282,7 @@ init_main
 	bsr	pt_InitRegisters
 	bsr	pt_InitAudTempStrucs
 	bsr	pt_ExamineSongStruc
-	IFEQ pt_finetune_enabled
-		bsr	pt_InitFtuPeriodTableStarts
-	ENDC
+	bsr	pt_InitFtuPeriodTableStarts
 	bsr	bg_copy_image_to_plane
 	bsr	hsi_init_shift_table
 	bsr	scs_init_characters_offsets
@@ -1308,9 +1305,7 @@ init_main
 
 	PT_EXAMINE_SONG_STRUCTURE
 
-	IFEQ pt_finetune_enabled
-		PT_INIT_FINETUNE_TABLE_STARTS
-	ENDC
+	PT_INIT_FINETUNE_TABLE_STARTS
 
 ; **** Background-Image ****
 	COPY_IMAGE_TO_BITPLANE bg,bg_image_x_position,bg_image_y_position,extra_pf1
