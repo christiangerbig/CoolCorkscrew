@@ -1,7 +1,7 @@
 ; Requirements
-; CPU:		68020+
-; Chipset:	AGA PAL
-; OS:		3.0+
+; 68020+
+; AGA PAL
+; 3.0+
 
 
 ; History/Changes
@@ -1910,8 +1910,8 @@ scs_horiz_scrolltext
 	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
 	move.l	#(BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16,BLTCON0-DMACONR(a6) ; Minterm D=A
-	moveq	#FALSE,d5
-	move.l	d5,BLTAFWM-DMACONR(a6)	; Ausmaskierung
+	moveq	#-1,d5
+	move.l	d5,BLTAFWM-DMACONR(a6)
 	move.l	d0,BLTAPT-DMACONR(a6)	; Character-Image
 	move.l	d1,BLTDPT-DMACONR(a6)	; Playfield
 	move.l	#((scs_image_plane_width-scs_text_char_width)<<16)+(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A-Mod + D-Mod
@@ -2045,8 +2045,8 @@ scs_horiz_scroll
 	add.l	#(scs_text_x_position/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; Zielbild 48 Pixel später beginnen
 	WAITBLIT
 	move.l	#((-scs_horiz_scroll_speed<<12)+BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16,BLTCON0-DMACONR(a6) ; Minterm D=A
-	moveq	#FALSE,d0
-	move.l	d0,BLTAFWM-DMACONR(a6)	; keine Ausmaskierung
+	moveq	#-1,d0
+	move.l	d0,BLTAFWM-DMACONR(a6)
 	move.l	a0,BLTDPT-DMACONR(a6)	; Zielbild
 	addq.w	#WORD_SIZE,a0		; 16 Pixel später beginnen
 	move.l	a0,BLTAPT-DMACONR(a6)	; Quellbild
