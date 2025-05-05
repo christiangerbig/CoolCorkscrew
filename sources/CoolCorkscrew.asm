@@ -1415,7 +1415,7 @@ hcs_init_xy_coords_loop2
 	lsl.w	#8,d1
 	move.b	_CIAB+CIATODLOW,d1	; b
 	add.l	d1,d5			; (f(x)*a)+b
-	and.l	d3,d5			; Nur Bits 0-15
+	and.l	d3,d5			; Nur low word
 	divu.w	d4,d5			; f(x+1)=[(f(x)*a)+b]/mod
 	swap	d5			; Rest der Division
 	move.w	d5,d0			; f(x+1) retten
