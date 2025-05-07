@@ -15,22 +15,22 @@
 
 ; V.1.2 Beta
 ; - Geschwindigkeit des Raumschiffs um 50% reduziert. Hier für wird eine separate
-;   Sinus-Tabelle mit 512 Werten verwendet.
+; Sinus-Tabelle mit 512 Werten verwendet.
 ; - Sprite-Nutzung geändert, damit das Raumschiff auch am linken Rand ohne
-;   Anzeigefehler dargestellt wird.
-;   SPR0/1 Raumschiff
-;   SRP2-7 Character-Scrolling
+; Anzeigefehler dargestellt wird.
+; SPR0/1 Raumschiff
+; SRP2-7 Character-Scrolling
 
 ; V.1.3 Beta
 ; - Das Raumschiff bewegt sich jetzt von rechts nach links und wieder zurück
-;   SPR0-5 Character-Scrolling
-;   SPR0/1 (re-use) Raumschiff nach links
-;   SPR2/3 (re-use) Raumschiff nach rechts
+; SPR0-5 Character-Scrolling
+; SPR0/1 (re-use) Raumschiff nach links
+; SPR2/3 (re-use) Raumschiff nach rechts
 
 ; V1.4 Beta
 ; - Mit Grass' RSE-graphics.
 ; - Convert-Color-Table der Bar wird schon bei den Inits aufgerufen, damit schon
-;   zu Beginn die Farbwerte der Bar richtig dargestellt werden.
+; zu Beginn die Farbwerte der Bar richtig dargestellt werden.
 
 ; V.1.5 Beta
 ; - Mit Grass' überarbeitetem Logo ("C"-Version)
@@ -56,16 +56,16 @@
 ; - Mouse-Handler: Out-Fader stoppen ggf. In-Fader
 ; - Mit Lunix' Icon
 ; - Spaceship-Animation: Jetzt wird der vom User ausgelöste Rechtsflug vom
-;                        Scrolltext unterbrochen und die Raumschiff-graphics
-;                        wird nun im horizontal Blank geändert. Es werden
-;                        nur noch SPR0 & SPR1 benutzt.
+;                      Scrolltext unterbrochen und die Raumschiff-graphics
+;                      wird nun im horizontal Blank geändert. Es werden
+;                      nur noch SPR0 & SPR1 benutzt.
 ; - adf-Datei erstellt
 ; - Fader optimiert
 
 ; V.1.1
 ; - Credits erneut geändert und luNix auf eigenen Wunsch wieder herausgenommen.
 ; - Im Icon ab den Offset $3a und $3e die Werte $80000000 eingetragen, damit
-;   es keine fixe Position mehr hat
+; es keine fixe Position mehr hat
 ; - überarbeitetete Include-Files integriert
 ; - Move-Spaceship optimiert
 
@@ -74,10 +74,10 @@
 
 ; V.1.3
 ; - Abfrage der Raumschiff-Animation geändert: Die Animation kann nur gestartet
-;   werden, wenn der Corkscrew-Scrolltext aktiv ist und das Intro nicht bereits
-;   beendet wird
+; werden, wenn der Corkscrew-Scrolltext aktiv ist und das Intro nicht bereits
+; beendet wird
 ; - Neuer 8xy-Befehl: Ship-Animation wird jetzt seaparat über den 840-Befehl
-;   aktiviert
+; aktiviert
 
 ; V.1.4
 ; - überarbeitetete Include-Files integriert
@@ -1176,7 +1176,7 @@ variables_size			RS.B 0
 	CNOP 0,4
 init_main_variables
 
-;  PT-Replay 
+; PT-Replay 
 	IFD PROTRACKER_VERSION_2 
 		PT2_INIT_VARIABLES
 	ENDC
@@ -1187,11 +1187,11 @@ init_main_variables
 	moveq	#TRUE,d0
 	move.w	d0,pt_effects_handler_active(a3)
 
-;  Horiz-Scaling-Image 
+; Horiz-Scaling-Image 
 	move.w	d0,hsi_x_radius_angle(a3) ; 0°
 	move.w	d0,hsi_x_radius_angle_step(a3) ; 0°
 
-;  Horiz-Character-Scrolling 
+; Horiz-Character-Scrolling 
 	move.w	d0,hcs_get_horiz_speed_active(a3)
 	MOVEF.W sine_table_length/4,d2
 	move.w	d2,hcs_horiz_speed_angle(a3) : 90°
@@ -1202,7 +1202,7 @@ init_main_variables
 	moveq	#hcs_horiz_step_min,d2
 	move.w	d2,hcs_horiz_step(a3)
 
-;  Single-Corkscrew-Scroll 
+; Single-Corkscrew-Scroll 
 	lea	scs_image_data,a0
 	move.w	d1,scs_enabled(a3)
 	move.l	a0,scs_image(a3)
@@ -1214,21 +1214,21 @@ init_main_variables
 	move.w	d1,scs_text_delay_counter(a3) ; Zähler inaktiv
 	move.w	d0,scs_text_move_active(a3)
 
-;  Sine-Bars 
+; Sine-Bars 
 	move.w	d0,hcs_horiz_step_angle(a3) ; 0°
 	move.w	d0,sb_variable_y_radius(a3) : 0°
 
-;  Sine-Bars 2.3.2 
+; Sine-Bars 2.3.2 
 	move.w	d1,sb232_active(a3)
 	move.w	d0,sb232_y_radius_angle(a3) ; 0°
 	move.w	d0,sb232_y_angle(a3) ;0°
 
-;  Sine-Bars 3.6 
+; Sine-Bars 3.6 
 	move.w	d1,sb36_active(a3)
 	move.w	d0,sb36_y_angle(a3) ;0°
 	move.w	d0,sb36_y_distance_angle(a3) ; 0°
 
-;  Move-Spaceship 
+; Move-Spaceship 
 	move.w	d1,msl_active(a3)
 	MOVEF.W sine_table_length2/4,d3
 	move.w	d2,msl_x_angle(a3) ;90°
@@ -1236,54 +1236,54 @@ init_main_variables
 	move.w	d1,msr_active(a3)
 	move.w	d2,msr_x_angle(a3) ;90°
 
-;  Radius-Fader-In 
+; Radius-Fader-In 
 	move.w	d1,rfi_active(a3)
 	move.w	d0,rfi_delay_counter(a3)
 
-;  Radius-Fader-Out *
+; Radius-Fader-Out *
 	move.w	d1,rfo_active(a3)
 	move.w	d0,rfo_delay_counter(a3)
 
-;  Image-Fader 
+; Image-Fader 
 	move.w	d0,if_rgb8_colors_counter(a3)
 	move.w	d1,if_rgb8_copy_colors_active(a3)
 
-;  Image-Fader-In 
+; Image-Fader-In 
 	move.w	d1,ifi_rgb8_active(a3)
 	MOVEF.W sine_table_length/4,d2
 	move.w	d2,ifi_rgb8_fader_angle(a3) ; 90°
 
-;  Image-Fader-Out 
+; Image-Fader-Out 
 	move.w	d1,ifo_rgb8_active(a3)
 	move.w	d2,ifo_rgb8_fader_angle(a3) ; 90°
 
-;  Sprite-Fader 
+; Sprite-Fader 
 	move.w	d0,sprf_rgb8_colors_counter(a3)
 	move.w	d1,sprf_rgb8_copy_colors_active(a3)
 
-;  Sprite-Fader-In 
+; Sprite-Fader-In 
 	move.w	d1,sprfi_rgb8_active(a3)
 	MOVEF.W sine_table_length/4,d2
 	move.w	d2,sprfi_rgb8_fader_angle(a3) ; 90°
 
-;  Sprite-Fader-Out 
+; Sprite-Fader-Out 
 	move.w	d1,sprfo_rgb8_active(a3)
 	move.w	d2,sprfo_rgb8_fader_angle(a3) ; 90°
 
-;  Bar-Fader 
+; Bar-Fader 
 	move.w	d0,bf_rgb8_colors_counter(a3)
 	move.w	d1,bf_rgb8_convert_colors_active(a3)
 
-;  Bar-Fader-In 
+; Bar-Fader-In 
 	move.w	d1,bfi_rgb8_active(a3)
 	MOVEF.W sine_table_length/4,d2
 	move.w	d2,bfi_rgb8_fader_angle(a3) ; 90°
 
-;  Bar-Fader-Out 
+; Bar-Fader-Out 
 	move.w	d1,bfo_rgb8_active(a3)
 	move.w	d2,bfo_rgb8_fader_angle(a3) ; 90°
 
-;  Main 
+; Main 
 	move.w	d1,mh_start_spaceship_active(a3)
 	move.w	d1,stop_fx_active(a3)
 	move.w	d1,exit_active(a3)
@@ -1310,7 +1310,7 @@ init_main
 	bsr	init_first_copperlist
 	bra	init_second_copperlist
 
-;  PT-Replay 
+; PT-Replay 
 	PT_DETECT_SYS_FREQUENCY
 
 	PT_INIT_REGISTERS
@@ -1322,11 +1322,11 @@ init_main
 	PT_INIT_FINETUNE_TABLE_STARTS
 
 
-;  Background-Image 
+; Background-Image 
 	COPY_IMAGE_TO_BITPLANE bg,bg_image_x_position,bg_image_y_position,extra_pf1
 
 
-;  Horiz-Scaling-Image 
+; Horiz-Scaling-Image 
 	CNOP 0,4
 hsi_init_shift_table
 	moveq	#0,d0			; 1. Shiftwert
@@ -1339,7 +1339,7 @@ hsi_init_shift_table_loop
 	rts
 
 
-;  Single-Corkscrew-Scroll 
+; Single-Corkscrew-Scroll 
 	INIT_CHARACTERS_OFFSETS.W scs
 
 	IFEQ scs_pipe_effect
@@ -1363,7 +1363,7 @@ scs_init_x_shift_table_loop
 	ENDC
 
 
-;  Bar-Fader 
+; Bar-Fader 
 	CNOP 0,4
 bf_rgb8_init_color_table
 	clr.w	bf_rgb8_convert_colors_active(a3)
@@ -1583,7 +1583,7 @@ cl2_vb1_init_bpldat_loop
 	rts
 
 
-;  Viewport 1
+; Viewport 1
 	COP_INIT_PLAYFIELD_REGISTERS cl2,,vp1
 
 	CNOP 0,4
@@ -1621,7 +1621,7 @@ cl2_vp1_set_plane_ptrs_loop
 	COP_INIT_BPLCON1_CHUNKY_SCREEN cl2,cl2_vp1_HSTART,cl2_vp1_VSTART,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
 
 
-;  Vertical-Blank 2
+; Vertical-Blank 2
 	CNOP 0,4
 cl2_vb2_init_bpldat
 	move.l	#(((cl2_vb2_VSTART<<24)|(((cl2_vb2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ;WAIT-Befehl
@@ -1637,7 +1637,7 @@ cl2_vb2_init_bpldat_loop
 	rts
 
 
-;  Viewport 2
+; Viewport 2
 	COP_INIT_PLAYFIELD_REGISTERS cl2,,vp2
 
 	CNOP 0,4
@@ -2236,7 +2236,7 @@ scs_char_vert_scroll
 	move.l	(a2),a2
 	lea	(extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8(a2),a0 ; Erste Zeile, rechter Rand abzüglich 64 Pixel
 	lea	((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_vert_scroll_window_y_size*extra_pf2_plane_width*extra_pf2_depth)(a2),a1 ; Letzte Zeile rechter Rand abzüglich 64 Pixel
-;  vertikaler Umlaufeffekt 
+; vertikaler Umlaufeffekt 
 	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
 	move.w	#BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC,BLTCON0-DMACONR(a6) ; Minterm D=A
@@ -2244,7 +2244,7 @@ scs_char_vert_scroll
 	move.l	a1,BLTDPT-DMACONR(a6)	; Ziel
 	move.l	#((extra_pf2_plane_width-scs_text_char_width)<<16)+(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A-Mod + D-Mod
 	move.w	#(scs_text_char_vert_speed*scs_vert_scroll_window_depth*64)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
-;  Buchstaben vertikal bewegen 
+; Buchstaben vertikal bewegen 
 	lea	((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_text_char_vert_speed*extra_pf2_plane_width*extra_pf2_depth)(a2),a0 ; Zweite Zeile, rechter Rand abzüglich 64 Pixel
 	lea	(extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8(a2),a1 ; Erste, Zeile rechter Rand abzüglich 64 Pixel
 	WAITBLIT
