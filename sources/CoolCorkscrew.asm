@@ -856,7 +856,7 @@ cl2_size2			EQU copperlist2_size
 cl2_size3			EQU copperlist2_size
 
 
-; Sprite0-Zusatzstruktur 
+; Sprite0 additional structure 
 	RSRESET
 
 spr0_extension1			RS.B 0
@@ -875,7 +875,7 @@ spr0_ext2_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*ms_image_y_size
 
 spr0_extension2_size		RS.B 0
 
-; Sprite0-Hauptstruktur 
+; Sprite0 main structure 
 	RSRESET
 
 spr0_begin			RS.B 0
@@ -887,7 +887,7 @@ spr0_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite0_size			RS.B 0
 
-; Sprite1-Zusatzstruktur 
+; Sprite1 additional structure 
 	RSRESET
 
 spr1_extension1	RS.B 0
@@ -906,7 +906,7 @@ spr1_ext2_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*ms_image_y_size
 
 spr1_extension2_size		RS.B 0
 
-; Sprite1-Hauptstruktur 
+; Sprite1 main structure 
 	RSRESET
 
 spr1_begin			RS.B 0
@@ -918,7 +918,7 @@ spr1_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite1_size			RS.B 0
 
-; Sprite2-Zusatzstruktur 
+; Sprite2 additional structure 
 	RSRESET
 
 spr2_extension1	RS.B 0
@@ -928,7 +928,7 @@ spr2_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
 
 spr2_extension1_size		RS.B 0
 
-; Sprite2-Hauptstruktur 
+; Sprite2 main structure 
 	RSRESET
 
 spr2_begin			RS.B 0
@@ -939,7 +939,7 @@ spr2_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite2_size			RS.B 0
 
-; Sprite3-Zusatzstruktur 
+; Sprite3 additional structure 
 	RSRESET
 
 spr3_extension1	RS.B 0
@@ -949,7 +949,7 @@ spr3_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
 
 spr3_extension1_size		RS.B 0
 
-; Sprite3-Hauptstruktur 
+; Sprite3 main structure 
 	RSRESET
 
 spr3_begin			RS.B 0
@@ -960,7 +960,7 @@ spr3_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite3_size			RS.B 0
 
-; Sprite4-Zusatzstruktur 
+; Sprite4 additional structure 
 	RSRESET
 
 spr4_extension1			RS.B 0
@@ -970,7 +970,7 @@ spr4_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
 
 spr4_extension1_size		RS.B 0
 
-; Sprite4-Hauptstruktur 
+; Sprite4 main structure 
 	RSRESET
 
 spr4_begin			RS.B 0
@@ -981,7 +981,7 @@ spr4_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite4_size			RS.B 0
 
-; Sprite5-Zusatzstruktur 
+; Sprite5 additional structure 
 	RSRESET
 
 spr5_extension1		RS.B 0
@@ -991,7 +991,7 @@ spr5_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
 
 spr5_extension1_size		RS.B 0
 
-; Sprite5-Hauptstruktur 
+; Sprite5 main structure 
 	RSRESET
 
 spr5_begin			RS.B 0
@@ -1002,7 +1002,7 @@ spr5_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite5_size			RS.B 0
 
-; Sprite6-Hauptstruktur 
+; Sprite6 main structure 
 	RSRESET
 
 spr6_begin			RS.B 0
@@ -1011,7 +1011,7 @@ spr6_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite6_size			RS.B 0
 
-; Sprite7-Hauptstruktur 
+; Sprite7 main structure 
 	RSRESET
 
 spr7_begin			RS.B 0
@@ -1188,17 +1188,17 @@ init_main_variables
 	move.w	d0,pt_effects_handler_active(a3)
 
 ;  Horiz-Scaling-Image 
-	move.w	d0,hsi_x_radius_angle(a3) ; 0 Grad
-	move.w	d0,hsi_x_radius_angle_step(a3) ; 0 Grad
+	move.w	d0,hsi_x_radius_angle(a3) ; 0°
+	move.w	d0,hsi_x_radius_angle_step(a3) ; 0°
 
 ;  Horiz-Character-Scrolling 
 	move.w	d0,hcs_get_horiz_speed_active(a3)
 	MOVEF.W sine_table_length/4,d2
-	move.w	d2,hcs_horiz_speed_angle(a3) : 90 Grad
+	move.w	d2,hcs_horiz_speed_angle(a3) : 90°
 	move.w	d0,hcs_horiz_speed(a3)
 	moveq	#FALSE,d1
 	move.w	d1,hcs_get_horiz_step_active(a3)
-	move.w	d2,hcs_horiz_step_angle(a3) ; 90 Grad
+	move.w	d2,hcs_horiz_step_angle(a3) ; 90°
 	moveq	#hcs_horiz_step_min,d2
 	move.w	d2,hcs_horiz_step(a3)
 
@@ -1215,26 +1215,26 @@ init_main_variables
 	move.w	d0,scs_text_move_active(a3)
 
 ;  Sine-Bars 
-	move.w	d0,hcs_horiz_step_angle(a3) ; 0 Grad
-	move.w	d0,sb_variable_y_radius(a3) : 0 Grad
+	move.w	d0,hcs_horiz_step_angle(a3) ; 0°
+	move.w	d0,sb_variable_y_radius(a3) : 0°
 
 ;  Sine-Bars 2.3.2 
 	move.w	d1,sb232_active(a3)
-	move.w	d0,sb232_y_radius_angle(a3) ; 0 Grad
-	move.w	d0,sb232_y_angle(a3) ;0 Grad
+	move.w	d0,sb232_y_radius_angle(a3) ; 0°
+	move.w	d0,sb232_y_angle(a3) ;0°
 
 ;  Sine-Bars 3.6 
 	move.w	d1,sb36_active(a3)
-	move.w	d0,sb36_y_angle(a3) ;0 Grad
-	move.w	d0,sb36_y_distance_angle(a3) ; 0 Grad
+	move.w	d0,sb36_y_angle(a3) ;0°
+	move.w	d0,sb36_y_distance_angle(a3) ; 0°
 
 ;  Move-Spaceship 
 	move.w	d1,msl_active(a3)
 	MOVEF.W sine_table_length2/4,d3
-	move.w	d2,msl_x_angle(a3) ;90 Grad
+	move.w	d2,msl_x_angle(a3) ;90°
 
 	move.w	d1,msr_active(a3)
-	move.w	d2,msr_x_angle(a3) ;90 Grad
+	move.w	d2,msr_x_angle(a3) ;90°
 
 ;  Radius-Fader-In 
 	move.w	d1,rfi_active(a3)
@@ -1251,11 +1251,11 @@ init_main_variables
 ;  Image-Fader-In 
 	move.w	d1,ifi_rgb8_active(a3)
 	MOVEF.W sine_table_length/4,d2
-	move.w	d2,ifi_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	d2,ifi_rgb8_fader_angle(a3) ; 90°
 
 ;  Image-Fader-Out 
 	move.w	d1,ifo_rgb8_active(a3)
-	move.w	d2,ifo_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	d2,ifo_rgb8_fader_angle(a3) ; 90°
 
 ;  Sprite-Fader 
 	move.w	d0,sprf_rgb8_colors_counter(a3)
@@ -1264,11 +1264,11 @@ init_main_variables
 ;  Sprite-Fader-In 
 	move.w	d1,sprfi_rgb8_active(a3)
 	MOVEF.W sine_table_length/4,d2
-	move.w	d2,sprfi_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	d2,sprfi_rgb8_fader_angle(a3) ; 90°
 
 ;  Sprite-Fader-Out 
 	move.w	d1,sprfo_rgb8_active(a3)
-	move.w	d2,sprfo_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	d2,sprfo_rgb8_fader_angle(a3) ; 90°
 
 ;  Bar-Fader 
 	move.w	d0,bf_rgb8_colors_counter(a3)
@@ -1277,11 +1277,11 @@ init_main_variables
 ;  Bar-Fader-In 
 	move.w	d1,bfi_rgb8_active(a3)
 	MOVEF.W sine_table_length/4,d2
-	move.w	d2,bfi_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	d2,bfi_rgb8_fader_angle(a3) ; 90°
 
 ;  Bar-Fader-Out 
 	move.w	d1,bfo_rgb8_active(a3)
-	move.w	d2,bfo_rgb8_fader_angle(a3) ; 90 Grad
+	move.w	d2,bfo_rgb8_fader_angle(a3) ; 90°
 
 ;  Main 
 	move.w	d1,mh_start_spaceship_active(a3)
@@ -1347,7 +1347,7 @@ hsi_init_shift_table_loop
 scs_init_x_shift_table
 		moveq	#0,d1		; 1. Y-Winkel
 		moveq	#scs_pipe_shift_x_radius*2,d2
-		MOVEF.L sine_table_length/2,d3 ; Länge der Tabelle (180 Grad)
+		MOVEF.L sine_table_length/2,d3 ; Länge der Tabelle (180°)
 		divu.w	#scs_roller_y_radius*2,d3 ; Schrittweite in Sinus-Tabelle berechnen
 		lea	sine_table(pc),a0
 		lea	scs_pipe_shift_x_table(pc),a1 ; Tabelle mit X-Shift-Werten
@@ -1713,7 +1713,7 @@ cl2_init_roller_loop
 	subq.w	#LONGWORD_SIZE,a0
 	COP_WAIT CL_X_WRAP,CL_Y_WRAP	; Copperliste patchen
 cl2_init_roller_skip
-	add.l	d6,d0			; nächste Zeile in CL
+	add.l	d6,d0			; next line in cl
 	dbf	d7,cl2_init_roller_loop
 	movem.l (a7)+,a4-a6
 	rts
@@ -1752,10 +1752,10 @@ cl2_vp2_set_plane_ptrs_loop2
 
 	CNOP 0,4
 scs_set_vert_compression
-	MOVEF.W	sine_table_length/4,d1	; erster Y-Winkel 90 Grad
+	MOVEF.W	sine_table_length/4,d1	; erster Y-Winkel 90°
 	moveq	#scs_roller_y_radius*2,d3 ; Y-Radius
 	moveq	#scs_roller_y_center,d4
-	MOVEF.W (sine_table_length/4)*3,d5 ; 270 Grad
+	MOVEF.W (sine_table_length/4)*3,d5 ; 270°
 	moveq	#cl2_extension6_size,d6
 	lea	sine_table(pc),a0	
 	move.l	cl2_construction2(a3),a1
@@ -1770,7 +1770,7 @@ scs_set_vert_compression_loop
 	add.w	d7,cl2_ext6_BPL1MOD+WORD_SIZE(a1,d0.l) ; BPL1MOD
 	addq.w	#scs_roller_y_angle_step,d1 ; nächster Y-Winkel
 	sub.w	d7,cl2_ext6_BPL2MOD+WORD_SIZE(a1,d0.l) ; BPL2MOD
-	cmp.w	d5,d1			; Tabellenende 270 Grad ?
+	cmp.w	d5,d1			; Tabellenende 270° ?
 	ble.s	scs_set_vert_compression_loop
 	rts
 
@@ -1821,7 +1821,7 @@ scs_set_pipe_loop
 		add.w	d2,d0		; X-Mittelpunkt + x'
 		DUALPF_SOFTSCROLL_64PIXEL_LORES d1,d0,d3
 		move.w	d1,(a1)		; BPLCON1
-		add.l	a2,a1		; nächste Zeile in CL
+		add.l	a2,a1		; next line in cl
 		dbf	d7,scs_set_pipe_loop
 		rts
 	ENDC
@@ -1965,7 +1965,7 @@ scs_check_control_codes
 	CNOP 0,4
 scs_start_sine_bars232
 	move.w	#FALSE,sb36_active(a3)
-	clr.w	sb232_y_angle(a3)	; 0 Grad
+	clr.w	sb232_y_angle(a3)	; 0°
 	clr.w	sb232_active(a3)
 	clr.w	rfi_active(a3)
 	move.w	#1,rfi_delay_counter(a3) ; Verzögerungszähler aktivieren
@@ -1974,7 +1974,7 @@ scs_start_sine_bars232
 	CNOP 0,4
 scs_start_sine_bars36
 	move.w	#FALSE,sb232_active(a3)
-	clr.w	sb36_y_angle(a3)	; 0 Grad
+	clr.w	sb36_y_angle(a3)	; 0°
 	clr.w	sb36_active(a3)
 	clr.w	rfi_active(a3)
 	move.w	#1,rfi_delay_counter(a3) ; Verzögerungszähler aktivieren
@@ -1990,11 +1990,11 @@ scs_start_radius_fader_out
 scs_start_spaceship
 	tst.w	msr_active(a3)		; Fliegt Raumschiff bereits nach rechts ?
 	bne.s	scs_start_spaceship_skip
-	move.w	#sine_table_length2/2,msr_x_angle(a3) ; 180 Grad
+	move.w	#sine_table_length2/2,msr_x_angle(a3) ; 180°
 scs_start_spaceship_skip
 	bsr	msl_copy_bitmaps
 	clr.w	msl_active(a3)		; Animation nach links starten
-	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90 Grad
+	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90°
 	moveq	#RETURN_OK,d0
 	rts
 	CNOP 0,4
@@ -2142,7 +2142,7 @@ hcs_get_horiz_speed
 	add.w	#hcs_horiz_speed_max*2,d0 ; + Mittelpunkt
 	move.w	d0,hcs_horiz_speed(a3)
 	addq.w	#hcs_horiz_speed_angle_speed,d2 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d2	; 180 Grad erreicht ?
+	cmp.w	#sine_table_length/2,d2	; 180° erreicht ?
 	ble.s	hcs_get_horiz_speed_skip
 	move.w	#FALSE,hcs_get_horiz_speed_active(a3)
 hcs_get_horiz_speed_skip
@@ -2163,7 +2163,7 @@ hcs_get_horiz_step
 	add.w	#(hcs_horiz_step_max*2)+1,d0 ; + Mittelpunkt
 	move.w	d0,hcs_horiz_step(a3)
 	addq.w	#hcs_horiz_step_angle_speed,d2 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d2	; 180 Grad erreicht ?
+	cmp.w	#sine_table_length/2,d2	; 180° erreicht ?
 	ble.s	hcs_get_horiz_step_skip
 	move.w	#FALSE,hcs_get_horiz_step_active(a3)
 hcs_get_horiz_step_skip
@@ -2200,7 +2200,7 @@ hcs_horiz_ballscrolling_loop2
 	move.w	(a5),d0			; X-Koord.
 	add.w	d3,d0			; X erhöhen
 	IFEQ hcs_quick_x_max_restart
-		and.w	d5,d0		; Überlauf entfernen
+		and.w	d5,d0		; remove overflow
 	ELSE
 	cmp.w	d5,d0			; X > X-Max ?
 	ble.s	hcs_horiz_ballscrolling_skip
@@ -2329,9 +2329,9 @@ sb36_get_yz_coords
 	move.w	#sb36_y_distance_center,a4
 	moveq	#sb36_bars_number-1,d7
 sb36_get_yz_coords_loop
-	moveq	#-(sine_table_length/4),d1 ; - 90 Grad
+	moveq	#-(sine_table_length/4),d1 ; - 90°
 	move.w	2(a0,d2.w*4),d0		; sin(w)
-	add.w	d2,d1			; Y-Winkel - 90 Grad
+	add.w	d2,d1			; Y-Winkel - 90°
 	ext.w	d1
 	move.w	d1,(a1)+		; Z-Vektor
 	muls.w	sb_variable_y_radius(a3),d0 ; y'=(yr*sin(w))/2^15
@@ -2377,7 +2377,7 @@ sb36_set_background_bars_loop2
 	swap	d0			; High-Bits
 	move.w	d0,(a4)			; COLOR00 High-Bits
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; COLOR05 High-Bits
-	add.l	d5,a4			; nächste Zeile in CL
+	add.l	d5,a4			; next line in cl
 	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a4) ; COLOR06 High-Bits
 	dbf	d6,sb36_set_background_bars_loop2
 sb36_set_background_bars_skip
@@ -2414,7 +2414,7 @@ sb36_set_foreround_bars_loop2
 	swap	d0			; High-Bits
 	move.w	d0,(a4)			; COLOR00 High-Bits
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; COLOR05 High-Bits
-	add.l	d5,a4			; nächste Zeile in CL
+	add.l	d5,a4			; next line in cl
 	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a4) ; COLOR06 High-Bits
 	dbf	d6,sb36_set_foreround_bars_loop2
 sb36_set_foreground_bars_skip
@@ -2441,7 +2441,7 @@ scs_set_center_bar_loop
 	swap	d0			; High-Bits
 	move.w	d0,(a1)			; COLOR00 High-Bits
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a1) ; COLOR05 High-Bits
-	add.l	a2,a1			; nächste Zeile in CL
+	add.l	a2,a1			; next line in cl
 	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a1) ; COLOR06 High-Bits
 	dbf	d7,scs_set_center_bar_loop
 scs_set_center_bar_quit
@@ -2459,7 +2459,7 @@ hsi_shrink_logo_x_size
 	ADDF.W	cl2_extension3_entry+cl2_ext3_BPLCON1_1+WORD_SIZE,a1
 	moveq	#hsi_lines_number-1,d7
 hsi_shrink_logo_x_size_loop1
-	moveq	#cl2_display_width-1,d6	; Anzahl der Spalten
+	moveq	#cl2_display_width-1,d6	; number of columns
 hsi_shrink_logo_x_size_loop2
 	move.w	(a0)+,d0		; Shiftwert
 	PF_SOFTSCROLL_64PIXEL_LORES d0,d1,d2
@@ -2482,12 +2482,12 @@ move_spaceship_left
 	swap	d1
 	add.w	#ms_x_center*SHIRES_PIXEL_FACTOR,d1
 	addq.w	#msl_x_angle_speed,d2	; nächster X-Winkel
-	cmp.w	#sine_table_length2/2,d2 ;180 Grad erreicht ?
+	cmp.w	#sine_table_length2/2,d2 ;180° erreicht ?
 	ble.s	move_spaceship_left_skip
 	move.w	#FALSE,msl_active(a3)
 	bsr	msr_copy_bitmaps
 	clr.w	msr_active(a3)
-	move.w	#sine_table_length2/4,msr_x_angle(a3) ; 180 Grad
+	move.w	#sine_table_length2/4,msr_x_angle(a3) ; 180°
 	rts
 	CNOP 0,4
 move_spaceship_left_skip
@@ -2529,7 +2529,7 @@ move_spaceship_right
 	swap	d1
 	add.w	#ms_x_center*SHIRES_PIXEL_FACTOR,d1 ; X ;+ X-Mittelpunkt
 	addq.w	#msr_x_angle_speed,d2	; nächster X-Winkel
-	cmp.w	#sine_table_length2/2,d2 ; 180 Grad erreicht ?
+	cmp.w	#sine_table_length2/2,d2 ; 180° erreicht ?
 	ble.s	move_spaceship_right_skip
 	move.w	#FALSE,msr_active(a3)
 	rts
@@ -2651,9 +2651,9 @@ image_fader_in
 	move.w	ifi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	ifi_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180° ?
 	ble.s	image_fader_in_skip
-	MOVEF.W sine_table_length/2,d0	; 180 Grad
+	MOVEF.W sine_table_length/2,d0	; 180°
 image_fader_in_skip
 	move.w	d0,ifi_rgb8_fader_angle(a3) 
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -2664,12 +2664,12 @@ image_fader_in_skip
 	ADDF.W	ifi_rgb8_fader_center,d0
 	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	ifi_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5			; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W if_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
 	move.w	d6,if_rgb8_colors_counter(a3) ; Image-Fader-In fertig ?
@@ -2688,9 +2688,9 @@ image_fader_out
 	move.w	ifo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	ifo_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180° ?
 	ble.s	image_fader_out_skip
-	MOVEF.W sine_table_length/2,d0	; 180 Grad
+	MOVEF.W sine_table_length/2,d0	; 180°
 image_fader_out_skip
 	move.w	d0,ifo_rgb8_fader_angle(a3) 
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -2701,12 +2701,12 @@ image_fader_out_skip
 	ADDF.W	ifo_rgb8_fader_center,d0
 	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	ifo_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5			; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W if_rgb8_colors_number-1,d7
 	bsr.s	if_rgb8_fader_loop
 	move.w	d6,if_rgb8_colors_counter(a3) ; Image-Fader-Out fertig ?
@@ -2731,9 +2731,9 @@ sprite_fader_in
 	move.w	sprfi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	sprfi_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180° ?
 	ble.s	sprite_fader_in_skip
-	MOVEF.W sine_table_length/2,d0	; 180 Grad
+	MOVEF.W sine_table_length/2,d0	; 180°
 sprite_fader_in_skip
 	move.w	d0,sprfi_rgb8_fader_angle(a3) 
 	MOVEF.W sprf_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -2744,12 +2744,12 @@ sprite_fader_in_skip
 	ADDF.W	sprfi_rgb8_fader_center,d0
 	lea	spr_rgb8_color_table+(sprf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	sprfi_rgb8_color_table+(sprf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5			; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W sprf_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
 	move.w	d6,sprf_rgb8_colors_counter(a3) ; Image-Fader-In fertig ?
@@ -2768,9 +2768,9 @@ sprite_fader_out
 	move.w	sprfo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	sprfo_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180° ?
 	ble.s	sprite_fader_out_skip
-	MOVEF.W sine_table_length/2,d0	; 180 Grad
+	MOVEF.W sine_table_length/2,d0	; 180°
 sprite_fader_out_skip
 	move.w	d0,sprfo_rgb8_fader_angle(a3) 
 	MOVEF.W sprf_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -2781,12 +2781,12 @@ sprite_fader_out_skip
 	ADDF.W	sprfo_rgb8_fader_center,d0
 	lea	spr_rgb8_color_table+(sprf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	sprfo_rgb8_color_table+(sprf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5			; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W sprf_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
 	move.w	d6,sprf_rgb8_colors_counter(a3) ; Image-Fader-Out fertig ?
@@ -2808,9 +2808,9 @@ bar_fader_in
 	move.w	bfi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	bfi_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0 ; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0 ; Y-Winkel <= 180° ?
 	ble.s	bar_fader_in_skip
-	MOVEF.W sine_table_length/2,d0 ;180 Grad
+	MOVEF.W sine_table_length/2,d0 ;180°
 bar_fader_in_skip
 	move.w	d0,bfi_rgb8_fader_angle(a3) 
 	MOVEF.W bf_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -2821,12 +2821,12 @@ bar_fader_in_skip
 	ADDF.W	bfi_rgb8_fader_center,d0
 	lea	bf_rgb8_color_cache+(bf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	bfi_rgb8_color_table+(bf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5		`	; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5		`	; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W bf_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
 	move.w	d6,bf_rgb8_colors_counter(a3) ; Image-Fader-In fertig ?
@@ -2845,9 +2845,9 @@ bar_fader_out
 	move.w	bfo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	bfo_rgb8_fader_angle_speed,d0 ; nächster Winkel
-	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180 Grad ?
+	cmp.w	#sine_table_length/2,d0	; Y-Winkel <= 180° ?
 	ble.s	bar_fader_out_skip
-	MOVEF.W sine_table_length/2,d0	; 180 Grad
+	MOVEF.W sine_table_length/2,d0	; 180°
 bar_fader_out_skip
 	move.w	d0,bfo_rgb8_fader_angle(a3) 
 	MOVEF.W bf_rgb8_colors_number*3,d6 ; RGB-Zähler
@@ -2858,12 +2858,12 @@ bar_fader_out_skip
 	ADDF.W	bfo_rgb8_fader_center,d0
 	lea	bf_rgb8_color_cache+(bf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; Puffer für Farbwerte
 	lea	bfo_rgb8_color_table+(bf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a1 ; Sollwerte
-	move.w	d0,a5			; Additions-/Subtraktionswert für Blau
+	move.w	d0,a5			; increase/decrease blue
 	swap	d0
 	clr.w	d0
-	move.l	d0,a2			; Additions-/Subtraktionswert für Rot
+	move.l	d0,a2			; increase/decrease red
 	lsr.l	#8,d0
-	move.l	d0,a4			; Additions-/Subtraktionswert für Grün
+	move.l	d0,a4			; increase/decrease green
 	MOVEF.W bf_rgb8_colors_number-1,d7 ;Anzahl der Farben
 	bsr	if_rgb8_fader_loop
 	move.w	d6,bf_rgb8_colors_counter(a3) ;Image-Fader-Out fertig ?
@@ -2967,7 +2967,7 @@ mh_start_spaceship
 	beq.s	mh_start_spaceship_quit
 	bsr	msl_copy_bitmaps
 	clr.w	msl_active(a3)		; Animation nach links starten
-	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90 Grad
+	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90°
 mh_start_spaceship_quit
 	rts
 
