@@ -1908,12 +1908,12 @@ scs_horiz_scrolltext
 	move.l	#(BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
 	moveq	#-1,d5
 	move.l	d5,BLTAFWM-DMACONR(a6)
-	move.l	d0,BLTAPT-DMACONR(a6)	; character
+	move.l	d0,BLTAPT-DMACONR(a6)	; character image
 	move.l	d1,BLTDPT-DMACONR(a6)	; playfield write
 	move.l	#((scs_image_plane_width-scs_text_char_width)<<16)+(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A&D moduli
 	move.w	#((scs_text_char_y_size/2)*scs_text_char_depth*64)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 	WAITBLIT
-	cmp.w	#(scs_vert_scroll_window_y_size-(scs_text_char_y_size/2))*extra_pf2_plane_width*extra_pf2_depth,d3 ; character outside playfield ?
+	cmp.w	#(scs_vert_scroll_window_y_size-(scs_text_char_y_size/2))*extra_pf2_plane_width*extra_pf2_depth,d3 ; character image outside playfield ?
 	blt.s	scs_horiz_scrolltext_skip1
 	moveq	#scs_text_char_x_restart/8,d1
 	add.l	(a0),d1			; add playfield address
