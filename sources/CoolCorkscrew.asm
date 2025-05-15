@@ -467,7 +467,7 @@ scs_text_char_x_shift_max	EQU scs_text_char_x_size
 scs_text_char_x_restart		EQU vp2_visible_pixels_number+64
 scs_text_char_y_restart		EQU 48
 scs_text_char_vert_speed	EQU 1
-scs_text_characters_number	EQU scs_horiz_scroll_window_x_size/scs_text_char_x_size
+scs_text_chars_number	EQU scs_horiz_scroll_window_x_size/scs_text_char_x_size
 
 scs_text_x_position		EQU 48
 scs_text_y_position		EQU 0
@@ -863,7 +863,7 @@ spr0_extension1_size		RS.B 0
 
 	RSRESET
 
-spr0_extension2	RS.B 0
+spr0_extension2			RS.B 0
 
 spr0_ext2_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 spr0_ext2_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*ms_image_y_size
@@ -885,7 +885,7 @@ sprite0_size			RS.B 0
 ; Sprite1 additional structure 
 	RSRESET
 
-spr1_extension1	RS.B 0
+spr1_extension1			RS.B 0
 
 spr1_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 spr1_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
@@ -916,7 +916,7 @@ sprite1_size			RS.B 0
 ; Sprite2 additional structure 
 	RSRESET
 
-spr2_extension1	RS.B 0
+spr2_extension1			RS.B 0
 
 spr2_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 spr2_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
@@ -937,7 +937,7 @@ sprite2_size			RS.B 0
 ; Sprite3 additional structure 
 	RSRESET
 
-spr3_extension1	RS.B 0
+spr3_extension1			RS.B 0
 
 spr3_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 spr3_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
@@ -979,7 +979,7 @@ sprite4_size			RS.B 0
 ; Sprite5 additional structure 
 	RSRESET
 
-spr5_extension1		RS.B 0
+spr5_extension1			RS.B 0
 
 spr5_ext1_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 spr5_ext1_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*hcs_image_y_size
@@ -1188,7 +1188,7 @@ init_main_variables
 
 ; Horiz-Character-Scrolling 
 	move.w	d0,hcs_get_horiz_speed_active(a3)
-	MOVEF.W sine_table_length1/4,d2
+	moveq	#sine_table_length1/4,d2
 	move.w	d2,hcs_horiz_speed_angle(a3) : 90°
 	move.w	d0,hcs_horiz_speed(a3)
 	moveq	#FALSE,d1
@@ -1292,7 +1292,7 @@ init_main
 	bsr	pt_InitFtuPeriodTableStarts
 	bsr	bg_copy_image_to_plane
 	bsr	hsi_init_shift_table
-	bsr	scs_init_characters_offsets
+	bsr	scs_init_chars_offsets
 	IFEQ scs_pipe_effect
 		bsr	scs_init_x_shift_table
 	ENDC
@@ -1334,7 +1334,7 @@ hsi_init_shift_table_loop
 
 
 ; Single-Corkscrew-Scroll 
-	INIT_CHARACTERS_OFFSETS.W scs
+	INIT_CHARS_OFFSETS.W scs
 
 	IFEQ scs_pipe_effect
 		CNOP 0,4
@@ -1394,7 +1394,7 @@ hcs_init_xy_coords
 	move.w	#hcs_random_x_max,d4
 	lea	spr_ptrs_construction(pc),a2
 	lea	hcs_objects_x_coords(pc),a5
-	moveq	#hcs_z_planes_number-1,d7	; number of used sprites
+	moveq	#hcs_z_planes_number-1,d7 ; number of used sprites
 hcs_init_xy_coords_loop1
 	move.w	VHPOSR-DMACONR(a6),d5	; f(x)
 	move.l	(a2)+,a0		; 1st sprite structure
@@ -1659,7 +1659,7 @@ cl2_vp2_init_plane_ptrs_loop
 cl2_init_roller
 	movem.l a4-a6,-(a7)
 	move.l	#(((cl2_vp2_VSTART<<24)|(((cl2_vp2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
-	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits1,d1 ; color low
+	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits1,d1 ; color high
 	move.l	#COLOR01<<16,d2
 	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits2,d3 ; color low
 	move.l	#COLOR02<<16,d4
@@ -1728,7 +1728,7 @@ cl2_vp2_set_plane_ptrs_loop1
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
 	move.w	d0,4(a0)		; BPLxPTL
-	swap	d0			; high
+	swap	d0
 	move.w	d0,(a0)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a0
 	dbf	d7,cl2_vp2_set_plane_ptrs_loop1
@@ -1740,7 +1740,7 @@ cl2_vp2_set_plane_ptrs_loop2
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
 	move.w	d0,4(a1)		; BPLxPTL
-	swap	d0			; high
+	swap	d0
 	move.w	d0,(a1)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a1
 	dbf	d7,cl2_vp2_set_plane_ptrs_loop2
@@ -1792,7 +1792,7 @@ scs_set_color_gradients_loop
 	move.l	(a4)+,d0
 	move.w	d0,cl2_ext6_COLOR02_low-cl2_ext6_COLOR00_high(a2) ; color low
 	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a2) ; color low
-	swap	d0			; high
+	swap	d0
 	move.w	d0,cl2_ext6_COLOR02_high-cl2_ext6_COLOR00_high(a2) ; color high
 	add.l	a5,a2			; next line in cl
 	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a2) ; color high
@@ -1903,9 +1903,9 @@ scs_horiz_scrolltext
 	add.w	d3,d1			; x offset + y offset
 	move.l	extra_pf2(a3),a0
 	add.l	(a0),d1			; add playfield address
-	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
+	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.l	#(BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.l	#(BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
 	moveq	#-1,d5
 	move.l	d5,BLTAFWM-DMACONR(a6)
 	move.l	d0,BLTAPT-DMACONR(a6)	; character image
@@ -2041,7 +2041,7 @@ scs_horiz_scroll
 	move.l	(a0),a0
 	add.l	#(scs_text_x_position/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 48 pixel in destination
 	WAITBLIT
-	move.l	#((-scs_horiz_scroll_speed<<12)+BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.l	#((-scs_horiz_scroll_speed<<12)|BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
 	moveq	#-1,d0
 	move.l	d0,BLTAFWM-DMACONR(a6)
 	move.l	a0,BLTDPT-DMACONR(a6)	; destination
@@ -2103,9 +2103,9 @@ scs_vert_scroll
 	move.l	(a2),a2
 	lea	(vp2_pf_pixel_per_datafetch/8)+(scs_vert_scroll_window_y_size*extra_pf2_plane_width*extra_pf2_depth)(a2),a1 ; last line, skip 64 pixel
 ; vertikaler Umlaufeffekt 
-	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
+	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.w	#BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D=A
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-(scs_vert_scroll_window_width))<<16)+(extra_pf2_plane_width-scs_vert_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
@@ -2234,9 +2234,9 @@ scs_char_vert_scroll
 	lea	(extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8(a2),a0 ; 1st line, right border 64 pixel substracted
 	lea	((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_vert_scroll_window_y_size*extra_pf2_plane_width*extra_pf2_depth)(a2),a1 ; last line, right border 64 pixel substracted
 ; Vertical wrapping
-	move.w	#DMAF_BLITHOG+DMAF_SETCLR,DMACON-DMACONR(a6)
+	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.w	#BC0F_SRCA+BC0F_DEST+ANBNC+ANBC+ABNC+ABC,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D=A
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-scs_text_char_width)<<16)+(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A&D moduli
@@ -2293,7 +2293,7 @@ sb232_get_y_coords_loop2
 	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ; color low
 	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a2) ; color low
 	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a2) ; color low
-	swap	d0			; high
+	swap	d0
 	move.w	d0,(a2)			; color high
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a2) ; color high
 	add.l	a6,a2			; next line in cl
@@ -2361,7 +2361,7 @@ sb36_set_background_bars
 	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
 sb36_set_background_bars_loop1
-	move.l	(a0)+,d0		; high word: z vector, low word: y
+	move.l	(a0)+,d0 		; low word: y, high word: z vector
 	bmi.s	sb36_set_background_bars_skip
 	lea	scs_bar_color_table(pc),a1
 	lea	(a2,d0.w*4),a4		; y offset in cl
@@ -2371,7 +2371,7 @@ sb36_set_background_bars_loop2
 	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a4) ; color low
 	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a4) ; color low
 	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a4) ; color low
-	swap	d0			; high
+	swap	d0
 	move.w	d0,(a4)			; color high
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; color high
 	add.l	d5,a4			; next line in cl
@@ -2397,7 +2397,7 @@ sb36_set_foreground_bars
 	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
 sb36_set_foreround_bars_loop1
-	move.l	(a0)+,d0		; high word: z vector, low word: y
+	move.l	(a0)+,d0 		; low word: y, high word: z vector
 	bpl.s	sb36_set_foreground_bars_skip
 sb36_set_foreground_bar
 	lea	scs_bar_color_table(pc),a1
@@ -2408,7 +2408,7 @@ sb36_set_foreround_bars_loop2
 	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a4) ; color low
 	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a4) ; color low
 	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a4) ; color low
-	swap	d0			; high
+	swap	d0
 	move.w	d0,(a4)			; color high
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; color high
 	add.l	d5,a4			; next line in cl
@@ -2435,7 +2435,7 @@ scs_set_center_bar_loop
 	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a1) ; color low
 	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a1) ; color low
 	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a1) ; color low
-	swap	d0			; high
+	swap	d0
 	move.w	d0,(a1)			; color high
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a1) ; color high
 	add.l	a2,a1			; next line in cl
@@ -3187,7 +3187,7 @@ scs_ascii_end
 	EVEN
 
 	CNOP 0,2
-scs_characters_offsets
+scs_chars_offsets
 	DS.W scs_ascii_end-scs_ascii
 	
 	IFEQ scs_pipe_effect
@@ -3279,7 +3279,7 @@ scs_text
 	DC.B "GRAPHICS          "
 	DC.B "  GRASS   ",ASCII_CTRL_A,ASCII_CTRL_P,ASCII_CTRL_F,"         "
 scs_stop_text
-	REPT ((scs_text_characters_number)/(scs_origin_char_x_size/scs_text_char_x_size))-2
+	REPT ((scs_text_chars_number)/(scs_origin_char_x_size/scs_text_char_x_size))-2
 		DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_S," "
