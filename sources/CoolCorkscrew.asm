@@ -467,7 +467,7 @@ scs_text_char_x_shift_max	EQU scs_text_char_x_size
 scs_text_char_x_restart		EQU vp2_visible_pixels_number+64
 scs_text_char_y_restart		EQU 48
 scs_text_char_vert_speed	EQU 1
-scs_text_chars_number	EQU scs_horiz_scroll_window_x_size/scs_text_char_x_size
+scs_text_chars_number		EQU scs_horiz_scroll_window_x_size/scs_text_char_x_size
 
 scs_text_x_position		EQU 48
 scs_text_y_position		EQU 0
@@ -1935,7 +1935,6 @@ scs_horiz_scrolltext_quit
 	GET_NEW_char_IMAGE.W scs,scs_check_control_codes,NORESTART
 
 
-
 ; Input
 ; d0.b	ASCII-Code
 ; Result
@@ -2034,9 +2033,9 @@ scs_stop_scrolltext_quit
 scs_horiz_scroll
 	move.w	#DMAF_BLITHOG,DMACON-DMACONR(a6)
 	tst.w	scs_enabled(a3)
-	bne.s	scs_no_horiz_scroll
+	bne.s	scs_horiz_scroll_quit
 	tst.w	scs_text_move_active(a3)
-	bne.s	scs_no_horiz_scroll
+	bne.s	scs_horiz_scroll_quit
 	move.l	extra_pf2(a3),a0
 	move.l	(a0),a0
 	add.l	#(scs_text_x_position/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 48 pixel in destination
@@ -2049,7 +2048,7 @@ scs_horiz_scroll
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	#((extra_pf2_plane_width-scs_horiz_scroll_window_width)<<16)+(extra_pf2_plane_width-scs_horiz_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
 	move.w	#(scs_horiz_scroll_window_y_size*scs_horiz_scroll_window_depth*64)+(scs_horiz_scroll_window_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
-scs_no_horiz_scroll
+scs_horiz_scroll_quit
 	rts
 
 
@@ -2095,7 +2094,7 @@ hcs_get_bplcon1_shifts_loop2
 	CNOP 0,4
 scs_vert_scroll
 	tst.w	scs_enabled(a3)
-	bne.s	scs_no_vert_scroll
+	bne.s	scs_vert_scroll_quit
 	move.l	extra_pf2(a3),a0
 	move.l	(a0),a0
 	add.l	#((scs_text_x_position+16)/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 64 pixel in destination
@@ -2123,7 +2122,7 @@ scs_vert_scroll
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; estination
 	move.w	#(scs_vert_scroll_window_y_size*scs_vert_scroll_window_depth*64)+(scs_vert_scroll_window_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
-scs_no_vert_scroll
+scs_vert_scroll_quit
 	rts
 
 
