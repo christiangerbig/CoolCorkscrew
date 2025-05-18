@@ -1911,7 +1911,7 @@ scs_horiz_scrolltext
 	move.l	d0,BLTAPT-DMACONR(a6)	; character image
 	move.l	d1,BLTDPT-DMACONR(a6)	; playfield write
 	move.l	#((scs_image_plane_width-scs_text_char_width)<<16)+(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A&D moduli
-	move.w	#((scs_text_char_y_size/2)*scs_text_char_depth*64)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
+	move.w	#((scs_text_char_y_size/2)*scs_text_char_depth<<6)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 	WAITBLIT
 	cmp.w	#(scs_vert_scroll_window_y_size-(scs_text_char_y_size/2))*extra_pf2_plane_width*extra_pf2_depth,d3 ; character image outside playfield ?
 	blt.s	scs_horiz_scrolltext_skip1
@@ -1919,7 +1919,7 @@ scs_horiz_scrolltext
 	add.l	(a0),d1			; add playfield address
 	move.l	d1,BLTDPT-DMACONR(a6)	; playfield write
 scs_horiz_scrolltext_skip1
-	move.w	#((scs_text_char_y_size/2)*scs_text_char_depth*64)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
+	move.w	#((scs_text_char_y_size/2)*scs_text_char_depth<<6)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 	sub.w	#(scs_text_char_y_size/scs_horiz_scroll_speed)*extra_pf2_plane_width*extra_pf2_depth,d3
 	bpl.s	scs_horiz_scrolltext_skip2
 	move.w	#(scs_horiz_scroll_window_y_size-(scs_text_char_y_size/2))*extra_pf2_plane_width*extra_pf2_depth,d3 ; resert y offset
@@ -2047,7 +2047,7 @@ scs_horiz_scroll
 	addq.w	#WORD_SIZE,a0		; skip 16 pixel
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	#((extra_pf2_plane_width-scs_horiz_scroll_window_width)<<16)+(extra_pf2_plane_width-scs_horiz_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
-	move.w	#(scs_horiz_scroll_window_y_size*scs_horiz_scroll_window_depth*64)+(scs_horiz_scroll_window_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
+	move.w	#(scs_horiz_scroll_window_y_size*scs_horiz_scroll_window_depth<<6)+(scs_horiz_scroll_window_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 scs_horiz_scroll_quit
 	rts
 
@@ -2109,7 +2109,7 @@ scs_vert_scroll
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-(scs_vert_scroll_window_width))<<16)+(extra_pf2_plane_width-scs_vert_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
 	move.w	scs_variable_vert_scroll_speed(a3),d0
-	MULUF.W scs_vert_scroll_window_depth*64,d0,d1
+	MULUF.W scs_vert_scroll_window_depth<<6,d0,d1
 	or.w	#scs_vert_scroll_window_x_size/16,d0
 	move.w	d0,BLTSIZE-DMACONR(a6)
 ; Laufschrift vertikal bewegen 
@@ -2121,7 +2121,7 @@ scs_vert_scroll
 	move.w	#DMAF_BLITHOG,DMACON-DMACONR(a6)
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; estination
-	move.w	#(scs_vert_scroll_window_y_size*scs_vert_scroll_window_depth*64)+(scs_vert_scroll_window_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
+	move.w	#(scs_vert_scroll_window_y_size*scs_vert_scroll_window_depth<<6)+(scs_vert_scroll_window_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 scs_vert_scroll_quit
 	rts
 
@@ -2239,7 +2239,7 @@ scs_char_vert_scroll
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-scs_text_char_width)<<16)+(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A&D moduli
-	move.w	#(scs_text_char_vert_speed*scs_vert_scroll_window_depth*64)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
+	move.w	#(scs_text_char_vert_speed*scs_vert_scroll_window_depth<<6)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 ; Buchstaben vertikal bewegen 
 	lea	((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_text_char_vert_speed*extra_pf2_plane_width*extra_pf2_depth)(a2),a0 ; 2nd line, right border 64 pixel substracted
 	lea	(extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8(a2),a1 ; 1st line, right border 64 pixel substracted
@@ -2247,7 +2247,7 @@ scs_char_vert_scroll
 	move.w	#DMAF_BLITHOG,DMACON-DMACONR(a6)
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
-	move.w	#(scs_vert_scroll_window_y_size*scs_vert_scroll_window_depth*64)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
+	move.w	#(scs_vert_scroll_window_y_size*scs_vert_scroll_window_depth<<6)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 scs_char_vert_scroll_quit
 	rts
 
