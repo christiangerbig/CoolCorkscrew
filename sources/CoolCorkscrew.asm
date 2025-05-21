@@ -147,22 +147,23 @@ pt_usedfx			EQU %1111110101011010
 pt_usedefx			EQU %0000110000000000
 pt_mute_enabled			EQU FALSE
 pt_music_fader_enabled		EQU TRUE
-pt_fade_out_delay		EQU 2	; Ticks
+pt_fade_out_delay		EQU 2	; ticks
 pt_split_module_enabled		EQU TRUE
 pt_track_notes_played_enabled	EQU FALSE
 pt_track_volumes_enabled	EQU FALSE
 pt_track_periods_enabled	EQU FALSE
 pt_track_data_enabled		EQU FALSE
+	IFD PROTRACKER_VERSION_3
 pt_metronome_enabled		EQU FALSE
 pt_metrochanbits		EQU pt_metrochan1
 pt_metrospeedbits		EQU pt_metrospeed4th
+	ENDC
 
 ; Horiz-Character-Scrolling
-hcs_quick_x_max_restart		EQU FALSE
+hcs_quick_x_max_restart_enabled	EQU FALSE
 
 ; Single-Corkscrew-Scroll 
-scs_pipe_effect			EQU TRUE
-scs_center_bar			EQU TRUE
+scs_pipe_effect_enabled		EQU TRUE
 
 dma_bits			EQU DMAF_SPRITE|DMAF_BLITTER|DMAF_COPPER|DMAF_RASTER|DMAF_MASTER|DMAF_SETCLR
 
@@ -237,6 +238,7 @@ disk_memory_size		EQU 0
 extra_memory_size		EQU 0
 
 chip_memory_size		EQU 0
+
 	IFEQ pt_ciatiming_enabled
 ciab_cra_bits			EQU CIACRBF_LOAD
 	ENDC
@@ -245,7 +247,7 @@ ciaa_ta_time			EQU 0
 ciaa_tb_time			EQU 0
 	IFEQ pt_ciatiming_enabled
 ciab_ta_time			EQU 14187 ; = 0.709379 MHz * [20000 µs = 50 Hz duration for one frame on a PAL machine]
-;ciab_ta_time			EQU 14318 ; = 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
+; ciab_ta_time			EQU 14318 ; = 0.715909 MHz * [20000 µs = 50 Hz duration for one frame on a NTSC machine]
 	ELSE
 ciab_ta_time			EQU 0
 	ENDC
@@ -415,7 +417,7 @@ hcs_image_depth			EQU 4
 hcs_used_sprites_number		EQU 6
 hcs_reused_sprites_number	EQU 192/(hcs_image_y_size+1)*(hcs_used_sprites_number/2)
 
-	IFEQ hcs_quick_x_max_restart
+	IFEQ hcs_quick_x_max_restart_enabled
 hcs_random_x_max		EQU (512*SHIRES_PIXEL_FACTOR)-1
 hcs_x_min			EQU 0
 hcs_x_max			EQU hcs_random_x_max
@@ -476,7 +478,7 @@ scs_text_delay			EQU (1*(scs_vert_scroll_window_y_size))+1 ; no FPS delay so tha
 
 scs_center_bar_height		EQU 10
 
-; Scrolltext stauchen 
+; Roller-Effect
 scs_roller_y_radius		EQU vp2_visible_lines_number/2
 scs_roller_y_center		EQU vp2_visible_lines_number/2
 scs_roller_y_angle_step		EQU (sine_table_length1/2)/vp2_visible_lines_number
@@ -783,23 +785,19 @@ cl2_extension5_size		RS.B 0
 cl2_extension6			RS.B 0
 
 cl2_ext6_WAIT			RS.L 1
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 cl2_ext6_BPLCON1		RS.L 1
 	ENDC
 cl2_ext6_BPLCON3_1		RS.L 1
 cl2_ext6_BPL1MOD		RS.L 1
 cl2_ext6_BPL2MOD		RS.L 1
-	IFEQ scs_center_bar
 cl2_ext6_COLOR00_high		RS.L 1
-	ENDC
 cl2_ext6_COLOR01_high		RS.L 1
 cl2_ext6_COLOR02_high		RS.L 1
 cl2_ext6_COLOR05_high		RS.L 1
 cl2_ext6_COLOR06_high		RS.L 1
 cl2_ext6_BPLCON3_2		RS.L 1
-	IFEQ scs_center_bar
 cl2_ext6_COLOR00_low		RS.L 1
-	ENDC
 cl2_ext6_COLOR01_low		RS.L 1
 cl2_ext6_COLOR02_low		RS.L 1
 cl2_ext6_COLOR05_low		RS.L 1
@@ -1078,10 +1076,10 @@ hcs_get_horiz_step_active	RS.W 1
 hcs_horiz_step_angle		RS.W 1
 hcs_horiz_step			RS.W 1
 
-; Single-Corkscrew-Scroll 
+; Single-Corkscrew-Scroll
+scs_active			RS.W 1
 	RS_ALIGN_LONGWORD
 scs_image			RS.L 1
-scs_enabled			RS.W 1
 scs_text_table_start		RS.W 1
 scs_text_char_x_shift		RS.W 1
 scs_text_char_y_offset		RS.W 1
@@ -1199,7 +1197,7 @@ init_main_variables
 
 ; Single-Corkscrew-Scroll 
 	lea	scs_image_data,a0
-	move.w	d1,scs_enabled(a3)
+	move.w	d1,scs_active(a3)
 	move.l	a0,scs_image(a3)
 	move.w	d0,scs_text_table_start(a3)
 	move.w	d0,scs_text_char_x_shift(a3)
@@ -1234,7 +1232,7 @@ init_main_variables
 	move.w	d1,rfi_active(a3)
 	move.w	d0,rfi_delay_counter(a3)
 
-; Radius-Fader-Out *
+; Radius-Fader-Out
 	move.w	d1,rfo_active(a3)
 	move.w	d0,rfo_delay_counter(a3)
 
@@ -1293,7 +1291,7 @@ init_main
 	bsr	bg_copy_image_to_plane
 	bsr	hsi_init_shift_table
 	bsr	scs_init_chars_offsets
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 		bsr	scs_init_x_shift_table
 	ENDC
 	bsr	bf_rgb8_init_color_table
@@ -1336,7 +1334,7 @@ hsi_init_shift_table_loop
 ; Single-Corkscrew-Scroll 
 	INIT_CHARS_OFFSETS.W scs
 
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 		CNOP 0,4
 scs_init_x_shift_table
 		moveq	#0,d1		; 1st y angle
@@ -1413,7 +1411,7 @@ hcs_init_xy_coords_loop2
 	divu.w	d4,d5			; f(x+1)=[(f(x)*a)+b]/mod
 	swap	d5			; remainder
 	move.w	d5,d0
-	IFNE hcs_quick_x_max_restart
+	IFNE hcs_quick_x_max_restart_enabled
 		add.w	#hcs_x_min,d0
 	ENDC
 	move.w	d0,(a5)+		; x coordinate
@@ -1551,7 +1549,7 @@ init_second_copperlist
 	bsr	cl2_vp1_set_plane_ptrs
 	bsr	cl2_vp2_set_plane_ptrs
 	bsr	scs_set_vert_compression
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 		bsr	scs_set_color_gradients
 		bsr	scs_set_pipe
 	ELSE
@@ -1668,35 +1666,29 @@ cl2_init_roller
 	ror.l	#8,d6			; $01000000
 	move.l	#(BPL1MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a1
 	move.l	#(BPL2MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a2
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 		move.l	#BPLCON1<<16,a4
 	ENDC
-	IFEQ scs_center_bar
-		move.w	#COLOR00,a5
-	ENDC
+	move.w	#COLOR00,a5
 	move.l	#COLOR06<<16,a6
 	moveq	#vp2_visible_lines_number-1,d7
 cl2_init_roller_loop
 	move.l	d0,(a0)+		; CWAIT x,y
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 		move.l	a4,(a0)+	; BPLCON1
 	ENDC
 	move.l	d1,(a0)+		; BPLCON3 color high
 	move.l	a1,(a0)+		; BPL1MOD
 	move.l	a2,(a0)+		; BPL2MOD
-	IFEQ scs_center_bar
-		move.w	a5,(a0)+	; COLOR00
-		move.w	#color00_high_bits,(a0)+
-	ENDC
+	move.w	a5,(a0)+		; COLOR00
+	move.w	#color00_high_bits,(a0)+
 	move.l	d2,(a0)+		; COLOR01
 	move.l	d4,(a0)+		; COLOR02
 	move.l	d5,(a0)+		; COLOR05
 	move.l	a6,(a0)+		; COLOR06
 	move.l	d3,(a0)+		; BPLCON3 color low
-	IFEQ scs_center_bar
-		move.w	a5,(a0)+	; COLOR00
-		move.w	#color00_low_bits,(a0)+
-	ENDC
+	move.w	a5,(a0)+		; COLOR00
+	move.w	#color00_low_bits,(a0)+
 	move.l	d2,(a0)+		; COLOR01
 	move.l	d4,(a0)+		; COLOR02
 	move.l	d5,(a0)+		; COLOR05
@@ -1781,7 +1773,7 @@ scs_set_color_gradients
 	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
 	lea	scs_color_gradient_outline(pc),a4
 	move.w	#cl2_extension6_size,a5
-	moveq	#vp2_visible_lines_number-1,d7 ; number of color values
+	moveq	#vp2_visible_lines_number-1,d7 ; number of colors
 scs_set_color_gradients_loop
 	move.w	d2,(a2)			; color high
 	move.w	d3,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ; color low
@@ -1800,7 +1792,7 @@ scs_set_color_gradients_loop
 	movem.l (a7)+,a4-a5
 	rts
 
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 		CNOP 0,4
 scs_set_pipe
 		moveq	#scs_pipe_shift_x_center,d2
@@ -1889,7 +1881,7 @@ beam_routines
 
 	CNOP 0,4
 scs_horiz_scrolltext
-	tst.w	scs_enabled(a3)
+	tst.w	scs_active(a3)
 	bne	scs_horiz_scrolltext_quit
 	tst.w	scs_text_move_active(a3)
 	bne.s	scs_horiz_scrolltext_quit
@@ -1936,9 +1928,9 @@ scs_horiz_scrolltext_quit
 
 
 ; Input
-; d0.b	ASCII-Code
+; d0.b	ASCII code
 ; Result
-; d0.l	Rückgabewert
+; d0.l	Return code
 	CNOP 0,4
 scs_check_control_codes
 	cmp.b	#"¹",d0
@@ -2011,7 +2003,7 @@ scs_pause_scrolltext
 	rts
 	CNOP 0,4
 scs_stop_scrolltext
-	move.w	#FALSE,scs_enabled(a3)	; stop text
+	move.w	#FALSE,scs_active(a3)	; stop text
 	tst.w	exit_active(a3)		; quit intro ?
 	bne.s	scs_stop_scrolltext_quit
 	clr.w	pt_music_fader_active(a3)
@@ -2032,7 +2024,7 @@ scs_stop_scrolltext_quit
 	CNOP 0,4
 scs_horiz_scroll
 	move.w	#DMAF_BLITHOG,DMACON-DMACONR(a6)
-	tst.w	scs_enabled(a3)
+	tst.w	scs_active(a3)
 	bne.s	scs_horiz_scroll_quit
 	tst.w	scs_text_move_active(a3)
 	bne.s	scs_horiz_scroll_quit
@@ -2093,7 +2085,7 @@ hcs_get_bplcon1_shifts_loop2
 
 	CNOP 0,4
 scs_vert_scroll
-	tst.w	scs_enabled(a3)
+	tst.w	scs_active(a3)
 	bne.s	scs_vert_scroll_quit
 	move.l	extra_pf2(a3),a0
 	move.l	(a0),a0
@@ -2101,7 +2093,7 @@ scs_vert_scroll
 	move.l	extra_pf2(a3),a2
 	move.l	(a2),a2
 	lea	(vp2_pf_pixel_per_datafetch/8)+(scs_vert_scroll_window_y_size*extra_pf2_plane_width*extra_pf2_depth)(a2),a1 ; last line, skip 64 pixel
-; vertikaler Umlaufeffekt 
+; Vertical wrapping - scrolltext
 	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
 	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D=A
@@ -2112,7 +2104,7 @@ scs_vert_scroll
 	MULUF.W scs_vert_scroll_window_depth<<6,d0,d1
 	or.w	#scs_vert_scroll_window_x_size/16,d0
 	move.w	d0,BLTSIZE-DMACONR(a6)
-; Laufschrift vertikal bewegen 
+; Vertical moving - scrolltext
 	move.w	scs_variable_vert_scroll_speed(a3),d0
 	MULUF.W extra_pf2_plane_width*extra_pf2_depth,d0,d1
 	lea	(vp2_pf_pixel_per_datafetch/8)(a2,d0.w),a0 ; 2nd or 3rd line, skip 64 pixel
@@ -2174,11 +2166,11 @@ horiz_char_scrolling
 	MOVEF.W FALSE_BYTE-SPRCTLF_SH2-SPRCTLF_SH0-SPRCTLF_SH1,d2 ; mask for SH0,SH1,SH2 bits
 	move.w	hcs_horiz_speed(a3),d3
 	moveq	#0,d4			; to store the X bit
-	IFNE hcs_quick_x_max_restart
+	IFNE hcs_quick_x_max_restart_enabled
 		move.w	#hcs_x_max,d5
 	ENDC
 	lea	spr_ptrs_construction+(hcs_z_planes_number*QUADWORD_SIZE)(pc),a2 ; last sprite
-	IFNE hcs_quick_x_max_restart
+	IFNE hcs_quick_x_max_restart_enabled
 		move.w	#hcs_horiz_restart,a4
 	ENDC
 	lea	hcs_objects_x_coords(pc),a5
@@ -2195,12 +2187,12 @@ hcs_horiz_ballscrolling_loop2
 	and.b	d2,d1			; clear SH0,SH1,SH2 bits
 	move.w	(a5),d0			; x
 	add.w	d3,d0			; increase x by speed
-	IFEQ hcs_quick_x_max_restart
+	IFEQ hcs_quick_x_max_restart_enabled
 		and.w	d5,d0		; remove overflow
 	ELSE
-	cmp.w	d5,d0			; x max ?
-	ble.s	hcs_horiz_ballscrolling_skip
-	sub.w	a4,d0			; reset x
+		cmp.w	d5,d0		; x max ?
+		ble.s	hcs_horiz_ballscrolling_skip
+		sub.w	a4,d0		; reset x
 hcs_horiz_ballscrolling_skip
 	ENDC
 	move.w	d0,(a5)+		
@@ -2226,13 +2218,13 @@ hcs_horiz_ballscrolling_skip
 
 	CNOP 0,4
 scs_char_vert_scroll
-	tst.w	scs_enabled(a3)
+	tst.w	scs_active(a3)
 	bne.s	scs_char_vert_scroll_quit
 	move.l	extra_pf2(a3),a2
 	move.l	(a2),a2
 	lea	(extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8(a2),a0 ; 1st line, right border 64 pixel substracted
 	lea	((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_vert_scroll_window_y_size*extra_pf2_plane_width*extra_pf2_depth)(a2),a1 ; last line, right border 64 pixel substracted
-; Vertical wrapping
+; Vertical wrapping - character
 	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
 	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D=A
@@ -2240,7 +2232,7 @@ scs_char_vert_scroll
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-scs_text_char_width)<<16)+(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A&D moduli
 	move.w	#(scs_text_char_vert_speed*scs_vert_scroll_window_depth<<6)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
-; Buchstaben vertikal bewegen 
+; Vertical moving - character
 	lea	((extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8)+(scs_text_char_vert_speed*extra_pf2_plane_width*extra_pf2_depth)(a2),a0 ; 2nd line, right border 64 pixel substracted
 	lea	(extra_pf2_x_size-vp2_pf_pixel_per_datafetch)/8(a2),a1 ; 1st line, right border 64 pixel substracted
 	WAITBLIT
@@ -2425,7 +2417,7 @@ scs_set_center_bar
 	tst.w	sb_variable_y_radius(a3)
 	bne.s	scs_set_center_bar_quit
 	lea	scs_bar_color_table(pc),a0
-	move.l	cl2_construction2(a3),a1 
+	move.l	cl2_construction2(a3),a1
 	ADDF.W	(cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE)+(((vp2_visible_lines_number-scs_center_bar_height)/2)*cl2_extension6_size),a1 ; y centering
 	move.w	#cl2_extension6_size,a2
 	moveq	#scs_center_bar_height-1,d7
@@ -2923,7 +2915,7 @@ mh_exit_demo
 	move.w	d1,pt_effects_handler_active(a3)
 	moveq	#TRUE,d0
 	move.w	d1,mh_start_spaceship_active(a3)
-	tst.w	scs_enabled(a3)
+	tst.w	scs_active(a3)
 	bne.s	mh_exit_demo_skip1
 	move.w	#scs_stop_text-scs_text,scs_text_table_start(a3) ; end scrolltext
 	move.w	d0,exit_active(a3)	; intro should end after text stop
@@ -3039,8 +3031,9 @@ pt_increase_x_radius_angle_step
 	rts
 	CNOP 0,4
 pt_start_scrolltext
-	clr.w	scs_enabled(a3)
-	clr.w	scs_text_table_start(a3) ; text start
+	moveq	#TRUE,d0
+	move.w	d0,scs_active(a3)
+	move.w	d0,scs_text_table_start(a3) ; text start
 	rts
 	CNOP 0,4
 pt_enable_spaceship
@@ -3172,13 +3165,11 @@ scs_color_gradient_back
 scs_color_gradient_outline
 	INCLUDE "CoolCorkscrew:colortables/2x32-Colorgradient-Grey.hlct"
 
-	IFEQ scs_center_bar
-		CNOP 0,4
+	CNOP 0,4
 scs_bar_color_table
-		REPT sb_bar_height
-			DC.L color00_bits
-		ENDR
-	ENDC
+	REPT sb_bar_height
+		DC.L color00_bits
+	ENDR
 
 scs_ascii
 	DC.B "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!?-'():\/# "
@@ -3189,7 +3180,7 @@ scs_ascii_end
 scs_chars_offsets
 	DS.W scs_ascii_end-scs_ascii
 	
-	IFEQ scs_pipe_effect
+	IFEQ scs_pipe_effect_enabled
 		CNOP 0,2
 scs_pipe_shift_x_table
 		DS.W scs_roller_y_radius*2
