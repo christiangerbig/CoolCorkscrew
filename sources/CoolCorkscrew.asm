@@ -383,11 +383,11 @@ cl2_vb2_hstart			EQU display_window_hstart-(1*CMOVE_SLOT_PERIOD)
 cl2_vb2_vstart			EQU vb2_VSTART
 
 ; Viewport 2
-cl2_vp2_hstart			EQU $00
+cl2_vp2_hstart			EQU 0
 cl2_vp2_vstart			EQU vp2_VSTART
 
 ; Copper-Interrupt
-cl2_hstart			EQU $00
+cl2_hstart			EQU 0
 cl2_vstart			EQU beam_position&$ff
 
 sine_table_length1		EQU 256
@@ -1374,7 +1374,7 @@ init_colors
 
 	CNOP 0,4
 init_sprites
-	bsr.s	spr_init_ptrs_table
+	bsr.s	spr_init_pointers_table
 	bsr.s	hcs_init_xy_coords
 	bsr	hcs_init_sprites_bitmaps
 	bra	spr_copy_structures
@@ -1390,7 +1390,7 @@ hcs_init_xy_coords
 	moveq	#0,d3
 	not.w	d3			; mask = $0000ffff
 	move.w	#hcs_random_x_max,d4
-	lea	spr_ptrs_construction(pc),a2
+	lea	spr_pointers_construction(pc),a2
 	lea	hcs_objects_x_coords(pc),a5
 	moveq	#hcs_z_planes_number-1,d7 ; number of used sprites
 hcs_init_xy_coords_loop1
@@ -1447,7 +1447,7 @@ hcs_init_sprite_header
 hcs_init_sprites_bitmaps
 	movem.l a3-a6,-(a7)
 	moveq	#(spr_pixel_per_datafetch/8)*2,d2
-	lea	spr_ptrs_construction(pc),a3
+	lea	spr_pointers_construction(pc),a3
 	lea	hcs_image_data,a4
 	moveq	#hcs_z_planes_number-1,d7
 hcs_init_sprites_bitmaps_loop1
@@ -1492,10 +1492,10 @@ init_CIA_timers
 init_first_copperlist
 	move.l	cl1_display(a3),a0
 	bsr.s	cl1_init_playfield_props
-	bsr	cl1_init_sprite_ptrs
+	bsr	cl1_init_sprite_pointers
 	bsr	cl1_init_colors
 	COP_MOVEQ 0,COPJMP2
-	bra	cl1_set_sprite_ptrs
+	bra	cl1_set_sprite_pointers
 
 
 	COP_INIT_PLAYFIELD_REGISTERS cl1,NOBITPLANESSPR
@@ -1525,7 +1525,7 @@ init_second_copperlist
 ; Viewport 1
 	bsr	cl2_vp1_init_playfield_props
 	bsr	cl2_vp1_init_colors
-	bsr	cl2_vp1_init_plane_ptrs
+	bsr	cl2_vp1_init_bitplane_pointers
 	COP_WAIT 0,vp1_VSTART
 	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
 	bsr	cl2_init_bplcon1s
@@ -1538,7 +1538,7 @@ init_second_copperlist
 ; Viewport 2
 	bsr	cl2_vp2_init_playfield_props
 	bsr	cl2_vp2_init_colors
-	bsr	cl2_vp2_init_plane_ptrs
+	bsr	cl2_vp2_init_bitplane_pointers
 	COP_WAIT 0,vp2_VSTART
 	COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
 	bsr	cl2_init_roller
@@ -1546,8 +1546,8 @@ init_second_copperlist
 ; Copper-Interrupt
 	bsr	cl2_init_copper_interrupt
 	COP_LISTEND
-	bsr	cl2_vp1_set_plane_ptrs
-	bsr	cl2_vp2_set_plane_ptrs
+	bsr	cl2_vp1_set_bitplane_pointers
+	bsr	cl2_vp2_set_bitplane_pointers
 	bsr	scs_set_vert_compression
 	IFEQ scs_pipe_effect_enabled
 		bsr	scs_set_color_gradients
@@ -1564,8 +1564,7 @@ init_second_copperlist
 cl2_vb1_init_bpldat
 	move.l	#(((cl2_vb1_VSTART<<24)|(((cl2_vb1_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	move.l	#BPL1DAT<<16,d1
-	moveq	#1,d2
-	ror.l	#8,d2			; $01000000
+	move.l	#$01000000,d2
 	MOVEF.W vb1_lines_number-1,d7
 cl2_vb1_init_bpldat_loop
 	move.l	d0,(a0)+		; CWAIT x,y
@@ -1587,27 +1586,27 @@ cl2_vp1_init_colors
 	rts
 
 	CNOP 0,4
-cl2_vp1_init_plane_ptrs
-	MOVEF.W BPL1PTH,d0
+cl2_vp1_init_bitplane_pointers
+	move.w #BPL1PTH,d0
 	moveq	#(extra_pf1_depth*2)-1,d7
-cl2_vp1_init_plane_ptrs_loop
+cl2_vp1_init_bitplane_pointers_loop
 	move.w	d0,(a0)			; BPLxPTH/L
 	addq.w	#WORD_SIZE,d0
 	addq.w	#LONGWORD_SIZE,a0
-	dbf	d7,cl2_vp1_init_plane_ptrs_loop
+	dbf	d7,cl2_vp1_init_bitplane_pointers_loop
 	rts
 
 	CNOP 0,4
-cl2_vp1_set_plane_ptrs
+cl2_vp1_set_bitplane_pointers
 	move.l	cl2_construction2(a3),a0 
 	ADDF.W	cl2_extension2_entry+cl2_ext2_BPL1PTH+WORD_SIZE,a0
 	move.l	extra_pf1(a3),a1
 	moveq	#extra_pf1_depth-1,d7
-cl2_vp1_set_plane_ptrs_loop
+cl2_vp1_set_bitplane_pointers_loop
 	move.w	(a1)+,(a0)		; BPLxPTH
 	addq.w	#QUADWORD_SIZE,a0
 	move.w	(a1)+,LONGWORD_SIZE-QUADWORD_SIZE(a0) ; BPLxPTL
-	dbf	d7,cl2_vp1_set_plane_ptrs_loop
+	dbf	d7,cl2_vp1_set_bitplane_pointers_loop
 	rts
 
 	COP_INIT_BPLCON1_CHUNKY_SCREEN cl2,cl2_vp1_HSTART,cl2_vp1_VSTART,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
@@ -1618,8 +1617,7 @@ cl2_vp1_set_plane_ptrs_loop
 cl2_vb2_init_bpldat
 	move.l	#(((cl2_vb2_VSTART<<24)|(((cl2_vb2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	move.l	#BPL1DAT<<16,d1
-	moveq	#1,d2
-	ror.l	#8,d2			; $01000000
+	move.l	#$01000000,d2
 	MOVEF.W vb2_lines_number-1,d7
 cl2_vb2_init_bpldat_loop
 	move.l	d0,(a0)+		; CWAIT x,y
@@ -1643,14 +1641,14 @@ cl2_vp2_init_colors
 	rts
 
 	CNOP 0,4
-cl2_vp2_init_plane_ptrs
-	MOVEF.W BPL1PTH,d0
+cl2_vp2_init_bitplane_pointers
+	move.w #BPL1PTH,d0
 	moveq	#(extra_pf2_depth*2*2)-1,d7
-cl2_vp2_init_plane_ptrs_loop
+cl2_vp2_init_bitplane_pointers_loop
 	move.w	d0,(a0)			; BPLxPTH/L
 	addq.w	#WORD_SIZE,d0
 	addq.w	#LONGWORD_SIZE,a0
-	dbf	d7,cl2_vp2_init_plane_ptrs_loop
+	dbf	d7,cl2_vp2_init_bitplane_pointers_loop
 	rts
 
 	CNOP 0,4
@@ -1662,8 +1660,7 @@ cl2_init_roller
 	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits2,d3 ; color low
 	move.l	#COLOR02<<16,d4
 	move.l	#COLOR05<<16,d5
-	moveq	#1,d6
-	ror.l	#8,d6			; $01000000
+	move.l	#$01000000,d6
 	move.l	#(BPL1MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a1
 	move.l	#(BPL2MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a2
 	IFEQ scs_pipe_effect_enabled
@@ -1694,10 +1691,10 @@ cl2_init_roller_loop
 	move.l	d5,(a0)+		; COLOR05
 	move.l	a6,(a0)+		; COLOR06
 	COP_MOVEQ 0,NOOP
-	cmp.l	#(((CL_Y_WRAP<<24)|(((cl2_vp2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; rasterline $ff ?
+	cmp.l	#(((CL_Y_WRAPPING<<24)|(((cl2_vp2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; y wrapping ?
 	bne.s	cl2_init_roller_skip
 	subq.w	#LONGWORD_SIZE,a0
-	COP_WAIT CL_X_WRAP,CL_Y_WRAP	; patch cl
+	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING	; patch cl
 cl2_init_roller_skip
 	add.l	d6,d0			; next line in cl
 	dbf	d7,cl2_init_roller_loop
@@ -1709,33 +1706,33 @@ cl2_init_roller_skip
 
 
 	CNOP 0,4
-cl2_vp2_set_plane_ptrs
+cl2_vp2_set_bitplane_pointers
 	MOVEF.L (extra_pf2_1_plane_x_offset/8)+(extra_pf2_1_plane_y_offset*extra_pf2_plane_width*extra_pf2_depth),d1 ; 2nd half
 	move.l	cl2_construction2(a3),a0
 	move.l	extra_pf2(a3),a2
 	lea	cl2_extension5_entry+cl2_ext5_BPL2PTH+WORD_SIZE(a0),a1
 	ADDF.W	cl2_extension5_entry+cl2_ext5_BPL1PTH+WORD_SIZE,a0
 	moveq	#extra_pf2_depth-1,d7
-cl2_vp2_set_plane_ptrs_loop1
+cl2_vp2_set_bitplane_pointers_loop1
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
 	move.w	d0,4(a0)		; BPLxPTL
 	swap	d0
 	move.w	d0,(a0)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a0
-	dbf	d7,cl2_vp2_set_plane_ptrs_loop1
+	dbf	d7,cl2_vp2_set_bitplane_pointers_loop1
 
 	MOVEF.L (extra_pf2_2_plane_x_offset/8)+(extra_pf2_2_plane_y_offset*extra_pf2_plane_width*extra_pf2_depth),d1 ; 2nd half
 	move.l	extra_pf2(a3),a2
 	moveq	#extra_pf2_depth-1,d7
-cl2_vp2_set_plane_ptrs_loop2
+cl2_vp2_set_bitplane_pointers_loop2
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
 	move.w	d0,4(a1)		; BPLxPTL
 	swap	d0
 	move.w	d0,(a1)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a1
-	dbf	d7,cl2_vp2_set_plane_ptrs_loop2
+	dbf	d7,cl2_vp2_set_bitplane_pointers_loop2
 	rts
 
 	CNOP 0,4
@@ -1833,8 +1830,8 @@ no_sync_routines
 beam_routines
 	bsr	wait_copint
 	bsr	swap_second_copperlist
-	bsr	spr_swap_structures
-	bsr	spr_set_sprite_ptrs
+	bsr	swap_sprite_structures
+	bsr	set_sprite_pointers
 	bsr	scs_horiz_scrolltext
 	bsr	scs_horiz_scroll
 	bsr	hcs_get_bplcon1_shifts
@@ -1873,10 +1870,10 @@ beam_routines
 	SWAP_COPPERLIST cl2,2
 
 
-	SWAP_SPRITES spr,spr_swap_number
+	SWAP_SPRITES spr_swap_number
 
 
-	SET_SPRITES spr,spr_swap_number
+	SET_SPRITES spr_swap_number
 
 
 	CNOP 0,4
@@ -2169,7 +2166,7 @@ horiz_char_scrolling
 	IFNE hcs_quick_x_max_restart_enabled
 		move.w	#hcs_x_max,d5
 	ENDC
-	lea	spr_ptrs_construction+(hcs_z_planes_number*QUADWORD_SIZE)(pc),a2 ; last sprite
+	lea	spr_pointers_construction+(hcs_z_planes_number*QUADWORD_SIZE)(pc),a2 ; last sprite
 	IFNE hcs_quick_x_max_restart_enabled
 		move.w	#hcs_horiz_restart,a4
 	ENDC
@@ -2485,7 +2482,7 @@ move_spaceship_left_skip
 	MOVEF.W msl_spaceship_y_position,d1 ; VSTART
 	moveq	#ms_image_y_size,d2
 	add.w	d1,d2			; VSTOP
-	lea	spr_ptrs_construction(pc),a2
+	lea	spr_pointers_construction(pc),a2
 	move.l	(a2)+,a0		; 1st sprite structure
 	ADDF.W	spr0_extension2_entry,a0
 	move.l	(a2),a1			; 2nd sprite structure
@@ -2529,7 +2526,7 @@ move_spaceship_right_skip
 	MOVEF.W msl_spaceship_y_position,d1 ;VSTART
 	moveq	#ms_image_y_size,d2
 	add.w	d1,d2			; VSTOP
-	lea	spr_ptrs_construction(pc),a2
+	lea	spr_pointers_construction(pc),a2
 	move.l	(a2)+,a0		; 1st sprite structure
 	ADDF.W	spr0_extension2_entry,a0
 	move.l	(a2),a1			; 2nd sprite structure
@@ -2557,12 +2554,12 @@ msr_copy_bitmaps
 	CNOP 0,4
 ms_copy_image_data
 	movem.l d1/a0/a4-a6,-(a7)
-	lea	spr_ptrs_construction(pc),a5
+	lea	spr_pointers_construction(pc),a5
 	move.l	(a5)+,a0		; 1st sprite structure
 	ADDF.W	spr0_extension2_entry+((spr_pixel_per_datafetch/8)*2),a0 ; skip header
 	move.l	(a5),a1			; 2nd sprite structure
 	ADDF.W	spr1_extension2_entry+((spr_pixel_per_datafetch/8)*2),a1 ; skip header
-	lea	spr_ptrs_display(pc),a5 ; Zeiger auf Sprites
+	lea	spr_pointers_display(pc),a5 ; Zeiger auf Sprites
 	move.l	(a5)+,a4		; 1st sprite structure
 	ADDF.W	spr0_extension2_entry+((spr_pixel_per_datafetch/8)*2),a4 ; skip header
 	move.l	(a5),a5			; 2nd sprite structure
@@ -3094,12 +3091,12 @@ vp2_spr_rgb8_color_table
 
 
 	CNOP 0,4
-spr_ptrs_construction
+spr_pointers_construction
 	DS.L spr_number
 
 
 	CNOP 0,4
-spr_ptrs_display
+spr_pointers_display
 	DS.L spr_number
 
 
