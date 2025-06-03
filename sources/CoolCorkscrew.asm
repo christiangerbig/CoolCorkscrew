@@ -286,7 +286,7 @@ vp1_visible_pixels_number	EQU 320
 vp1_visible_lines_number	EQU 30
 
 vp1_vstart			EQU MINROW+((192-vp1_visible_lines_number)/2)
-vp1_vstop			EQU vp1_VSTART+vp1_visible_lines_number
+vp1_vstop			EQU vp1_vstart+vp1_visible_lines_number
 
 vp1_pf_pixel_per_datafetch	EQU 64	; 4x
 
@@ -295,8 +295,8 @@ vp1_pf1_colors_number		EQU 16
 ; Vertical-Blank 2
 vb2_lines_number		EQU (192-extra_pf1_y_size)/2
 
-vb2_vstart			EQU vp1_VSTOP
-vb2_vstop			EQU vp1_VSTOP+vb2_lines_number
+vb2_vstart			EQU vp1_vstop
+vb2_vstop			EQU vp1_vstop+vb2_lines_number
 
 ; Viewport 2
 vp2_pixel_per_line		EQU 320
@@ -304,7 +304,7 @@ vp2_visible_pixels_number	EQU 320
 vp2_visible_lines_number	EQU 64
 
 vp2_vstart			EQU vb2_VSTOP
-vp2_vstop			EQU vp2_VSTART+vp2_visible_lines_number
+vp2_vstop			EQU vp2_vstart+vp2_visible_lines_number
 
 vp2_pf_pixel_per_datafetch	EQU 64	; 4x
 
@@ -376,7 +376,7 @@ cl2_vb1_vstart			EQU vb1_VSTART
 
 ; Viewport 1
 cl2_vp1_hstart			EQU display_window_hstart+(1*CMOVE_SLOT_PERIOD)
-cl2_vp1_vstart			EQU vp1_VSTART
+cl2_vp1_vstart			EQU vp1_vstart
 
 ; Vertical-Blank 2
 cl2_vb2_hstart			EQU display_window_hstart-(1*CMOVE_SLOT_PERIOD)
@@ -384,11 +384,11 @@ cl2_vb2_vstart			EQU vb2_VSTART
 
 ; Viewport 2
 cl2_vp2_hstart			EQU 0
-cl2_vp2_vstart			EQU vp2_VSTART
+cl2_vp2_vstart			EQU vp2_vstart
 
 ; Copper-Interrupt
 cl2_hstart			EQU 0
-cl2_vstart			EQU beam_position&$ff
+cl2_vstart			EQU beam_position&CL_Y_WRAPPING
 
 sine_table_length1		EQU 256
 sine_table_length2		EQU 512
@@ -521,11 +521,11 @@ ms_x_center			EQU 384+64
 
 ; Move-Ship-Left 
 msl_x_angle_speed		EQU 1
-msl_spaceship_y_position	EQU vp2_VSTART+((vp2_visible_lines_number-ms_image_y_size)/2)
+msl_spaceship_y_position	EQU vp2_vstart+((vp2_visible_lines_number-ms_image_y_size)/2)
 
 ; Move-Ship-Right 
 msr_x_angle_speed		EQU 1
-msr_spaceship_y_position	EQU vp2_VSTART+((vp2_visible_lines_number-ms_image_y_size)/2)
+msr_spaceship_y_position	EQU vp2_vstart+((vp2_visible_lines_number-ms_image_y_size)/2)
 
 ; Radius-Fader 
 rf_max_y_radius			EQU sb_y_radius*2
@@ -1526,10 +1526,10 @@ init_second_copperlist
 	bsr	cl2_vp1_init_playfield_props
 	bsr	cl2_vp1_init_colors
 	bsr	cl2_vp1_init_bitplane_pointers
-	COP_WAIT 0,vp1_VSTART
+	COP_WAIT 0,vp1_vstart
 	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
 	bsr	cl2_init_bplcon1s
-	COP_WAIT 0,vp1_VSTOP
+	COP_WAIT 0,vp1_vstop
 	COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
 
 ; Vertical-Blank 2
@@ -1539,7 +1539,7 @@ init_second_copperlist
 	bsr	cl2_vp2_init_playfield_props
 	bsr	cl2_vp2_init_colors
 	bsr	cl2_vp2_init_bitplane_pointers
-	COP_WAIT 0,vp2_VSTART
+	COP_WAIT 0,vp2_vstart
 	COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
 	bsr	cl2_init_roller
 
@@ -1556,7 +1556,8 @@ init_second_copperlist
 		bsr	scs_set_color_gradients
 	ENDC
 	bsr	copy_second_copperlist
-	bra	swap_second_copperlist
+	bsr	swap_second_copperlist
+	bra	set_second_copperlist
 
 
 ; Vertical Blank 1
@@ -1609,7 +1610,7 @@ cl2_vp1_set_bitplane_pointers_loop
 	dbf	d7,cl2_vp1_set_bitplane_pointers_loop
 	rts
 
-	COP_INIT_BPLCON1_CHUNKY_SCREEN cl2,cl2_vp1_HSTART,cl2_vp1_VSTART,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
+	COP_INIT_BPLCON1_CHUNKY_SCREEN cl2,cl2_vp1_hstart,cl2_vp1_vstart,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
 
 
 ; Vertical-Blank 2
@@ -1654,7 +1655,7 @@ cl2_vp2_init_bitplane_pointers_loop
 	CNOP 0,4
 cl2_init_roller
 	movem.l a4-a6,-(a7)
-	move.l	#(((cl2_vp2_VSTART<<24)|(((cl2_vp2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
+	move.l	#(((cl2_vp2_vstart<<24)|(((cl2_vp2_hstart/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits1,d1 ; color high
 	move.l	#COLOR01<<16,d2
 	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits2,d3 ; color low
@@ -1691,7 +1692,7 @@ cl2_init_roller_loop
 	move.l	d5,(a0)+		; COLOR05
 	move.l	a6,(a0)+		; COLOR06
 	COP_MOVEQ 0,NOOP
-	cmp.l	#(((CL_Y_WRAPPING<<24)|(((cl2_vp2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; y wrapping ?
+	cmp.l	#(((CL_Y_WRAPPING<<24)|(((cl2_vp2_hstart/4)*2)<<16))|$10000)|$fffe,d0 ; y wrapping ?
 	bne.s	cl2_init_roller_skip
 	subq.w	#LONGWORD_SIZE,a0
 	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING	; patch cl
@@ -1702,7 +1703,7 @@ cl2_init_roller_skip
 	rts
 
 
-	COP_INIT_COPINT cl2,cl2_HSTART,cl2_VSTART
+	COP_INIT_COPINT cl2,cl2_hstart,cl2_vstart
 
 
 	CNOP 0,4
@@ -1830,6 +1831,7 @@ no_sync_routines
 beam_routines
 	bsr	wait_copint
 	bsr	swap_second_copperlist
+	bsr	set_second_copperlist
 	bsr	swap_sprite_structures
 	bsr	set_sprite_pointers
 	bsr	scs_horiz_scrolltext
@@ -1868,6 +1870,9 @@ beam_routines
 
 
 	SWAP_COPPERLIST cl2,2
+
+
+	SET_COPPERLIST cl2
 
 
 	SWAP_SPRITES spr_swap_number
