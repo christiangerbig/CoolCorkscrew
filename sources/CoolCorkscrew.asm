@@ -1528,7 +1528,7 @@ init_second_copperlist
 	bsr	cl2_vp1_init_bitplane_pointers
 	COP_WAIT 0,vp1_vstart
 	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
-	bsr	cl2_init_bplcon1s
+	bsr	cl2_init_bplcon1_chunky
 	COP_WAIT 0,vp1_vstop
 	COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
 
@@ -1610,7 +1610,7 @@ cl2_vp1_set_bitplane_pointers_loop
 	dbf	d7,cl2_vp1_set_bitplane_pointers_loop
 	rts
 
-	COP_INIT_BPLCON1_CHUNKY_SCREEN cl2,cl2_vp1_hstart,cl2_vp1_vstart,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
+	COP_INIT_BPLCON1_CHUNKY cl2,cl2_vp1_hstart,cl2_vp1_vstart,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
 
 
 ; Vertical-Blank 2
