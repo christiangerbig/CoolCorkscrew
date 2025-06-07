@@ -1375,7 +1375,7 @@ init_colors
 	CNOP 0,4
 init_sprites
 	bsr.s	spr_init_pointers_table
-	bsr.s	hcs_init_xy_coords
+	bsr.s	hcs_init_xy_coordinates
 	bsr	hcs_init_sprites_bitmaps
 	bra	spr_copy_structures
 
@@ -1385,21 +1385,21 @@ init_sprites
 
 ; Horiz-Characterscrolling 
 	CNOP 0,4
-hcs_init_xy_coords
+hcs_init_xy_coordinates
 	movem.l a4-a5,-(a7)
 	moveq	#0,d3
 	not.w	d3			; mask = $0000ffff
 	move.w	#hcs_random_x_max,d4
 	lea	spr_pointers_construction(pc),a2
-	lea	hcs_objects_x_coords(pc),a5
+	lea	hcs_objects_x_coordinates(pc),a5
 	moveq	#hcs_z_planes_number-1,d7 ; number of used sprites
-hcs_init_xy_coords_loop1
+hcs_init_xy_coordinates_loop1
 	move.w	VHPOSR-DMACONR(a6),d5	; f(x)
 	move.l	(a2)+,a0		; 1st sprite structure
 	move.l	(a2)+,a1		; 2nd sprite structure
 	move.w	#display_window_vstart,a4 ; 1st y
 	moveq	#hcs_objects_per_sprite_number-1,d6
-hcs_init_xy_coords_loop2
+hcs_init_xy_coordinates_loop2
 	mulu.w	VHPOSR-DMACONR(a6),d5	; f(x)*a
 	move.w	VHPOSR-DMACONR(a6),d1
 	swap	d1
@@ -1420,8 +1420,8 @@ hcs_init_xy_coords_loop2
 	ADDF.W	spr2_extension1_size,a0	; skip n bytes
 	ADDF.W	spr3_extension1_size,a1
 	ADDF.W	hcs_image_y_size+1,a4	; increase y
-	dbf	d6,hcs_init_xy_coords_loop2
-	dbf	d7,hcs_init_xy_coords_loop1
+	dbf	d6,hcs_init_xy_coordinates_loop2
+	dbf	d7,hcs_init_xy_coordinates_loop1
 	movem.l (a7)+,a4-a5
 	rts
 
@@ -1845,8 +1845,8 @@ beam_routines
 	bsr	scs_char_vert_scroll
 	bsr	radius_fader_in
 	bsr	radius_fader_out
-	bsr	sb232_get_y_coords
-	bsr	sb36_get_yz_coords
+	bsr	sb232_get_y_coordinates
+	bsr	sb36_get_yz_coordinates
 	bsr	sb36_set_background_bars
 	bsr	sb36_set_foreground_bars
 	bsr	scs_set_center_bar
@@ -2175,7 +2175,7 @@ horiz_char_scrolling
 	IFNE hcs_quick_x_max_restart_enabled
 		move.w	#hcs_horiz_restart,a4
 	ENDC
-	lea	hcs_objects_x_coords(pc),a5
+	lea	hcs_objects_x_coordinates(pc),a5
 	move.w	#spr2_extension1_size,a6
 	moveq	#hcs_z_planes_number-1,d7
 hcs_horiz_ballscrolling_loop1
@@ -2247,12 +2247,12 @@ scs_char_vert_scroll_quit
 
 
 	CNOP 0,4
-sb232_get_y_coords
+sb232_get_y_coordinates
 	movem.l a4-a6,-(a7)
 	tst.w	sb232_active(a3)
-	bne	sb232_get_y_coords_quit
+	bne	sb232_get_y_coordinates_quit
 	tst.w	sb_variable_y_radius(a3) ; y radius = 0  ?
-	beq	sb232_get_y_coords_quit
+	beq	sb232_get_y_coordinates_quit
 	move.w	sb232_y_radius_angle(a3),d3 ; 1st y radius angle
 	move.w	d3,d0
 	move.w	sb232_y_angle(a3),d4	; 1st y angle
@@ -2267,7 +2267,7 @@ sb232_get_y_coords
 	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a5
 	move.w	#cl2_extension6_size,a6
 	moveq	#sb232_bars_number-1,d7
-sb232_get_y_coords_loop1
+sb232_get_y_coordinates_loop1
 	move.w	2(a0,d3.w*4),d0		; sin(w)
 	muls.w	sb_variable_y_radius(a3),d0 ; yr'=(yr*sin(w))/2^15
 	swap	d0
@@ -2281,7 +2281,7 @@ sb232_get_y_coords_loop1
 	lea	(a5,d0.w*4),a2
 	lea	scs_bar_color_table(pc),a4
 	moveq	#sb_bar_height-1,d6
-sb232_get_y_coords_loop2
+sb232_get_y_coordinates_loop2
 	move.l	(a4)+,d0
 	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ; color low
 	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a2) ; color low
@@ -2291,20 +2291,20 @@ sb232_get_y_coords_loop2
 	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a2) ; color high
 	add.l	a6,a2			; next line in cl
 	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a2) ; color high
-	dbf	d6,sb232_get_y_coords_loop2
-	dbf	d7,sb232_get_y_coords_loop1
-sb232_get_y_coords_quit
+	dbf	d6,sb232_get_y_coordinates_loop2
+	dbf	d7,sb232_get_y_coordinates_loop1
+sb232_get_y_coordinates_quit
 	movem.l (a7)+,a4-a6
 	rts
 
 
 	CNOP 0,4
-sb36_get_yz_coords
+sb36_get_yz_coordinates
 	move.l	a4,-(a7)
 	tst.w	sb36_active(a3)
-	bne.s	sb36_get_yz_coords_quit
+	bne.s	sb36_get_yz_coordinates_quit
 	tst.w	sb_variable_y_radius(a3)
-	beq.s	sb36_get_yz_coords_quit
+	beq.s	sb36_get_yz_coordinates_quit
 	move.w	sb36_y_angle(a3),d2	; 1st y angle
 	move.w	d2,d0		
 	move.w	sb36_y_distance_angle(a3),d4 ; 1st y distance angle
@@ -2314,11 +2314,11 @@ sb36_get_yz_coords
 	addq.b	#sb36_y_distance_speed,d0
 	move.w	d0,sb36_y_distance_angle(a3) 
 	lea	sine_table(pc),a0
-	lea	sb36_yz_coords(pc),a1
+	lea	sb36_yz_coordinates(pc),a1
 	move.w	#sb36_y_center,a2
 	move.w	#sb36_y_distance_center,a4
 	moveq	#sb36_bars_number-1,d7
-sb36_get_yz_coords_loop
+sb36_get_yz_coordinates_loop
 	moveq	#-(sine_table_length1/4),d1 ; - 90°
 	move.w	2(a0,d2.w*4),d0		; sin(w)
 	add.w	d2,d1			; y angle - 90°
@@ -2335,8 +2335,8 @@ sb36_get_yz_coords_loop
 	add.w	a4,d3			; y' + y distance center
 	addq.b	#sb36_y_distance_step1,d4
 	add.b	d3,d2			; y distance to next bar
-	dbf	d7,sb36_get_yz_coords_loop
-sb36_get_yz_coords_quit
+	dbf	d7,sb36_get_yz_coordinates_loop
+sb36_get_yz_coordinates_quit
 	move.l	(a7)+,a4
 	rts
 
@@ -2349,7 +2349,7 @@ sb36_set_background_bars
 	tst.w	sb_variable_y_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_background_bars_quit
 	MOVEF.L cl2_extension6_size,d5
-	lea	sb36_yz_coords(pc),a0
+	lea	sb36_yz_coordinates(pc),a0
 	move.l	cl2_construction2(a3),a2 
 	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
@@ -2385,7 +2385,7 @@ sb36_set_foreground_bars
 	tst.w	sb_variable_y_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_foreground_bars_quit
 	MOVEF.L cl2_extension6_size,d5
-	lea	sb36_yz_coords(pc),a0
+	lea	sb36_yz_coordinates(pc),a0
 	move.l	cl2_construction2(a3),a2 
 	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
@@ -3150,7 +3150,7 @@ hsi_bplcon1_table
 
 ; Horiz-Characterscrolling
 	CNOP 0,2
-hcs_objects_x_coords
+hcs_objects_x_coordinates
 	DS.W hcs_objects_number
 
 
@@ -3191,7 +3191,7 @@ scs_pipe_shift_x_table
 
 ; Sine-Bars 3.6 
 	CNOP 0,4
-sb36_yz_coords
+sb36_yz_coordinates
 	DS.W sb36_bars_number*2
 
 
