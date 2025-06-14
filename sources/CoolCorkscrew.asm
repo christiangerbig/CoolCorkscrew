@@ -86,7 +86,7 @@
 ; 840	Enable ship animation
 
 
-; Execution time 68020: 279 raster lines
+; Execution time 68020: 279 rasterlines
 
 
 	MC68040
@@ -330,7 +330,7 @@ vp2_pf2_plane_moduli		EQU -((extra_pf2_plane_width*(extra_pf2_depth-1))+(extra_p
 ; View 
 diwstrt_bits			EQU ((display_window_vstart&$ff)*DIWSTRTF_V0)|(display_window_hstart&$ff)
 diwstop_bits			EQU ((display_window_vstop&$ff)*DIWSTOPF_V0)|(display_window_hstop&$ff)
-bplcon0_bits			EQU BPLCON0F_ECSENA|((pf_depth>>3)*BPLCON0F_BPU3)|(BPLCON0F_COLOR)|((pf_depth&$07)*BPLCON0F_BPU0)
+bplcon0_bits			EQU BPLCON0F_ECSENA|((pf_depth>>3)*BPLCON0F_BPU3)|BPLCON0F_COLOR|((pf_depth&$07)*BPLCON0F_BPU0)
 bplcon3_bits1			EQU BPLCON3F_SPRES0
 bplcon3_bits2			EQU bplcon3_bits1|BPLCON3F_LOCT
 bplcon4_bits			EQU (BPLCON4F_OSPRM4*spr_odd_color_table_select)|(BPLCON4F_ESPRM4*spr_even_color_table_select)
@@ -341,9 +341,9 @@ color00_high_bits		EQU $011
 color00_low_bits		EQU $e1d
 
 ; Viewport 1
-vp1_ddfstrt_bits		EQU DDFSTART_320_PIXEL
+vp1_ddfstrt_bits		EQU DDFSTRT_320_PIXEL
 vp1_ddfstop_bits		EQU DDFSTOP_320_PIXEL_4X
-vp1_bplcon0_bits1		EQU BPLCON0F_ECSENA|((extra_pf1_depth>>3)*BPLCON0F_BPU3)|(BPLCON0F_COLOR)|((extra_pf1_depth&$07)*BPLCON0F_BPU0)
+vp1_bplcon0_bits1		EQU BPLCON0F_ECSENA|((extra_pf1_depth>>3)*BPLCON0F_BPU3)|BPLCON0F_COLOR|((extra_pf1_depth&$07)*BPLCON0F_BPU0)
 vp1_bplcon0_bits2		EQU BPLCON0F_ECSENA|BPLCON0F_COLOR
 vp1_bplcon1_bits		EQU 0
 vp1_bplcon2_bits		EQU 0
@@ -354,9 +354,9 @@ vp1_fmode_bits			EQU fmode_bits|FMODEF_BPL32|FMODEF_BPAGEM
 vp1_color00_bits		EQU color00_bits
 
 ; Viewport 2
-vp2_ddfstrt_bits		EQU DDFSTART_320_PIXEL
+vp2_ddfstrt_bits		EQU DDFSTRT_320_PIXEL
 vp2_ddfstop_bits		EQU DDFSTOP_320_PIXEL_4X
-vp2_bplcon0_bits1		EQU BPLCON0F_ECSENA|(((extra_pf2_depth*2)>>3)*BPLCON0F_BPU3)|(BPLCON0F_COLOR)|BPLCON0F_DPF|(((extra_pf2_depth*2)&$07)*BPLCON0F_BPU0)
+vp2_bplcon0_bits1		EQU BPLCON0F_ECSENA|(((extra_pf2_depth*2)>>3)*BPLCON0F_BPU3)|BPLCON0F_COLOR|BPLCON0F_DPF|(((extra_pf2_depth*2)&$07)*BPLCON0F_BPU0)
 vp2_bplcon0_bits2		EQU BPLCON0F_ECSENA|BPLCON0F_COLOR
 vp2_bplcon1_bits		EQU 0
 vp2_bplcon2_bits		EQU BPLCON2F_PF2P2
@@ -465,7 +465,6 @@ scs_vert_scroll_window_depth	EQU scs_image_depth
 scs_vert_scroll_speed1		EQU 2	; corkscrew effect on
 scs_vert_scroll_speed2		EQU 1	; corkscrew effect off
 
-scs_text_char_x_shift_max	EQU scs_text_char_x_size
 scs_text_char_x_restart		EQU vp2_visible_pixels_number+64
 scs_text_char_y_restart		EQU 48
 scs_text_char_vert_speed	EQU 1
@@ -1889,7 +1888,7 @@ scs_horiz_scrolltext
 	bne.s	scs_horiz_scrolltext_quit
 	move.w	scs_text_char_x_shift(a3),d2
 	addq.w	#scs_horiz_scroll_speed,d2
-	cmp.w	#scs_text_char_x_shift_max,d2
+	cmp.w	#scs_text_char_x_size,d2
 	blt.s	scs_horiz_scrolltext_skip3
 	bsr.s	scs_get_new_char_image	; d0 = character
 	MOVEF.L scs_text_char_x_restart/8,d1
@@ -1909,8 +1908,8 @@ scs_horiz_scrolltext
 	WAITBLIT
 	cmp.w	#(scs_vert_scroll_window_y_size-(scs_text_char_y_size/2))*extra_pf2_plane_width*extra_pf2_depth,d3 ; character image outside playfield ?
 	blt.s	scs_horiz_scrolltext_skip1
-	moveq	#scs_text_char_x_restart/8,d1
-	add.l	(a0),d1			; add playfield address
+	move.l	(a0),d1
+	ADDF.L	scs_text_char_x_restart/8,d1
 	move.l	d1,BLTDPT-DMACONR(a6)	; playfield write
 scs_horiz_scrolltext_skip1
 	move.w	#(((scs_text_char_y_size/2)*scs_text_char_depth)<<6)+(scs_text_char_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
@@ -2031,15 +2030,15 @@ scs_horiz_scroll
 	tst.w	scs_text_move_active(a3)
 	bne.s	scs_horiz_scroll_quit
 	move.l	extra_pf2(a3),a0
-	move.l	(a0),a0
-	add.l	#(scs_text_x_position/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 48 pixel in destination
+	move.l	(a0),a0			; destination
+	ADDF.W	(scs_text_x_position/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 48 pixel
 	WAITBLIT
 	move.l	#((-scs_horiz_scroll_speed<<12)|BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
 	moveq	#-1,d0
 	move.l	d0,BLTAFWM-DMACONR(a6)
-	move.l	a0,BLTDPT-DMACONR(a6)	; destination
+	move.l	a0,BLTDPT-DMACONR(a6)
 	addq.w	#WORD_SIZE,a0		; skip 16 pixel
-	move.l	a0,BLTAPT-DMACONR(a6)	; source
+	move.l	a0,BLTAPT-DMACONR(a6)
 	move.l	#((extra_pf2_plane_width-scs_horiz_scroll_window_width)<<16)+(extra_pf2_plane_width-scs_horiz_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
 	move.w	#((scs_horiz_scroll_window_y_size*scs_horiz_scroll_window_depth)<<6)+(scs_horiz_scroll_window_x_size/WORD_BITS),BLTSIZE-DMACONR(a6)
 scs_horiz_scroll_quit
@@ -2071,8 +2070,8 @@ hcs_get_bplcon1_shifts_loop1
 	moveq	#cl2_display_width-1,d6	; number of entries in destination table
 hcs_get_bplcon1_shifts_loop2
 	move.w	d1,d0			; -cos(w)
-	muls.w	2(a0,d2.w*4),d0		; x'=(xr'*(-cos(w)))/2^15
-	add.l	d0,d0
+	muls.w	WORD_SIZE(a0,d2.w*4),d0	; x'=(xr'*(-cos(w)))/2^15
+	MULUF.L	2,d0
 	swap	d0
 	add.w	d3,d0			; x' + x center
 	subq.w	#1,d0			; count starts at 0
@@ -2090,8 +2089,8 @@ scs_vert_scroll
 	tst.w	scs_active(a3)
 	bne.s	scs_vert_scroll_quit
 	move.l	extra_pf2(a3),a0
-	move.l	(a0),a0
-	add.l	#((scs_text_x_position+16)/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 64 pixel in destination
+	move.l	(a0),a0			; destination
+	ADDF.W	((scs_text_x_position+16)/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 64 pixel
 	move.l	extra_pf2(a3),a2
 	move.l	(a2),a2
 	lea	(vp2_pf_pixel_per_datafetch/8)+(scs_vert_scroll_window_y_size*extra_pf2_plane_width*extra_pf2_depth)(a2),a1 ; last line, skip 64 pixel
@@ -2273,7 +2272,7 @@ sb232_get_y_coordinates_loop1
 	swap	d0
 	addq.b	#sb232_y_radius_angle_step,d3
 	muls.w	2(a0,d4.w*4),d0		; y'=(yr'*sin(w))/2^15
-	add.l	d0,d0
+	MULUF.L	2,d0
 	swap	d0
 	ADDF.B	sb232_y_distance,d4	; y distance to next bar
 	add.w	a1,d0			; y' + y center
