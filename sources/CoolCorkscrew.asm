@@ -207,9 +207,13 @@ pf_colors_number		EQU pf1_colors_number+pf2_colors_number
 pf_depth			EQU pf1_depth3+pf2_depth3
 
 pf_extra_number			EQU 2
+; Viewport 1
+; Playfield1
 extra_pf1_x_size		EQU 320
 extra_pf1_y_size		EQU 30
 extra_pf1_depth			EQU 4
+; Viewport 2
+; Dual Playfield 1 & 2
 extra_pf2_x_size		EQU 448
 extra_pf2_y_size		EQU (64*2)+2 ; vertical scroll speed = 2
 extra_pf2_depth			EQU 2
@@ -264,9 +268,9 @@ ciab_tb_continuous_enabled	EQU FALSE
 
 beam_position			EQU $133
 
-
 MINROW				EQU VSTART_256_LINES
 
+; View
 display_window_hstart		EQU HSTART_320_PIXEL
 display_window_vstart		EQU MINROW
 display_window_hstop		EQU HSTOP_320_PIXEL
@@ -278,7 +282,7 @@ spr_pixel_per_datafetch		EQU 64	; 4x
 vb1_lines_number		EQU (192-extra_pf1_y_size)/2
 
 vb1_vstart			EQU MINROW
-vb1_vstop			EQU MINROW+vb1_lines_number
+vb1_vstop			EQU vb1_vstart+vb1_lines_number
 
 ; Viewport 1
 vp1_pixel_per_line		EQU 320
@@ -288,9 +292,13 @@ vp1_visible_lines_number	EQU 30
 vp1_vstart			EQU MINROW+((192-vp1_visible_lines_number)/2)
 vp1_vstop			EQU vp1_vstart+vp1_visible_lines_number
 
-vp1_pf_pixel_per_datafetch	EQU 64	; 4x
+vp1_pf1_depth			EQU 4
+vp1_pf_depth			EQU vp1_pf1_depth
 
 vp1_pf1_colors_number		EQU 16
+vp1_pf_colors_number		EQU vp1_pf1_colors_number
+
+vp1_pf_pixel_per_datafetch	EQU 64	; 4x
 
 ; Vertical-Blank 2
 vb2_lines_number		EQU (192-extra_pf1_y_size)/2
@@ -303,12 +311,17 @@ vp2_pixel_per_line		EQU 320
 vp2_visible_pixels_number	EQU 320
 vp2_visible_lines_number	EQU 64
 
-vp2_vstart			EQU vb2_VSTOP
+vp2_vstart			EQU vb2_vstop
 vp2_vstop			EQU vp2_vstart+vp2_visible_lines_number
 
-vp2_pf_pixel_per_datafetch	EQU 64	; 4x
+vp2_pf1_depth			EQU 4
+vp2_pf2_depth			EQU 4
+vp2_pf_depth			EQU vp1_pf1_depth+vp2_pf2_depth
 
 vp2_pf1_colors_number		EQU 4
+vp2_pf_colors_number		EQU vp2_pf1_colors_number
+
+vp2_pf_pixel_per_datafetch	EQU 64	; 4x
 
 ; Viewport 1
 ; Playfield 1
@@ -318,6 +331,7 @@ extra_pf1_plane_width		EQU extra_pf1_x_size/8
 ; Playfield 1 
 extra_pf2_plane_width		EQU extra_pf2_x_size/8
 
+
 ; Viewport 1 
 vp1_data_fetch_width		EQU vp1_pixel_per_line/8
 vp1_pf1_plane_moduli		EQU (extra_pf1_plane_width*(extra_pf1_depth-1))+extra_pf1_plane_width-vp1_data_fetch_width
@@ -326,6 +340,7 @@ vp1_pf1_plane_moduli		EQU (extra_pf1_plane_width*(extra_pf1_depth-1))+extra_pf1_
 vp2_data_fetch_width		EQU vp2_pixel_per_line/8
 vp2_pf1_plane_moduli		EQU (extra_pf2_plane_width*(extra_pf2_depth-1))+extra_pf2_plane_width-vp2_data_fetch_width
 vp2_pf2_plane_moduli		EQU -((extra_pf2_plane_width*(extra_pf2_depth-1))+(extra_pf2_plane_width-vp2_data_fetch_width)+(2*vp2_data_fetch_width))
+
 
 ; View 
 diwstrt_bits			EQU ((display_window_vstart&$ff)*DIWSTRTF_V0)|(display_window_hstart&$ff)
@@ -346,7 +361,7 @@ vp1_ddfstop_bits		EQU DDFSTOP_320_PIXEL_4X
 vp1_bplcon0_bits1		EQU BPLCON0F_ECSENA|((extra_pf1_depth>>3)*BPLCON0F_BPU3)|BPLCON0F_COLOR|((extra_pf1_depth&$07)*BPLCON0F_BPU0)
 vp1_bplcon0_bits2		EQU BPLCON0F_ECSENA|BPLCON0F_COLOR
 vp1_bplcon1_bits		EQU 0
-vp1_bplcon2_bits		EQU 0
+vp1_bplcon2_bits		EQU 0	; sprites behind playfield 1
 vp1_bplcon3_bits1		EQU bplcon3_bits1
 vp1_bplcon3_bits2		EQU vp1_bplcon3_bits1|BPLCON3F_LOCT
 vp1_bplcon4_bits		EQU bplcon4_bits
@@ -359,7 +374,7 @@ vp2_ddfstop_bits		EQU DDFSTOP_320_PIXEL_4X
 vp2_bplcon0_bits1		EQU BPLCON0F_ECSENA|(((extra_pf2_depth*2)>>3)*BPLCON0F_BPU3)|BPLCON0F_COLOR|BPLCON0F_DPF|(((extra_pf2_depth*2)&$07)*BPLCON0F_BPU0)
 vp2_bplcon0_bits2		EQU BPLCON0F_ECSENA|BPLCON0F_COLOR
 vp2_bplcon1_bits		EQU 0
-vp2_bplcon2_bits		EQU BPLCON2F_PF2P2
+vp2_bplcon2_bits		EQU BPLCON2F_PF2P2 ; sprites behind playfield 1, in front of playfield 2
 vp2_bplcon3_bits1		EQU bplcon3_bits1|BPLCON3F_PF2OF1
 vp2_bplcon3_bits2		EQU vp2_bplcon3_bits1|BPLCON3F_LOCT
 vp2_bplcon4_bits		EQU (BPLCON4F_OSPRM4*vp2_spr_odd_color_table_select)|(BPLCON4F_ESPRM4*vp2_spr_even_color_table_select)
@@ -370,7 +385,8 @@ cl2_display_x_size		EQU 320
 cl2_display_width		EQU cl2_display_x_size/8
 cl2_display_y_size		EQU vp1_visible_lines_number
 
-; Vertical Blank	1
+
+; Vertical Blank 1	1
 cl2_vb1_hstart			EQU display_window_hstart-(1*CMOVE_SLOT_PERIOD)
 cl2_vb1_vstart			EQU vb1_VSTART
 
@@ -386,24 +402,25 @@ cl2_vb2_vstart			EQU vb2_VSTART
 cl2_vp2_hstart			EQU 0
 cl2_vp2_vstart			EQU vp2_vstart
 
-; Copper-Interrupt
+; Copper Interrupt
 cl2_hstart			EQU 0
 cl2_vstart			EQU beam_position&CL_Y_WRAPPING
+
 
 sine_table_length1		EQU 256
 sine_table_length2		EQU 512
 
-; Background-Image 
-bg_image_x_size			EQU 256
-bg_image_plane_width		EQU bg_image_x_size/8
-bg_image_y_size			EQU 30
-bg_image_depth			EQU 4
-bg_image_x_position		EQU 16
-bg_image_y_position		EQU 0
+; Logo
+lg_image_x_size			EQU 256
+lg_image_plane_width		EQU lg_image_x_size/8
+lg_image_y_size			EQU 30
+lg_image_depth			EQU 4
+lg_image_x_position		EQU 16
+lg_image_y_position		EQU 0
 
 ; Horiz-Scaling-Image 
 hsi_shift_values_number		EQU 32
-hsi_lines_number		EQU bg_image_y_size
+hsi_lines_number		EQU lg_image_y_size
 hsi_x_radius			EQU 8
 hsi_x_radius_angle_speed	EQU 5
 hsi_x_angle_step		EQU 4
@@ -661,7 +678,7 @@ cl2_ext2_COLOR12_high1		RS.L 1
 cl2_ext2_COLOR13_high1		RS.L 1
 cl2_ext2_COLOR14_high1		RS.L 1
 cl2_ext2_COLOR15_high1		RS.L 1
-cl2_ext2_BPLCON3_low1		RS.L 1
+cl2_ext2_BPLCON3_2		RS.L 1
 cl2_ext2_COLOR00_low1		RS.L 1
 cl2_ext2_COLOR01_low1		RS.L 1
 cl2_ext2_COLOR02_low1		RS.L 1
@@ -686,6 +703,8 @@ cl2_ext2_BPL3PTH		RS.L 1
 cl2_ext2_BPL3PTL		RS.L 1
 cl2_ext2_BPL4PTH		RS.L 1
 cl2_ext2_BPL4PTL		RS.L 1
+cl2_ext2_WAIT			RS.L 1
+cl2_ext2_bplcon0		RS.L 1
 
 cl2_extension2_size		RS.B 0
 
@@ -743,38 +762,19 @@ cl2_extension3_size		RS.B 0
 
 cl2_extension4			RS.B 0
 
-cl2_ext4_WAIT			RS.L 1
-cl2_ext4_BPL1DAT		RS.L 1
+cl2_ext4_WAIT2			RS.L 1
+cl2_ext4_bplcon0		RS.L 1
 
 cl2_extension4_size		RS.B 0
+
 
 
 	RSRESET
 
 cl2_extension5			RS.B 0
 
-cl2_ext5_DDFSTRT		RS.L 1
-cl2_ext5_DDFSTOP		RS.L 1
-cl2_ext5_BPLCON1		RS.L 1
-cl2_ext5_BPLCON2		RS.L 1
-cl2_ext5_BPLCON3_1		RS.L 1
-cl2_ext5_BPL1MOD		RS.L 1
-cl2_ext5_BPL2MOD		RS.L 1
-cl2_ext5_BPLCON4		RS.L 1
-cl2_ext5_FMODE			RS.L 1
-cl2_ext5_COLOR00_high1		RS.L 1
-cl2_ext5_COLOR04_high1		RS.L 1
-cl2_ext5_BPLCON3_low1		RS.L 1
-cl2_ext5_COLOR00_low1		RS.L 1
-cl2_ext5_COLOR04_low1		RS.L 1
-cl2_ext5_BPL1PTH		RS.L 1
-cl2_ext5_BPL1PTL		RS.L 1
-cl2_ext5_BPL2PTH		RS.L 1
-cl2_ext5_BPL2PTL		RS.L 1
-cl2_ext5_BPL3PTH		RS.L 1
-cl2_ext5_BPL3PTL		RS.L 1
-cl2_ext5_BPL4PTH		RS.L 1
-cl2_ext5_BPL4PTL		RS.L 1
+cl2_ext5_WAIT			RS.L 1
+cl2_ext5_BPL1DAT		RS.L 1
 
 cl2_extension5_size		RS.B 0
 
@@ -783,27 +783,59 @@ cl2_extension5_size		RS.B 0
 
 cl2_extension6			RS.B 0
 
-cl2_ext6_WAIT			RS.L 1
-	IFEQ scs_pipe_effect_enabled
+cl2_ext6_DDFSTRT		RS.L 1
+cl2_ext6_DDFSTOP		RS.L 1
 cl2_ext6_BPLCON1		RS.L 1
-	ENDC
+cl2_ext6_BPLCON2		RS.L 1
 cl2_ext6_BPLCON3_1		RS.L 1
 cl2_ext6_BPL1MOD		RS.L 1
 cl2_ext6_BPL2MOD		RS.L 1
-cl2_ext6_COLOR00_high		RS.L 1
-cl2_ext6_COLOR01_high		RS.L 1
-cl2_ext6_COLOR02_high		RS.L 1
-cl2_ext6_COLOR05_high		RS.L 1
-cl2_ext6_COLOR06_high		RS.L 1
-cl2_ext6_BPLCON3_2		RS.L 1
-cl2_ext6_COLOR00_low		RS.L 1
-cl2_ext6_COLOR01_low		RS.L 1
-cl2_ext6_COLOR02_low		RS.L 1
-cl2_ext6_COLOR05_low		RS.L 1
-cl2_ext6_COLOR06_low		RS.L 1
-cl2_ext6_NOOP			RS.L 1
+cl2_ext6_BPLCON4		RS.L 1
+cl2_ext6_FMODE			RS.L 1
+cl2_ext6_COLOR00_high1		RS.L 1
+cl2_ext6_COLOR04_high1		RS.L 1
+cl2_ext6_BPLCON3_low1		RS.L 1
+cl2_ext6_COLOR00_low1		RS.L 1
+cl2_ext6_COLOR04_low1		RS.L 1
+cl2_ext6_BPL1PTH		RS.L 1
+cl2_ext6_BPL1PTL		RS.L 1
+cl2_ext6_BPL2PTH		RS.L 1
+cl2_ext6_BPL2PTL		RS.L 1
+cl2_ext6_BPL3PTH		RS.L 1
+cl2_ext6_BPL3PTL		RS.L 1
+cl2_ext6_BPL4PTH		RS.L 1
+cl2_ext6_BPL4PTL		RS.L 1
+cl2_ext6_WAIT			RS.L 1
+cl2_ext6_bplcon0		RS.L 1
 
 cl2_extension6_size		RS.B 0
+
+
+	RSRESET
+
+cl2_extension7			RS.B 0
+
+cl2_ext7_WAIT			RS.L 1
+	IFEQ scs_pipe_effect_enabled
+cl2_ext7_BPLCON1		RS.L 1
+	ENDC
+cl2_ext7_BPLCON3_1		RS.L 1
+cl2_ext7_BPL1MOD		RS.L 1
+cl2_ext7_BPL2MOD		RS.L 1
+cl2_ext7_COLOR00_high		RS.L 1
+cl2_ext7_COLOR01_high		RS.L 1
+cl2_ext7_COLOR02_high		RS.L 1
+cl2_ext7_COLOR05_high		RS.L 1
+cl2_ext7_COLOR06_high		RS.L 1
+cl2_ext7_BPLCON3_2		RS.L 1
+cl2_ext7_COLOR00_low		RS.L 1
+cl2_ext7_COLOR01_low		RS.L 1
+cl2_ext7_COLOR02_low		RS.L 1
+cl2_ext7_COLOR05_low		RS.L 1
+cl2_ext7_COLOR06_low		RS.L 1
+cl2_ext7_NOOP			RS.L 1
+
+cl2_extension7_size		RS.B 0
 
 
 	RSRESET
@@ -815,20 +847,15 @@ cl2_extension1_entry		RS.B cl2_extension1_size*vb1_lines_number
 
 ; Viewport 1
 cl2_extension2_entry		RS.B cl2_extension2_size
-cl2_WAIT1			RS.L 1
-cl2_bplcon0_1			RS.L 1
 cl2_extension3_entry		RS.B cl2_extension3_size*hsi_lines_number
-cl2_WAIT2			RS.L 1
-cl2_bplcon0_2			RS.L 1
 
 ; Vertical-Blank 2
-cl2_extension4_entry		RS.B cl2_extension4_size*vb2_lines_number
+cl2_extension4_entry		RS.B cl2_extension4_size
+cl2_extension5_entry		RS.B cl2_extension5_size*vb2_lines_number
 
 ; Viewport 2
-cl2_extension5_entry		RS.B cl2_extension5_size
-cl2_WAIT3			RS.L 1
-cl2_bplcon0_3			RS.L 1
-cl2_extension6_entry		RS.B cl2_extension6_size*vp2_visible_lines_number
+cl2_extension6_entry		RS.B cl2_extension6_size
+cl2_extension7_entry		RS.B cl2_extension7_size*vp2_visible_lines_number
 
 ; Copper-Interrupt
 cl2_WAIT5			RS.L 1
@@ -1282,21 +1309,29 @@ init_main_variables
 
 	CNOP 0,4
 init_main
-	bsr	pt_DetectSysFrEQU
+	bsr	pt_DetectSysFrequ
 	bsr	pt_InitRegisters
 	bsr	pt_InitAudTempStrucs
 	bsr	pt_ExamineSongStruc
 	bsr	pt_InitFtuPeriodTableStarts
-	bsr	bg_copy_image_to_bitplane
+
+	bsr	lg_copy_image_to_bitplane
+
 	bsr	hsi_init_shift_table
+
 	bsr	scs_init_chars_offsets
 	IFEQ scs_pipe_effect_enabled
 		bsr	scs_init_x_shift_table
 	ENDC
+
 	bsr	bf_rgb8_init_color_table
+
 	bsr	init_colors
+
 	bsr	init_sprites
+
 	bsr	init_CIA_timers
+
 	bsr	init_first_copperlist
 	bra	init_second_copperlist
 
@@ -1313,8 +1348,8 @@ init_main
 	PT_INIT_FINETUNE_TABLE_STARTS
 
 
-; Background-Image 
-	COPY_IMAGE_TO_BITPLANE bg,bg_image_x_position,bg_image_y_position,extra_pf1
+; Logo
+	COPY_IMAGE_TO_BITPLANE lg,lg_image_x_position,lg_image_y_position,extra_pf1
 
 
 ; Horiz-Scaling-Image 
@@ -1374,8 +1409,10 @@ init_colors
 	CNOP 0,4
 init_sprites
 	bsr.s	spr_init_pointers_table
+
 	bsr.s	hcs_init_xy_coordinates
 	bsr	hcs_init_sprites_bitmaps
+
 	bra	spr_copy_structures
 
 
@@ -1427,8 +1464,8 @@ hcs_init_xy_coordinates_loop2
 ; Input
 ; d0.w	X
 ; d1.w	Y
-; a0.l	Pointer 1st sprite structure
-; a1.l	Pointer 2nd sprite structure
+; a0.l	1st sprite structure
+; a1.l	2nd sprite structure
 ; Result
 	CNOP 0,4
 hcs_init_sprite_header
@@ -1517,31 +1554,23 @@ cl1_init_colors
 	CNOP 0,4
 init_second_copperlist
 	move.l	cl2_construction2(a3),a0
-
 ; Vertical-Blank 1
 	bsr.s	cl2_vb1_init_bpldat
-
 ; Viewport 1
 	bsr	cl2_vp1_init_playfield_props
 	bsr	cl2_vp1_init_colors
 	bsr	cl2_vp1_init_bitplane_pointers
-	COP_WAIT 0,vp1_vstart
-	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
+	bsr	cl2_vp1_start_display
 	bsr	cl2_init_bplcon1_chunky
-	COP_WAIT 0,vp1_vstop
-	COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
-
 ; Vertical-Blank 2
+	bsr	cl2_vb2_start_blank
 	bsr	cl2_vb2_init_bpldat
-
 ; Viewport 2
 	bsr	cl2_vp2_init_playfield_props
 	bsr	cl2_vp2_init_colors
 	bsr	cl2_vp2_init_bitplane_pointers
-	COP_WAIT 0,vp2_vstart
-	COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
+	bsr	cl2_vp2_start_display
 	bsr	cl2_init_roller
-
 ; Copper-Interrupt
 	bsr	cl2_init_copper_interrupt
 	COP_LISTEND
@@ -1564,10 +1593,10 @@ init_second_copperlist
 cl2_vb1_init_bpldat
 	move.l	#(((cl2_vb1_VSTART<<24)|(((cl2_vb1_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	move.l	#BPL1DAT<<16,d1
-	move.l	#$01000000,d2
+	move.l	#1<<24,d2
 	MOVEF.W vb1_lines_number-1,d7
 cl2_vb1_init_bpldat_loop
-	move.l	d0,(a0)+		; CWAIT x,y
+	move.l	d0,(a0)+		; CWAIT
 	add.l	d2,d0			; next line in cl
 	move.l	d1,(a0)+		; BPL1DAT
 	dbf	d7,cl2_vb1_init_bpldat_loop
@@ -1587,13 +1616,19 @@ cl2_vp1_init_colors
 
 	CNOP 0,4
 cl2_vp1_init_bitplane_pointers
-	move.w #BPL1PTH,d0
+	move.w	#BPL1PTH,d0
 	moveq	#(extra_pf1_depth*2)-1,d7
 cl2_vp1_init_bitplane_pointers_loop
 	move.w	d0,(a0)			; BPLxPTH/L
 	addq.w	#WORD_SIZE,d0
 	addq.w	#LONGWORD_SIZE,a0
 	dbf	d7,cl2_vp1_init_bitplane_pointers_loop
+	rts
+
+	CNOP 0,4
+cl2_vp1_start_display
+	COP_WAIT 0,vp1_vstart
+	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
 	rts
 
 	CNOP 0,4
@@ -1614,13 +1649,19 @@ cl2_vp1_set_bitplane_pointers_loop
 
 ; Vertical-Blank 2
 	CNOP 0,4
+cl2_vb2_start_blank
+	COP_WAIT 0,vp1_vstop
+	COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
+	rts
+
+	CNOP 0,4
 cl2_vb2_init_bpldat
 	move.l	#(((cl2_vb2_VSTART<<24)|(((cl2_vb2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	move.l	#BPL1DAT<<16,d1
-	move.l	#$01000000,d2
+	move.l	#1<<24,d2
 	MOVEF.W vb2_lines_number-1,d7
 cl2_vb2_init_bpldat_loop
-	move.l	d0,(a0)+		; CWAIT x,y
+	move.l	d0,(a0)+		; CWAIT
 	add.l	d2,d0			; next line in cl
 	move.l	d1,(a0)+		; BPL1DAT
 	dbf	d7,cl2_vb2_init_bpldat_loop
@@ -1652,6 +1693,12 @@ cl2_vp2_init_bitplane_pointers_loop
 	rts
 
 	CNOP 0,4
+cl2_vp2_start_display
+	COP_WAIT 0,vp2_vstart
+	COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
+	rts
+
+	CNOP 0,4
 cl2_init_roller
 	movem.l a4-a6,-(a7)
 	move.l	#(((cl2_vp2_vstart<<24)|(((cl2_vp2_hstart/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
@@ -1660,7 +1707,7 @@ cl2_init_roller
 	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits2,d3 ; color low
 	move.l	#COLOR02<<16,d4
 	move.l	#COLOR05<<16,d5
-	move.l	#$01000000,d6
+	move.l	#1<<24,d6
 	move.l	#(BPL1MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a1
 	move.l	#(BPL2MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a2
 	IFEQ scs_pipe_effect_enabled
@@ -1670,7 +1717,7 @@ cl2_init_roller
 	move.l	#COLOR06<<16,a6
 	moveq	#vp2_visible_lines_number-1,d7
 cl2_init_roller_loop
-	move.l	d0,(a0)+		; CWAIT x,y
+	move.l	d0,(a0)+		; CWAIT
 	IFEQ scs_pipe_effect_enabled
 		move.l	a4,(a0)+	; BPLCON1
 	ENDC
@@ -1694,7 +1741,7 @@ cl2_init_roller_loop
 	cmp.l	#(((CL_Y_WRAPPING<<24)|(((cl2_vp2_hstart/4)*2)<<16))|$10000)|$fffe,d0 ; y wrapping ?
 	bne.s	cl2_init_roller_skip
 	subq.w	#LONGWORD_SIZE,a0
-	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING	; patch cl
+	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING ; patch cl
 cl2_init_roller_skip
 	add.l	d6,d0			; next line in cl
 	dbf	d7,cl2_init_roller_loop
@@ -1710,8 +1757,8 @@ cl2_vp2_set_bitplane_pointers
 	MOVEF.L (extra_pf2_1_plane_x_offset/8)+(extra_pf2_1_plane_y_offset*extra_pf2_plane_width*extra_pf2_depth),d1 ; 2nd half
 	move.l	cl2_construction2(a3),a0
 	move.l	extra_pf2(a3),a2
-	lea	cl2_extension5_entry+cl2_ext5_BPL2PTH+WORD_SIZE(a0),a1
-	ADDF.W	cl2_extension5_entry+cl2_ext5_BPL1PTH+WORD_SIZE,a0
+	lea	cl2_extension6_entry+cl2_ext6_BPL2PTH+WORD_SIZE(a0),a1
+	ADDF.W	cl2_extension6_entry+cl2_ext6_BPL1PTH+WORD_SIZE,a0
 	moveq	#extra_pf2_depth-1,d7
 cl2_vp2_set_bitplane_pointers_loop1
 	move.l	(a2)+,d0		; bitplane address
@@ -1741,10 +1788,10 @@ scs_set_vert_compression
 	moveq	#scs_roller_y_radius*2,d3
 	moveq	#scs_roller_y_center,d4
 	MOVEF.W (sine_table_length1/4)*3,d5 ; 270°
-	moveq	#cl2_extension6_size,d6
+	moveq	#cl2_extension7_size,d6
 	lea	sine_table(pc),a0	
 	move.l	cl2_construction2(a3),a1
-	ADDF.W	cl2_extension6_entry,a1 
+	ADDF.W	cl2_extension7_entry,a1 
 	moveq	#extra_pf2_plane_width*extra_pf2_depth,d7
 scs_set_vert_compression_loop
 	move.w	2(a0,d1.w*4),d0		; sin(w)
@@ -1752,9 +1799,9 @@ scs_set_vert_compression_loop
 	swap	d0			; y'=(yr*sin(w))/2^15
 	add.w	d4,d0			; y' + y center
 	mulu.w	d6,d0			; y offsert in cl
-	add.w	d7,cl2_ext6_BPL1MOD+WORD_SIZE(a1,d0.l) ; BPL1MOD
+	add.w	d7,cl2_ext7_BPL1MOD+WORD_SIZE(a1,d0.l) ; BPL1MOD
 	addq.w	#scs_roller_y_angle_step,d1
-	sub.w	d7,cl2_ext6_BPL2MOD+WORD_SIZE(a1,d0.l) ; BPL2MOD
+	sub.w	d7,cl2_ext7_BPL2MOD+WORD_SIZE(a1,d0.l) ; BPL2MOD
 	cmp.w	d5,d1			; 270° ?
 	ble.s	scs_set_vert_compression_loop
 	rts
@@ -1767,24 +1814,24 @@ scs_set_color_gradients
 	lea	scs_color_gradient_front(pc),a0
 	lea	scs_color_gradient_back(pc),a1
 	move.l	cl2_construction2(a3),a2 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a2
 	lea	scs_color_gradient_outline(pc),a4
-	move.w	#cl2_extension6_size,a5
+	move.w	#cl2_extension7_size,a5
 	moveq	#vp2_visible_lines_number-1,d7 ; number of colors
 scs_set_color_gradients_loop
 	move.w	d2,(a2)			; color high
-	move.w	d3,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	(a0)+,cl2_ext6_COLOR01_high-cl2_ext6_COLOR00_high(a2) ; color high
-	move.w	(a0)+,cl2_ext6_COLOR01_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	(a1)+,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a2) ; color high
-	move.w	(a1)+,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a2) ; color low
+	move.w	d3,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	(a0)+,cl2_ext7_COLOR01_high-cl2_ext7_COLOR00_high(a2) ; color high
+	move.w	(a0)+,cl2_ext7_COLOR01_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	(a1)+,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a2) ; color high
+	move.w	(a1)+,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a2) ; color low
 	move.l	(a4)+,d0
-	move.w	d0,cl2_ext6_COLOR02_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR02_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a2) ; color low
 	swap	d0
-	move.w	d0,cl2_ext6_COLOR02_high-cl2_ext6_COLOR00_high(a2) ; color high
+	move.w	d0,cl2_ext7_COLOR02_high-cl2_ext7_COLOR00_high(a2) ; color high
 	add.l	a5,a2			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a2) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a2) ; color high
 	dbf	d7,scs_set_color_gradients_loop
 	movem.l (a7)+,a4-a5
 	rts
@@ -1796,8 +1843,8 @@ scs_set_pipe
 		MOVEF.W $ff,d3		; scroll mask H0-H7
 		lea	scs_pipe_shift_x_table(pc),a0
 		move.l	cl2_construction2(a3),a1
-		ADDF.W	cl2_extension6_entry+cl2_ext6_BPLCON1+WORD_SIZE,a1
-		move.w	#cl2_extension6_size,a2
+		ADDF.W	cl2_extension7_entry+cl2_ext7_BPLCON1+WORD_SIZE,a1
+		move.w	#cl2_extension7_size,a2
 		moveq	#vp2_visible_lines_number-1,d7
 scs_set_pipe_loop
 		move.w	(a0)+,d0	; x shift
@@ -2263,8 +2310,8 @@ sb232_get_y_coordinates
 	lea	sine_table(pc),a0	
 	move.w	#sb232_y_center,a1
 	move.l	cl2_construction2(a3),a5 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a5
-	move.w	#cl2_extension6_size,a6
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a5
+	move.w	#cl2_extension7_size,a6
 	moveq	#sb232_bars_number-1,d7
 sb232_get_y_coordinates_loop1
 	move.w	2(a0,d3.w*4),d0		; sin(w)
@@ -2276,20 +2323,20 @@ sb232_get_y_coordinates_loop1
 	swap	d0
 	ADDF.B	sb232_y_distance,d4	; y distance to next bar
 	add.w	a1,d0			; y' + y center
-	MULUF.W cl2_extension6_size/4,d0,d1 ; y offset in cl
+	MULUF.W cl2_extension7_size/4,d0,d1 ; y offset in cl
 	lea	(a5,d0.w*4),a2
 	lea	scs_bar_color_table(pc),a4
 	moveq	#sb_bar_height-1,d6
 sb232_get_y_coordinates_loop2
 	move.l	(a4)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a2) ; color low
 	swap	d0
 	move.w	d0,(a2)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a2) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a2) ; color high
 	add.l	a6,a2			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a2) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a2) ; color high
 	dbf	d6,sb232_get_y_coordinates_loop2
 	dbf	d7,sb232_get_y_coordinates_loop1
 sb232_get_y_coordinates_quit
@@ -2326,7 +2373,7 @@ sb36_get_yz_coordinates_loop
 	muls.w	sb_variable_y_radius(a3),d0 ; y'=(yr*sin(w))/2^15
 	swap	d0
 	add.w	a2,d0			; y' + y center
-	MULUF.W cl2_extension6_size/4,d0,d1 ; y offset in cl
+	MULUF.W cl2_extension7_size/4,d0,d1 ; y offset in cl
 	move.l	(a0,d4.w*4),d3		; sin(w)
 	MULUF.L sb36_y_distance_radius*2,d3,d1 ; y'=(yr*sin(w))/2^15
 	swap	d3
@@ -2347,10 +2394,10 @@ sb36_set_background_bars
 	bne.s	sb36_set_background_bars_quit
 	tst.w	sb_variable_y_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_background_bars_quit
-	MOVEF.L cl2_extension6_size,d5
+	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
 	move.l	cl2_construction2(a3),a2 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
 sb36_set_background_bars_loop1
 	move.l	(a0)+,d0 		; low word: y, high word: z vector
@@ -2360,14 +2407,14 @@ sb36_set_background_bars_loop1
 	moveq	#sb_bar_height-1,d6
 sb36_set_background_bars_loop2
 	move.l	(a1)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a4) ; color low
 	swap	d0
 	move.w	d0,(a4)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a4) ; color high
 	add.l	d5,a4			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a4) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a4) ; color high
 	dbf	d6,sb36_set_background_bars_loop2
 sb36_set_background_bars_skip
 	dbf	d7,sb36_set_background_bars_loop1
@@ -2383,10 +2430,10 @@ sb36_set_foreground_bars
 	bne.s	sb36_set_foreground_bars_quit
 	tst.w	sb_variable_y_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_foreground_bars_quit
-	MOVEF.L cl2_extension6_size,d5
+	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
 	move.l	cl2_construction2(a3),a2 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
 sb36_set_foreround_bars_loop1
 	move.l	(a0)+,d0 		; low word: y, high word: z vector
@@ -2397,14 +2444,14 @@ sb36_set_foreground_bar
 	moveq	#sb_bar_height-1,d6
 sb36_set_foreround_bars_loop2
 	move.l	(a1)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a4) ; color low
 	swap	d0
 	move.w	d0,(a4)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a4) ; color high
 	add.l	d5,a4			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a4) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a4) ; color high
 	dbf	d6,sb36_set_foreround_bars_loop2
 sb36_set_foreground_bars_skip
 	dbf	d7,sb36_set_foreround_bars_loop1
@@ -2419,19 +2466,19 @@ scs_set_center_bar
 	bne.s	scs_set_center_bar_quit
 	lea	scs_bar_color_table(pc),a0
 	move.l	cl2_construction2(a3),a1
-	ADDF.W	(cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE)+(((vp2_visible_lines_number-scs_center_bar_height)/2)*cl2_extension6_size),a1 ; y centering
-	move.w	#cl2_extension6_size,a2
+	ADDF.W	(cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE)+(((vp2_visible_lines_number-scs_center_bar_height)/2)*cl2_extension7_size),a1 ; y centering
+	move.w	#cl2_extension7_size,a2
 	moveq	#scs_center_bar_height-1,d7
 scs_set_center_bar_loop
 	move.l	(a0)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a1) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a1) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a1) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a1) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a1) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a1) ; color low
 	swap	d0
 	move.w	d0,(a1)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a1) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a1) ; color high
 	add.l	a2,a1			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a1) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a1) ; color high
 	dbf	d7,scs_set_center_bar_loop
 scs_set_center_bar_quit
 	rts
@@ -3300,8 +3347,8 @@ pt_auddata			SECTION pt_audio,DATA_C
 
 ; Gfx data
 
-; Background-Image 
-bg_image_data			SECTION bg_gfx,DATA
+; Logo
+lg_image_data			SECTION lg_gfx,DATA
 	INCBIN "CoolCorkscrew:graphics/256x30x16-Resistance.rawblit"
 
 ; Horiz-Charactersrolling 
@@ -3715,17 +3762,17 @@ cl2_vstart			EQU beam_position&CL_Y_WRAPPING
 sine_table_length1		EQU 256
 sine_table_length2		EQU 512
 
-; Background-Image 
-bg_image_x_size			EQU 256
-bg_image_plane_width		EQU bg_image_x_size/8
-bg_image_y_size			EQU 30
-bg_image_depth			EQU 4
-bg_image_x_position		EQU 16
-bg_image_y_position		EQU 0
+; Logo
+lg_image_x_size			EQU 256
+lg_image_plane_width		EQU lg_image_x_size/8
+lg_image_y_size			EQU 30
+lg_image_depth			EQU 4
+lg_image_x_position		EQU 16
+lg_image_y_position		EQU 0
 
 ; Horiz-Scaling-Image 
 hsi_shift_values_number		EQU 32
-hsi_lines_number		EQU bg_image_y_size
+hsi_lines_number		EQU lg_image_y_size
 hsi_x_radius			EQU 8
 hsi_x_radius_angle_speed	EQU 5
 hsi_x_angle_step		EQU 4
@@ -4063,40 +4110,10 @@ cl2_extension3_size		RS.B 0
 
 	RSRESET
 
-cl2_extension4			RS.B 0
-
-cl2_ext4_WAIT			RS.L 1
-cl2_ext4_BPL1DAT		RS.L 1
-
-cl2_extension4_size		RS.B 0
-
-
-	RSRESET
-
 cl2_extension5			RS.B 0
 
-cl2_ext5_DDFSTRT		RS.L 1
-cl2_ext5_DDFSTOP		RS.L 1
-cl2_ext5_BPLCON1		RS.L 1
-cl2_ext5_BPLCON2		RS.L 1
-cl2_ext5_BPLCON3_1		RS.L 1
-cl2_ext5_BPL1MOD		RS.L 1
-cl2_ext5_BPL2MOD		RS.L 1
-cl2_ext5_BPLCON4		RS.L 1
-cl2_ext5_FMODE			RS.L 1
-cl2_ext5_COLOR00_high1		RS.L 1
-cl2_ext5_COLOR04_high1		RS.L 1
-cl2_ext5_BPLCON3_low1		RS.L 1
-cl2_ext5_COLOR00_low1		RS.L 1
-cl2_ext5_COLOR04_low1		RS.L 1
-cl2_ext5_BPL1PTH		RS.L 1
-cl2_ext5_BPL1PTL		RS.L 1
-cl2_ext5_BPL2PTH		RS.L 1
-cl2_ext5_BPL2PTL		RS.L 1
-cl2_ext5_BPL3PTH		RS.L 1
-cl2_ext5_BPL3PTL		RS.L 1
-cl2_ext5_BPL4PTH		RS.L 1
-cl2_ext5_BPL4PTL		RS.L 1
+cl2_ext5_WAIT			RS.L 1
+cl2_ext5_BPL1DAT		RS.L 1
 
 cl2_extension5_size		RS.B 0
 
@@ -4105,27 +4122,57 @@ cl2_extension5_size		RS.B 0
 
 cl2_extension6			RS.B 0
 
-cl2_ext6_WAIT			RS.L 1
-	IFEQ scs_pipe_effect_enabled
+cl2_ext6_DDFSTRT		RS.L 1
+cl2_ext6_DDFSTOP		RS.L 1
 cl2_ext6_BPLCON1		RS.L 1
-	ENDC
+cl2_ext6_BPLCON2		RS.L 1
 cl2_ext6_BPLCON3_1		RS.L 1
 cl2_ext6_BPL1MOD		RS.L 1
 cl2_ext6_BPL2MOD		RS.L 1
-cl2_ext6_COLOR00_high		RS.L 1
-cl2_ext6_COLOR01_high		RS.L 1
-cl2_ext6_COLOR02_high		RS.L 1
-cl2_ext6_COLOR05_high		RS.L 1
-cl2_ext6_COLOR06_high		RS.L 1
-cl2_ext6_BPLCON3_2		RS.L 1
-cl2_ext6_COLOR00_low		RS.L 1
-cl2_ext6_COLOR01_low		RS.L 1
-cl2_ext6_COLOR02_low		RS.L 1
-cl2_ext6_COLOR05_low		RS.L 1
-cl2_ext6_COLOR06_low		RS.L 1
-cl2_ext6_NOOP			RS.L 1
+cl2_ext6_BPLCON4		RS.L 1
+cl2_ext6_FMODE			RS.L 1
+cl2_ext6_COLOR00_high1		RS.L 1
+cl2_ext6_COLOR04_high1		RS.L 1
+cl2_ext6_BPLCON3_low1		RS.L 1
+cl2_ext6_COLOR00_low1		RS.L 1
+cl2_ext6_COLOR04_low1		RS.L 1
+cl2_ext6_BPL1PTH		RS.L 1
+cl2_ext6_BPL1PTL		RS.L 1
+cl2_ext6_BPL2PTH		RS.L 1
+cl2_ext6_BPL2PTL		RS.L 1
+cl2_ext6_BPL3PTH		RS.L 1
+cl2_ext6_BPL3PTL		RS.L 1
+cl2_ext6_BPL4PTH		RS.L 1
+cl2_ext6_BPL4PTL		RS.L 1
 
 cl2_extension6_size		RS.B 0
+
+
+	RSRESET
+
+cl2_extension7			RS.B 0
+
+cl2_ext7_WAIT			RS.L 1
+	IFEQ scs_pipe_effect_enabled
+cl2_ext7_BPLCON1		RS.L 1
+	ENDC
+cl2_ext7_BPLCON3_1		RS.L 1
+cl2_ext7_BPL1MOD		RS.L 1
+cl2_ext7_BPL2MOD		RS.L 1
+cl2_ext7_COLOR00_high		RS.L 1
+cl2_ext7_COLOR01_high		RS.L 1
+cl2_ext7_COLOR02_high		RS.L 1
+cl2_ext7_COLOR05_high		RS.L 1
+cl2_ext7_COLOR06_high		RS.L 1
+cl2_ext7_BPLCON3_2		RS.L 1
+cl2_ext7_COLOR00_low		RS.L 1
+cl2_ext7_COLOR01_low		RS.L 1
+cl2_ext7_COLOR02_low		RS.L 1
+cl2_ext7_COLOR05_low		RS.L 1
+cl2_ext7_COLOR06_low		RS.L 1
+cl2_ext7_NOOP			RS.L 1
+
+cl2_extension7_size		RS.B 0
 
 
 	RSRESET
@@ -4144,13 +4191,13 @@ cl2_WAIT2			RS.L 1
 cl2_bplcon0_2			RS.L 1
 
 ; Vertical-Blank 2
-cl2_extension4_entry		RS.B cl2_extension4_size*vb2_lines_number
+cl2_extension5_entry		RS.B cl2_extension5_size*vb2_lines_number
 
 ; Viewport 2
-cl2_extension5_entry		RS.B cl2_extension5_size
+cl2_extension6_entry		RS.B cl2_extension6_size
 cl2_WAIT3			RS.L 1
 cl2_bplcon0_3			RS.L 1
-cl2_extension6_entry		RS.B cl2_extension6_size*vp2_visible_lines_number
+cl2_extension7_entry		RS.B cl2_extension7_size*vp2_visible_lines_number
 
 ; Copper-Interrupt
 cl2_WAIT5			RS.L 1
@@ -4604,12 +4651,12 @@ init_main_variables
 
 	CNOP 0,4
 init_main
-	bsr	pt_DetectSysFrEQU
+	bsr	pt_DetectSysFrequ
 	bsr	pt_InitRegisters
 	bsr	pt_InitAudTempStrucs
 	bsr	pt_ExamineSongStruc
 	bsr	pt_InitFtuPeriodTableStarts
-	bsr	bg_copy_image_to_bitplane
+	bsr	lg_copy_image_to_bitplane
 	bsr	hsi_init_shift_table
 	bsr	scs_init_chars_offsets
 	IFEQ scs_pipe_effect_enabled
@@ -4635,8 +4682,8 @@ init_main
 	PT_INIT_FINETUNE_TABLE_STARTS
 
 
-; Background-Image 
-	COPY_IMAGE_TO_BITPLANE bg,bg_image_x_position,bg_image_y_position,extra_pf1
+; Logo
+	COPY_IMAGE_TO_BITPLANE bg,lg_image_x_position,lg_image_y_position,extra_pf1
 
 
 ; Horiz-Scaling-Image 
@@ -4889,7 +4936,7 @@ cl2_vb1_init_bpldat
 	move.l	#$01000000,d2
 	MOVEF.W vb1_lines_number-1,d7
 cl2_vb1_init_bpldat_loop
-	move.l	d0,(a0)+		; CWAIT x,y
+	move.l	d0,(a0)+		; CWAIT
 	add.l	d2,d0			; next line in cl
 	move.l	d1,(a0)+		; BPL1DAT
 	dbf	d7,cl2_vb1_init_bpldat_loop
@@ -4939,10 +4986,10 @@ cl2_vp1_set_bitplane_pointers_loop
 cl2_vb2_init_bpldat
 	move.l	#(((cl2_vb2_VSTART<<24)|(((cl2_vb2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	move.l	#BPL1DAT<<16,d1
-	move.l	#$01000000,d2
+	move.l	#1<<24,d2		; next line
 	MOVEF.W vb2_lines_number-1,d7
 cl2_vb2_init_bpldat_loop
-	move.l	d0,(a0)+		; CWAIT x,y
+	move.l	d0,(a0)+		; CWAIT
 	add.l	d2,d0			; next line in cl
 	move.l	d1,(a0)+		; BPL1DAT
 	dbf	d7,cl2_vb2_init_bpldat_loop
@@ -4992,7 +5039,7 @@ cl2_init_roller
 	move.l	#COLOR06<<16,a6
 	moveq	#vp2_visible_lines_number-1,d7
 cl2_init_roller_loop
-	move.l	d0,(a0)+		; CWAIT x,y
+	move.l	d0,(a0)+		; CWAIT
 	IFEQ scs_pipe_effect_enabled
 		move.l	a4,(a0)+	; BPLCON1
 	ENDC
@@ -5016,7 +5063,7 @@ cl2_init_roller_loop
 	cmp.l	#(((CL_Y_WRAPPING<<24)|(((cl2_vp2_hstart/4)*2)<<16))|$10000)|$fffe,d0 ; y wrapping ?
 	bne.s	cl2_init_roller_skip
 	subq.w	#LONGWORD_SIZE,a0
-	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING	; patch cl
+	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING ; patch cl
 cl2_init_roller_skip
 	add.l	d6,d0			; next line in cl
 	dbf	d7,cl2_init_roller_loop
@@ -5032,8 +5079,8 @@ cl2_vp2_set_bitplane_pointers
 	MOVEF.L (extra_pf2_1_plane_x_offset/8)+(extra_pf2_1_plane_y_offset*extra_pf2_plane_width*extra_pf2_depth),d1 ; 2nd half
 	move.l	cl2_construction2(a3),a0
 	move.l	extra_pf2(a3),a2
-	lea	cl2_extension5_entry+cl2_ext5_BPL2PTH+WORD_SIZE(a0),a1
-	ADDF.W	cl2_extension5_entry+cl2_ext5_BPL1PTH+WORD_SIZE,a0
+	lea	cl2_extension6_entry+cl2_ext6_BPL2PTH+WORD_SIZE(a0),a1
+	ADDF.W	cl2_extension6_entry+cl2_ext6_BPL1PTH+WORD_SIZE,a0
 	moveq	#extra_pf2_depth-1,d7
 cl2_vp2_set_bitplane_pointers_loop1
 	move.l	(a2)+,d0		; bitplane address
@@ -5063,10 +5110,10 @@ scs_set_vert_compression
 	moveq	#scs_roller_y_radius*2,d3
 	moveq	#scs_roller_y_center,d4
 	MOVEF.W (sine_table_length1/4)*3,d5 ; 270°
-	moveq	#cl2_extension6_size,d6
+	moveq	#cl2_extension7_size,d6
 	lea	sine_table(pc),a0	
 	move.l	cl2_construction2(a3),a1
-	ADDF.W	cl2_extension6_entry,a1 
+	ADDF.W	cl2_extension7_entry,a1 
 	moveq	#extra_pf2_plane_width*extra_pf2_depth,d7
 scs_set_vert_compression_loop
 	move.w	2(a0,d1.w*4),d0		; sin(w)
@@ -5074,9 +5121,9 @@ scs_set_vert_compression_loop
 	swap	d0			; y'=(yr*sin(w))/2^15
 	add.w	d4,d0			; y' + y center
 	mulu.w	d6,d0			; y offsert in cl
-	add.w	d7,cl2_ext6_BPL1MOD+WORD_SIZE(a1,d0.l) ; BPL1MOD
+	add.w	d7,cl2_ext7_BPL1MOD+WORD_SIZE(a1,d0.l) ; BPL1MOD
 	addq.w	#scs_roller_y_angle_step,d1
-	sub.w	d7,cl2_ext6_BPL2MOD+WORD_SIZE(a1,d0.l) ; BPL2MOD
+	sub.w	d7,cl2_ext7_BPL2MOD+WORD_SIZE(a1,d0.l) ; BPL2MOD
 	cmp.w	d5,d1			; 270° ?
 	ble.s	scs_set_vert_compression_loop
 	rts
@@ -5089,24 +5136,24 @@ scs_set_color_gradients
 	lea	scs_color_gradient_front(pc),a0
 	lea	scs_color_gradient_back(pc),a1
 	move.l	cl2_construction2(a3),a2 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a2
 	lea	scs_color_gradient_outline(pc),a4
-	move.w	#cl2_extension6_size,a5
+	move.w	#cl2_extension7_size,a5
 	moveq	#vp2_visible_lines_number-1,d7 ; number of colors
 scs_set_color_gradients_loop
 	move.w	d2,(a2)			; color high
-	move.w	d3,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	(a0)+,cl2_ext6_COLOR01_high-cl2_ext6_COLOR00_high(a2) ; color high
-	move.w	(a0)+,cl2_ext6_COLOR01_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	(a1)+,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a2) ; color high
-	move.w	(a1)+,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a2) ; color low
+	move.w	d3,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	(a0)+,cl2_ext7_COLOR01_high-cl2_ext7_COLOR00_high(a2) ; color high
+	move.w	(a0)+,cl2_ext7_COLOR01_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	(a1)+,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a2) ; color high
+	move.w	(a1)+,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a2) ; color low
 	move.l	(a4)+,d0
-	move.w	d0,cl2_ext6_COLOR02_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR02_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a2) ; color low
 	swap	d0
-	move.w	d0,cl2_ext6_COLOR02_high-cl2_ext6_COLOR00_high(a2) ; color high
+	move.w	d0,cl2_ext7_COLOR02_high-cl2_ext7_COLOR00_high(a2) ; color high
 	add.l	a5,a2			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a2) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a2) ; color high
 	dbf	d7,scs_set_color_gradients_loop
 	movem.l (a7)+,a4-a5
 	rts
@@ -5118,14 +5165,14 @@ scs_set_pipe
 		MOVEF.W $ff,d3		; scroll mask H0-H7
 		lea	scs_pipe_shift_x_table(pc),a0
 		move.l	cl2_construction2(a3),a1
-		ADDF.W	cl2_extension6_entry+cl2_ext6_BPLCON1+WORD_SIZE,a1
-		move.w	#cl2_extension6_size,a2
+		ADDF.W	cl2_extension7_entry+cl2_ext7_BPLCON1+WORD_SIZE,a1
+		move.w	#cl2_extension7_size,a2
 		moveq	#vp2_visible_lines_number-1,d7
 scs_set_pipe_loop
 		move.w	(a0)+,d0	; x shift
 		moveq	#scs_pipe_shift_x_center,d1
-		sub.w	d0,d1		; x center-x'
-		add.w	d2,d0		; x center+x'
+		sub.w	d0,d1		; x center - x'
+		add.w	d2,d0		; x center + x'
 		DUALPF_SOFTSCROLL_64PIXEL_LORES d1,d0,d3
 		move.w	d1,(a1)		; BPLCON1
 		add.l	a2,a1		; next line in cl
@@ -5212,7 +5259,7 @@ scs_horiz_scrolltext
 	addq.w	#scs_horiz_scroll_speed,d2
 	cmp.w	#scs_text_char_x_size,d2
 	blt.s	scs_horiz_scrolltext_skip3
-	bsr.s	scs_get_new_char_image	; d0 = character
+	bsr.s	scs_get_new_char_image	; result d0 = character
 	MOVEF.L scs_text_char_x_restart/8,d1
 	move.w	scs_text_char_y_offset(a3),d3
 	add.w	d3,d1			; x offset + y offset
@@ -5585,8 +5632,8 @@ sb232_get_y_coordinates
 	lea	sine_table(pc),a0	
 	move.w	#sb232_y_center,a1
 	move.l	cl2_construction2(a3),a5 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a5
-	move.w	#cl2_extension6_size,a6
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a5
+	move.w	#cl2_extension7_size,a6
 	moveq	#sb232_bars_number-1,d7
 sb232_get_y_coordinates_loop1
 	move.w	2(a0,d3.w*4),d0		; sin(w)
@@ -5598,20 +5645,20 @@ sb232_get_y_coordinates_loop1
 	swap	d0
 	ADDF.B	sb232_y_distance,d4	; y distance to next bar
 	add.w	a1,d0			; y' + y center
-	MULUF.W cl2_extension6_size/4,d0,d1 ; y offset in cl
+	MULUF.W cl2_extension7_size/4,d0,d1 ; y offset in cl
 	lea	(a5,d0.w*4),a2
 	lea	scs_bar_color_table(pc),a4
 	moveq	#sb_bar_height-1,d6
 sb232_get_y_coordinates_loop2
 	move.l	(a4)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a2) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a2) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a2) ; color low
 	swap	d0
 	move.w	d0,(a2)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a2) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a2) ; color high
 	add.l	a6,a2			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a2) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a2) ; color high
 	dbf	d6,sb232_get_y_coordinates_loop2
 	dbf	d7,sb232_get_y_coordinates_loop1
 sb232_get_y_coordinates_quit
@@ -5648,7 +5695,7 @@ sb36_get_yz_coordinates_loop
 	muls.w	sb_variable_y_radius(a3),d0 ; y'=(yr*sin(w))/2^15
 	swap	d0
 	add.w	a2,d0			; y' + y center
-	MULUF.W cl2_extension6_size/4,d0,d1 ; y offset in cl
+	MULUF.W cl2_extension7_size/4,d0,d1 ; y offset in cl
 	move.l	(a0,d4.w*4),d3		; sin(w)
 	MULUF.L sb36_y_distance_radius*2,d3,d1 ; y'=(yr*sin(w))/2^15
 	swap	d3
@@ -5669,10 +5716,10 @@ sb36_set_background_bars
 	bne.s	sb36_set_background_bars_quit
 	tst.w	sb_variable_y_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_background_bars_quit
-	MOVEF.L cl2_extension6_size,d5
+	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
 	move.l	cl2_construction2(a3),a2 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
 sb36_set_background_bars_loop1
 	move.l	(a0)+,d0 		; low word: y, high word: z vector
@@ -5682,14 +5729,14 @@ sb36_set_background_bars_loop1
 	moveq	#sb_bar_height-1,d6
 sb36_set_background_bars_loop2
 	move.l	(a1)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a4) ; color low
 	swap	d0
 	move.w	d0,(a4)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a4) ; color high
 	add.l	d5,a4			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a4) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a4) ; color high
 	dbf	d6,sb36_set_background_bars_loop2
 sb36_set_background_bars_skip
 	dbf	d7,sb36_set_background_bars_loop1
@@ -5705,10 +5752,10 @@ sb36_set_foreground_bars
 	bne.s	sb36_set_foreground_bars_quit
 	tst.w	sb_variable_y_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_foreground_bars_quit
-	MOVEF.L cl2_extension6_size,d5
+	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
 	move.l	cl2_construction2(a3),a2 
-	ADDF.W	cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE,a2
+	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a2
 	moveq	#sb36_bars_number-1,d7
 sb36_set_foreround_bars_loop1
 	move.l	(a0)+,d0 		; low word: y, high word: z vector
@@ -5719,14 +5766,14 @@ sb36_set_foreground_bar
 	moveq	#sb_bar_height-1,d6
 sb36_set_foreround_bars_loop2
 	move.l	(a1)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a4) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a4) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a4) ; color low
 	swap	d0
 	move.w	d0,(a4)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a4) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a4) ; color high
 	add.l	d5,a4			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a4) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a4) ; color high
 	dbf	d6,sb36_set_foreround_bars_loop2
 sb36_set_foreground_bars_skip
 	dbf	d7,sb36_set_foreround_bars_loop1
@@ -5741,19 +5788,19 @@ scs_set_center_bar
 	bne.s	scs_set_center_bar_quit
 	lea	scs_bar_color_table(pc),a0
 	move.l	cl2_construction2(a3),a1
-	ADDF.W	(cl2_extension6_entry+cl2_ext6_COLOR00_high+WORD_SIZE)+(((vp2_visible_lines_number-scs_center_bar_height)/2)*cl2_extension6_size),a1 ; y centering
-	move.w	#cl2_extension6_size,a2
+	ADDF.W	(cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE)+(((vp2_visible_lines_number-scs_center_bar_height)/2)*cl2_extension7_size),a1 ; y centering
+	move.w	#cl2_extension7_size,a2
 	moveq	#scs_center_bar_height-1,d7
 scs_set_center_bar_loop
 	move.l	(a0)+,d0
-	move.w	d0,cl2_ext6_COLOR00_low-cl2_ext6_COLOR00_high(a1) ; color low
-	move.w	d0,cl2_ext6_COLOR05_low-cl2_ext6_COLOR00_high(a1) ; color low
-	move.w	d0,cl2_ext6_COLOR06_low-cl2_ext6_COLOR00_high(a1) ; color low
+	move.w	d0,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a1) ; color low
+	move.w	d0,cl2_ext7_COLOR05_low-cl2_ext7_COLOR00_high(a1) ; color low
+	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a1) ; color low
 	swap	d0
 	move.w	d0,(a1)			; color high
-	move.w	d0,cl2_ext6_COLOR05_high-cl2_ext6_COLOR00_high(a1) ; color high
+	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a1) ; color high
 	add.l	a2,a1			; next line in cl
-	move.w	d0,(cl2_ext6_COLOR06_high-cl2_ext6_COLOR00_high)-cl2_extension6_size(a1) ; color high
+	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a1) ; color high
 	dbf	d7,scs_set_center_bar_loop
 scs_set_center_bar_quit
 	rts
@@ -6317,7 +6364,7 @@ VERTB_int_server
 pt_effects_handler
 	tst.w	pt_effects_handler_active(a3)
 	bne.s	pt_effects_handler_quit
-	move.b	n_cmdlo(a2),d0
+	move.b	n_cmdlo(a2),d0		; 8xy
 	beq.s	pt_start_intro
 	cmp.b	#$10,d0
 	beq.s	pt_increase_x_radius_angle_step
@@ -6382,22 +6429,22 @@ nmi_int_server
 	INCLUDE "sys-structures.i"
 
 
+; View
 	CNOP 0,4
 pf1_rgb8_color_table
 	DC.L color00_bits
 
-
+; Viewport 1
 	CNOP 0,4
 vp1_pf1_rgb8_color_table
 	REPT vp1_pf1_colors_number
 		DC.L color00_bits
 	ENDR
 
-
+; Viewport 2
 	CNOP 0,4
 vp2_pf1_rgb8_color_table
 	DC.L color00_bits
-
 
 	CNOP 0,4
 vp2_pf2_rgb8_color_table
@@ -6410,16 +6457,13 @@ spr_rgb8_color_table
 		DC.L color00_bits
 	ENDR
 
-
 	CNOP 0,4
 vp2_spr_rgb8_color_table
 	INCLUDE "CoolCorkscrew:colortables/64x32x16-Spaceship.ct"
 
-
 	CNOP 0,4
 spr_pointers_construction
 	DS.L spr_number
-
 
 	CNOP 0,4
 spr_pointers_display
@@ -6622,8 +6666,8 @@ pt_auddata			SECTION pt_audio,DATA_C
 
 ; Gfx data
 
-; Background-Image 
-bg_image_data			SECTION bg_gfx,DATA
+; Logo
+lg_image_data			SECTION lg_gfx,DATA
 	INCBIN "CoolCorkscrew:graphics/256x30x16-Resistance.rawblit"
 
 ; Horiz-Charactersrolling 
