@@ -1527,6 +1527,7 @@ init_CIA_timers
 	CNOP 0,4
 init_first_copperlist
 	move.l	cl1_display(a3),a0
+; View
 	bsr.s	cl1_init_playfield_props
 	bsr.s	cl1_init_sprite_pointers
 	bsr	cl1_init_colors
@@ -1534,6 +1535,7 @@ init_first_copperlist
 	bra	cl1_set_sprite_pointers
 
 
+; View
 	COP_INIT_PLAYFIELD_REGISTERS cl1,NOBITPLANESSPR
 
 
@@ -4886,32 +4888,24 @@ cl1_init_colors
 	CNOP 0,4
 init_second_copperlist
 	move.l	cl2_construction2(a3),a0
-
-; Vertical-Blank 1
+; Vertical Blank 1
 	bsr.s	cl2_vb1_init_bpldat
-
 ; Viewport 1
 	bsr	cl2_vp1_init_playfield_props
 	bsr	cl2_vp1_init_colors
 	bsr	cl2_vp1_init_bitplane_pointers
-	COP_WAIT 0,vp1_vstart
-	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
+	bsr	cl2_vp1_start_display
 	bsr	cl2_init_bplcon1_chunky
-	COP_WAIT 0,vp1_vstop
-	COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
-
 ; Vertical-Blank 2
+	bsr	cl2_vb2_start_blank
 	bsr	cl2_vb2_init_bpldat
-
 ; Viewport 2
 	bsr	cl2_vp2_init_playfield_props
 	bsr	cl2_vp2_init_colors
 	bsr	cl2_vp2_init_bitplane_pointers
-	COP_WAIT 0,vp2_vstart
-	COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
+	bsr	cl2_vp2_start_display
 	bsr	cl2_init_roller
-
-; Copper-Interrupt
+; Copper Interrupt
 	bsr	cl2_init_copper_interrupt
 	COP_LISTEND
 	bsr	cl2_vp1_set_bitplane_pointers
@@ -4933,7 +4927,7 @@ init_second_copperlist
 cl2_vb1_init_bpldat
 	move.l	#(((cl2_vb1_VSTART<<24)|(((cl2_vb1_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
 	move.l	#BPL1DAT<<16,d1
-	move.l	#$01000000,d2
+	move.l	#1<<24,d2
 	MOVEF.W vb1_lines_number-1,d7
 cl2_vb1_init_bpldat_loop
 	move.l	d0,(a0)+		; CWAIT
@@ -4966,6 +4960,12 @@ cl2_vp1_init_bitplane_pointers_loop
 	rts
 
 	CNOP 0,4
+cl2_vp1_start_display
+	COP_WAIT 0,vp1_vstart
+	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
+	rts
+
+	CNOP 0,4
 cl2_vp1_set_bitplane_pointers
 	move.l	cl2_construction2(a3),a0 
 	ADDF.W	cl2_extension2_entry+cl2_ext2_BPL1PTH+WORD_SIZE,a0
@@ -4981,7 +4981,13 @@ cl2_vp1_set_bitplane_pointers_loop
 	COP_INIT_BPLCON1_CHUNKY cl2,cl2_vp1_hstart,cl2_vp1_vstart,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
 
 
-; Vertical-Blank 2
+; Vertical Blank 2
+	CNOP 0,4
+cl2_vb2_start_blank
+	COP_WAIT 0,vp1_vstop
+	COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
+	rts
+
 	CNOP 0,4
 cl2_vb2_init_bpldat
 	move.l	#(((cl2_vb2_VSTART<<24)|(((cl2_vb2_HSTART/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
@@ -5021,6 +5027,12 @@ cl2_vp2_init_bitplane_pointers_loop
 	rts
 
 	CNOP 0,4
+cl2_vp2_start_display
+	COP_WAIT 0,vp2_vstart
+	COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
+	rts
+
+	CNOP 0,4
 cl2_init_roller
 	movem.l a4-a6,-(a7)
 	move.l	#(((cl2_vp2_vstart<<24)|(((cl2_vp2_hstart/4)*2)<<16))|$10000)|$fffe,d0 ; CWAIT
@@ -5029,7 +5041,7 @@ cl2_init_roller
 	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits2,d3 ; color low
 	move.l	#COLOR02<<16,d4
 	move.l	#COLOR05<<16,d5
-	move.l	#$01000000,d6
+	move.l	#1<<24,d6
 	move.l	#(BPL1MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a1
 	move.l	#(BPL2MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a2
 	IFEQ scs_pipe_effect_enabled
