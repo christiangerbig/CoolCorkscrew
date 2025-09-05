@@ -3014,12 +3014,12 @@ mh_start_spaceship_quit
 
 	IFEQ pt_ciatiming_enabled
 		CNOP 0,4
-ciab_ta_int_server
+ciab_ta_server
 	ENDC
 
 	IFNE pt_ciatiming_enabled
 		CNOP 0,4
-VERTB_int_server
+VERTB_server
 	ENDC
 
 
@@ -3091,15 +3091,15 @@ pt_enable_spaceship
 	rts
 
 	CNOP 0,4
-ciab_tb_int_server
+ciab_tb_server
 	PT_TIMER_INTERRUPT_SERVER
 
 	CNOP 0,4
-EXTER_int_server
+EXTER_server
 	rts
 
 	CNOP 0,4
-nmi_int_server
+nmi_server
 	rts
 
 
@@ -4798,8 +4798,8 @@ hcs_init_xy_coordinates_loop2
 ; Input
 ; d0.w	X
 ; d1.w	Y
-; a0.l	Pointer 1st sprite structure
-; a1.l	Pointer 2nd sprite structure
+; a0.l	 1st sprite structure
+; a1.l	 2nd sprite structure
 ; Result
 	CNOP 0,4
 hcs_init_sprite_header
@@ -6346,12 +6346,12 @@ mh_start_spaceship_quit
 
 	IFEQ pt_ciatiming_enabled
 		CNOP 0,4
-ciab_ta_int_server
+ciab_ta_server
 	ENDC
 
 	IFNE pt_ciatiming_enabled
 		CNOP 0,4
-VERTB_int_server
+VERTB_server
 	ENDC
 
 
@@ -6423,15 +6423,15 @@ pt_enable_spaceship
 	rts
 
 	CNOP 0,4
-ciab_tb_int_server
+ciab_tb_server
 	PT_TIMER_INTERRUPT_SERVER
 
 	CNOP 0,4
-EXTER_int_server
+EXTER_server
 	rts
 
 	CNOP 0,4
-nmi_int_server
+nmi_server
 	rts
 
 
