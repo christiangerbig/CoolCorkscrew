@@ -54,8 +54,8 @@
 ; - Mouse-Handler: Out-Fader stops In-Fader
 ; - Lunix' icon included
 ; - Spaceship animation: If the user triggers the spaceship a flight to right
-;                      is aborted and the spaceship gfx are changed during
-;                      horizontal blank. Only SPR0 & SPR1 are used.
+;	 	 	     is aborted and the spaceship gfx are changed during
+;	 	 	     horizontal blank. Only SPR0 & SPR1 are used.
 ; - adf file created
 ; - Fader optimized
 
@@ -3296,28 +3296,28 @@ bf_rgb8_color_cache
 
 ; Single-Corkscrew-Scroll 
 scs_text
-	DC.B ASCII_CTRL_C,"RESISTANCE",ASCII_CTRL_P," PRESENTS A NEW INTRO CALLED          COOL¹   ",ASCII_CTRL_P,"          CORKSCREW ",ASCII_CTRL_P,ASCII_CTRL_F,"          "
+	DC.B ASCII_CTRL_C,"RESISTANCE",ASCII_CTRL_P," PRESENTS A NEW INTRO CALLED	     COOL¹   ",ASCII_CTRL_P,"	     CORKSCREW ",ASCII_CTRL_P,ASCII_CTRL_F,"	     "
 
-	DC.B "THIS IS OUR CONTRIBUTION TO ",ASCII_CTRL_A,"DEADLINE 2024           "
+	DC.B "THIS IS OUR CONTRIBUTION TO ",ASCII_CTRL_A,"DEADLINE 2024	 	"
 
-	DC.B "PRESS RMB TO START ",ASCII_CTRL_A,"SPACESHIP               "
+	DC.B "PRESS RMB TO START ",ASCII_CTRL_A,"SPACESHIP	 	    "
 
-	DC.B ASCII_CTRL_C,"²GREETINGS ",ASCII_CTRL_A,"FLY TO           ",ASCII_CTRL_N
-	DC.B "# DESIRE #         "
-	DC.B "# EPHIDRENA #         "
-	DC.B "# FOCUS DESIGN #         "
-	DC.B "# GHOSTOWN #         "
-	DC.B "# NAH-KOLOR #         "
-	DC.B "# PLANET JAZZ #         "
-	DC.B "# SOFTWARE FAILURE #         "
-	DC.B "# TEK #         "
-	DC.B "# WANTED TEAM #",ASCII_CTRL_F,"           "
+	DC.B ASCII_CTRL_C,"²GREETINGS ",ASCII_CTRL_A,"FLY TO	 	",ASCII_CTRL_N
+	DC.B "# DESIRE #	    "
+	DC.B "# EPHIDRENA #	    "
+	DC.B "# FOCUS DESIGN #	    "
+	DC.B "# GHOSTOWN #	    "
+	DC.B "# NAH-KOLOR #	    "
+	DC.B "# PLANET JAZZ #	    "
+	DC.B "# SOFTWARE FAILURE #	    "
+	DC.B "# TEK #	    "
+	DC.B "# WANTED TEAM #",ASCII_CTRL_F,"	 	"
 
-	DC.B ASCII_CTRL_C,"¹THE CREDITS          "
-	DC.B "CODING AND MUSIC          "
-	DC.B "DISSIDENT ",ASCII_CTRL_A,ASCII_CTRL_P,"          "
-	DC.B "GRAPHICS          "
-	DC.B "  GRASS   ",ASCII_CTRL_A,ASCII_CTRL_P,ASCII_CTRL_F,"         "
+	DC.B ASCII_CTRL_C,"¹THE CREDITS	     "
+	DC.B "CODING AND MUSIC	     "
+	DC.B "DISSIDENT ",ASCII_CTRL_A,ASCII_CTRL_P,"	     "
+	DC.B "GRAPHICS	     "
+	DC.B "  GRASS   ",ASCII_CTRL_A,ASCII_CTRL_P,ASCII_CTRL_F,"	    "
 scs_stop_text
 	REPT ((scs_text_chars_number)/(scs_origin_char_x_size/scs_text_char_x_size))-2
 		DC.B " "
@@ -3425,8 +3425,8 @@ msr_image_data			SECTION msr_gfx,DATA
 ; - Mouse-Handler: Out-Fader stops In-Fader
 ; - Lunix' icon included
 ; - Spaceship animation: If the user triggers the spaceship a flight to right
-;                      is aborted and the spaceship gfx are changed during
-;                      horizontal blank. Only SPR0 & SPR1 are used.
+;   is aborted and the spaceship gfx are changed during
+;   horizontal blank. Only SPR0 & SPR1 are used.
 ; - adf file created
 ; - Fader optimized
 
