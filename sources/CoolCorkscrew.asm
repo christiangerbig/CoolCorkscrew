@@ -2063,11 +2063,11 @@ scs_stop_scrolltext
 	tst.w	exit_active(a3)		; quit intro ?
 	bne.s	scs_stop_scrolltext_quit
 	clr.w	pt_music_fader_active(a3)
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	if_rgb8_copy_colors_active(a3)
-	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	clr.w	sprfo_rgb8_active(a3)
+	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	clr.w	sprf_rgb8_copy_colors_active(a3)
 	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
 	clr.w	bf_rgb8_convert_colors_active(a3)
@@ -2979,15 +2979,15 @@ mh_exit_demo
 	CNOP 0,4
 mh_exit_demo_skip1
 	move.w	d0,pt_music_fader_active(a3)
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
 	tst.w	ifi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip2
 	move.w	d1,ifi_rgb8_active(a3)
 mh_exit_demo_skip2
-	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprfo_rgb8_active(a3)
+	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprf_rgb8_copy_colors_active(a3)
 	tst.w	sprfi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip3
@@ -5395,11 +5395,11 @@ scs_stop_scrolltext
 	tst.w	exit_active(a3)		; quit intro ?
 	bne.s	scs_stop_scrolltext_quit
 	clr.w	pt_music_fader_active(a3)
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	clr.w	if_rgb8_copy_colors_active(a3)
-	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	clr.w	sprfo_rgb8_active(a3)
+	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	clr.w	sprf_rgb8_copy_colors_active(a3)
 	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
 	clr.w	bf_rgb8_convert_colors_active(a3)
@@ -6311,15 +6311,15 @@ mh_exit_demo
 	CNOP 0,4
 mh_exit_demo_skip1
 	move.w	d0,pt_music_fader_active(a3)
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
 	tst.w	ifi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip2
 	move.w	d1,ifi_rgb8_active(a3)
 mh_exit_demo_skip2
-	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprfo_rgb8_active(a3)
+	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprf_rgb8_copy_colors_active(a3)
 	tst.w	sprfi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip3
