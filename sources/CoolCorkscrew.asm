@@ -1771,7 +1771,7 @@ cl2_vp2_set_bitplane_pointers
 cl2_vp2_set_bitplane_pointers_loop1
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
-	move.w	d0,4(a0)		; BPLxPTL
+	move.w	d0,LONGWORD_SIZE(a0)		; BPLxPTL
 	swap	d0
 	move.w	d0,(a0)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a0
@@ -1783,7 +1783,7 @@ cl2_vp2_set_bitplane_pointers_loop1
 cl2_vp2_set_bitplane_pointers_loop2
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
-	move.w	d0,4(a1)		; BPLxPTL
+	move.w	d0,LONGWORD_SIZE(a1)		; BPLxPTL
 	swap	d0
 	move.w	d0,(a1)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a1
@@ -5103,7 +5103,7 @@ cl2_vp2_set_bitplane_pointers
 cl2_vp2_set_bitplane_pointers_loop1
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
-	move.w	d0,4(a0)		; BPLxPTL
+	move.w	d0,LONGWORD_SIZE(a0)		; BPLxPTL
 	swap	d0
 	move.w	d0,(a0)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a0
@@ -5115,7 +5115,7 @@ cl2_vp2_set_bitplane_pointers_loop1
 cl2_vp2_set_bitplane_pointers_loop2
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
-	move.w	d0,4(a1)		; BPLxPTL
+	move.w	d0,LONGWORD_SIZE(a1)		; BPLxPTL
 	swap	d0
 	move.w	d0,(a1)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a1
