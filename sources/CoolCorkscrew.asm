@@ -1608,7 +1608,7 @@ cl2_vb1_init_bpldat
 	MOVEF.W vb1_lines_number-1,d7
 cl2_vb1_init_bpldat_loop
 	move.l	d0,(a0)+		; CWAIT
-	add.l	d2,d0			; next line in cl
+	add.l	d2,d0			; next line
 	move.l	d1,(a0)+		; BPL1DAT
 	dbf	d7,cl2_vb1_init_bpldat_loop
 	rts
@@ -1673,7 +1673,7 @@ cl2_vb2_init_bpldat
 	MOVEF.W vb2_lines_number-1,d7
 cl2_vb2_init_bpldat_loop
 	move.l	d0,(a0)+		; CWAIT
-	add.l	d2,d0			; next line in cl
+	add.l	d2,d0			; next line
 	move.l	d1,(a0)+		; BPL1DAT
 	dbf	d7,cl2_vb2_init_bpldat_loop
 	rts
@@ -1754,7 +1754,7 @@ cl2_init_roller_loop
 	subq.w	#LONGWORD_SIZE,a0
 	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING ; patch cl
 cl2_init_roller_skip
-	add.l	d6,d0			; next line in cl
+	add.l	d6,d0			; next line
 	dbf	d7,cl2_init_roller_loop
 	movem.l (a7)+,a4-a6
 	rts
@@ -1841,7 +1841,7 @@ scs_set_color_gradients_loop
 	move.w	d0,cl2_ext7_COLOR06_low-cl2_ext7_COLOR00_high(a2) ; color low
 	swap	d0
 	move.w	d0,cl2_ext7_COLOR02_high-cl2_ext7_COLOR00_high(a2) ; color high
-	add.l	a5,a2			; next line in cl
+	add.l	a5,a2			; next line
 	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a2) ; color high
 	dbf	d7,scs_set_color_gradients_loop
 	movem.l (a7)+,a4-a5
@@ -1864,7 +1864,7 @@ scs_set_pipe_loop
 		add.w	d2,d0		; x center+x'
 		DUALPF_SOFTSCROLL_64PIXEL_LORES d1,d0,d3
 		move.w	d1,(a1)		; BPLCON1
-		add.l	a2,a1		; next line in cl
+		add.l	a2,a1		; next line
 		dbf	d7,scs_set_pipe_loop
 		rts
 	ENDC
@@ -1956,7 +1956,7 @@ scs_horiz_scrolltext
 	add.l	(a0),d1			; add playfield address
 	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.l	#(BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.l	#(BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D = A
 	moveq	#-1,d5
 	move.l	d5,BLTAFWM-DMACONR(a6)
 	move.l	d0,BLTAPT-DMACONR(a6)	; character image
@@ -2091,7 +2091,7 @@ scs_horiz_scroll
 	move.l	(a0),a0			; destination
 	ADDF.W	(scs_text_x_position/8)+(scs_text_y_position*extra_pf2_plane_width*extra_pf2_depth),a0 ; skip 48 pixel
 	WAITBLIT
-	move.l	#((-scs_horiz_scroll_speed<<12)|BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.l	#((-scs_horiz_scroll_speed<<12)|BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D = A
 	moveq	#-1,d0
 	move.l	d0,BLTAFWM-DMACONR(a6)
 	move.l	a0,BLTDPT-DMACONR(a6)
@@ -2155,7 +2155,7 @@ scs_vert_scroll
 ; Vertical wrapping - scrolltext
 	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D = A
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-(scs_vert_scroll_window_width))<<16)|(extra_pf2_plane_width-scs_vert_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
@@ -2286,7 +2286,7 @@ scs_char_vert_scroll
 ; Vertical wrapping - character
 	move.w	#DMAF_BLITHOG|DMAF_SETCLR,DMACON-DMACONR(a6)
 	WAITBLIT
-	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D=A
+	move.w	#BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC,BLTCON0-DMACONR(a6) ; minterm D = A
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-scs_text_char_width)<<16)|(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A&D moduli
@@ -2346,7 +2346,7 @@ sb232_get_y_coordinates_loop2
 	swap	d0
 	move.w	d0,(a2)			; color high
 	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a2) ; color high
-	add.l	a6,a2			; next line in cl
+	add.l	a6,a2			; next line
 	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a2) ; color high
 	dbf	d6,sb232_get_y_coordinates_loop2
 	dbf	d7,sb232_get_y_coordinates_loop1
@@ -2424,7 +2424,7 @@ sb36_set_background_bars_loop2
 	swap	d0
 	move.w	d0,(a4)			; color high
 	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a4) ; color high
-	add.l	d5,a4			; next line in cl
+	add.l	d5,a4			; next line
 	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a4) ; color high
 	dbf	d6,sb36_set_background_bars_loop2
 sb36_set_background_bars_skip
@@ -2461,7 +2461,7 @@ sb36_set_foreround_bars_loop2
 	swap	d0
 	move.w	d0,(a4)			; color high
 	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a4) ; color high
-	add.l	d5,a4			; next line in cl
+	add.l	d5,a4			; next line
 	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a4) ; color high
 	dbf	d6,sb36_set_foreround_bars_loop2
 sb36_set_foreground_bars_skip
@@ -2488,7 +2488,7 @@ scs_set_center_bar_loop
 	swap	d0
 	move.w	d0,(a1)			; color high
 	move.w	d0,cl2_ext7_COLOR05_high-cl2_ext7_COLOR00_high(a1) ; color high
-	add.l	a2,a1			; next line in cl
+	add.l	a2,a1			; next line
 	move.w	d0,(cl2_ext7_COLOR06_high-cl2_ext7_COLOR00_high)-cl2_extension7_size(a1) ; color high
 	dbf	d7,scs_set_center_bar_loop
 scs_set_center_bar_quit
@@ -3347,12 +3347,12 @@ scs_stop_text
 ; PT-Replay 
 	IFEQ pt_split_module_enabled
 pt_auddata			SECTION pt_audio,DATA
-		INCBIN "CoolCorkscrew:modules/mod.RetroDisco(remix).song"
+		INCBIN "CoolCorkscrew:trackermodules/mod.RetroDisco(remix).song"
 pt_audsmps			SECTION pt_audio2,DATA_C
-		INCBIN "CoolCorkscrew:modules/mod.RetroDisco(remix).smps"
+		INCBIN "CoolCorkscrew:trackermodules/mod.RetroDisco(remix).smps"
 	ELSE
 pt_auddata			SECTION pt_audio,DATA_C
-		INCBIN "CoolCorkscrew:modules/mod.RetroDisco(remix)"
+		INCBIN "CoolCorkscrew:trackermodules/mod.RetroDisco(remix)"
 	ENDC
 
 
