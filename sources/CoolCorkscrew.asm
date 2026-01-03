@@ -3126,7 +3126,7 @@ pf1_rgb8_color_table
 	CNOP 0,4
 vp1_pf1_rgb8_color_table
 	REPT vp1_pf1_colors_number
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 
@@ -3143,7 +3143,7 @@ vp2_pf2_rgb8_color_table
 	CNOP 0,4
 spr_rgb8_color_table
 	REPT spr_colors_number
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 
@@ -3227,7 +3227,7 @@ scs_color_gradient_outline
 	CNOP 0,4
 scs_bar_color_table
 	REPT sb_bar_height
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 scs_ascii
@@ -3260,7 +3260,7 @@ ifi_rgb8_color_table
 	CNOP 0,4
 ifo_rgb8_color_table
 	REPT vp1_pf1_colors_number
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 
@@ -3272,7 +3272,7 @@ sprfi_rgb8_color_table
 	CNOP 0,4
 sprfo_rgb8_color_table
 	REPT spr_colors_number
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 
@@ -3284,13 +3284,13 @@ bfi_rgb8_color_table
 	CNOP 0,4
 bfo_rgb8_color_table
 	REPT sb_bar_height
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 	CNOP 0,4
 bf_rgb8_color_cache
 	REPT sb_bar_height
-		DC.L color00_bits
+	DC.L color00_bits
 	ENDR
 
 
@@ -3329,7 +3329,7 @@ scs_text
 	DC.B "  GRASS   ",ASCII_CTRL_A,ASCII_CTRL_P,ASCII_CTRL_F,"         "
 scs_stop_text
 	REPT ((scs_text_chars_number)/(scs_origin_char_x_size/scs_text_char_x_size))-2
-		DC.B " "
+	DC.B " "
 	ENDR
 	DC.B ASCII_CTRL_S," "
 	EVEN
