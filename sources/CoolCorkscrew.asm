@@ -395,19 +395,15 @@ cl2_display_y_size		EQU vp1_visible_lines_number
 ; Vertical Blank 1
 cl2_hstart1			EQU display_window_hstart-(1*CMOVE_SLOT_PERIOD)
 cl2_vstart1			EQU vb1_VSTART
-
 ; Viewport 1
 cl2_hstart2			EQU display_window_hstart+(1*CMOVE_SLOT_PERIOD)
 cl2_vstart2			EQU vp1_vstart
-
 ; Vertical-Blank 2
 cl2_hstart3			EQU display_window_hstart-(1*CMOVE_SLOT_PERIOD)
 cl2_vstart3			EQU vb2_VSTART
-
 ; Viewport 2
 cl2_hstart4			EQU 0
 cl2_vstart4			EQU vp2_vstart
-
 ; Copper Interrupt
 cl2_hstart5			EQU 0
 cl2_vstart5			EQU beam_position&CL_Y_WRAPPING
@@ -1916,8 +1912,8 @@ beam_routines
 	bsr	sprite_fader_in
 	bsr	sprite_fader_out
 	bsr	sprf_rgb8_copy_color_table
-	bsr	bar_fader_in
-	bsr	bar_fader_out
+	bsr	rgb8_bar_fader_in
+	bsr	rgb8_bar_fader_out
 	bsr	bf_rgb8_convert_colors
 	bsr	control_counters
 	bsr	mouse_handler
@@ -2012,18 +2008,20 @@ scs_check_control_codes
 	CNOP 0,4
 scs_start_sine_bars232
 	move.w	#FALSE,sb36_active(a3)
-	clr.w	sb232_y_angle(a3)	; 0°
-	clr.w	sb232_active(a3)
-	clr.w	rfi_active(a3)
+	moveq	#TRUE,d0
+	move.w	d0,sb232_y_angle(a3)	; 0°
+	move.w	d0,sb232_active(a3)
+	move.w	d0,rfi_active(a3)
 	move.w	#1,rfi_delay_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
 	rts
 	CNOP 0,4
 scs_start_sine_bars36
 	move.w	#FALSE,sb232_active(a3)
-	clr.w	sb36_y_angle(a3)	; 0°
-	clr.w	sb36_active(a3)
-	clr.w	rfi_active(a3)
+	moveq	#TRUE,d0
+	move.w	d0,sb36_y_angle(a3)	; 0°
+	move.w	d0,sb36_active(a3)
+	move.w	d0,rfi_active(a3)
 	move.w	#1,rfi_delay_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
 	rts
@@ -2065,16 +2063,33 @@ scs_stop_scrolltext
 	move.w	#FALSE,scs_active(a3)	; stop text
 	tst.w	exit_active(a3)		; quit intro ?
 	bne.s	scs_stop_scrolltext_quit
-	clr.w	pt_music_fader_active(a3)
-	clr.w	ifo_rgb8_active(a3)
+	moveq	#TRUE,d0
+	moveq	#FALSE,d1
+	move.w	d0,pt_music_fader_active(a3)
+; Image-Fader
+	tst.w	ifi_rgb8_active(a3)	; fader still active ?
+	bne.s	scs_stop_scrolltext_skip1
+	move.w	d1,ifi_rgb8_active(a3)	; force fader stop
+scs_stop_scrolltext_skip1
+	move.w	d0,ifo_rgb8_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
-	clr.w	if_rgb8_copy_colors_active(a3)
-	clr.w	sprfo_rgb8_active(a3)
+	move.w	d0,if_rgb8_copy_colors_active(a3)
+; Sprites-Fader
+	tst.w	sprfi_rgb8_active(a3)	; fader still active ?
+	bne.s	scs_stop_scrolltext_skip2
+	move.w	d1,sprfi_rgb8_active(a3); force fader stop
+scs_stop_scrolltext_skip2
+	move.w	d0,sprfo_rgb8_active(a3)
 	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
-	clr.w	sprf_rgb8_copy_colors_active(a3)
+	move.w	d0,sprf_rgb8_copy_colors_active(a3)
+; Bar-Fader
+	tst.w	bfi_rgb8_active(a3)	; fader still active ?
+	bne.s	scs_stop_scrolltext_skip3
+	move.w	d1,bfi_rgb8_active(a3)	; force fader stop
+scs_stop_scrolltext_skip3
+	move.w	d0,bfo_rgb8_active(a3)
 	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
-	clr.w	bf_rgb8_convert_colors_active(a3)
-	clr.w	bfo_rgb8_active(a3)
+	move.w	d0,bf_rgb8_convert_colors_active(a3)
 scs_stop_scrolltext_quit
 	moveq	#RETURN_OK,d0
 	rts
@@ -2848,17 +2863,17 @@ sprite_fader_out_quit
 
 
 	CNOP 0,4
-bar_fader_in
+rgb8_bar_fader_in
 	movem.l a4-a6,-(a7)
 	tst.w	bfi_rgb8_active(a3)
-	bne.s	bar_fader_in_quit
+	bne.s	rgb8_bar_fader_in_quit
 	move.w	bfi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	bfi_rgb8_fader_angle_speed,d0
 	cmp.w	#sine_table_length1/2,d0 ; 180° ?
-	ble.s	bar_fader_in_skip
+	ble.s	rgb8_bar_fader_in_skip
 	MOVEF.W sine_table_length1/2,d0
-bar_fader_in_skip
+rgb8_bar_fader_in_skip
 	move.w	d0,bfi_rgb8_fader_angle(a3) 
 	MOVEF.W bf_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0	
@@ -2877,25 +2892,25 @@ bar_fader_in_skip
 	MOVEF.W bf_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
 	move.w	d6,bf_rgb8_colors_counter(a3) ; fader finished ?
-	bne.s	bar_fader_in_quit
+	bne.s	rgb8_bar_fader_in_quit
 	move.w	#FALSE,bfi_rgb8_active(a3)
-bar_fader_in_quit
+rgb8_bar_fader_in_quit
 	movem.l (a7)+,a4-a6
 	rts
 
 
 	CNOP 0,4
-bar_fader_out
+rgb8_bar_fader_out
 	movem.l a4-a6,-(a7)
 	tst.w	bfo_rgb8_active(a3)
-	bne.s	bar_fader_out_quit
+	bne.s	rgb8_bar_fader_out_quit
 	move.w	bfo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	bfo_rgb8_fader_angle_speed,d0
 	cmp.w	#sine_table_length1/2,d0 ; 180° ?
-	ble.s	bar_fader_out_skip
+	ble.s	rgb8_bar_fader_out_skip
 	MOVEF.W sine_table_length1/2,d0
-bar_fader_out_skip
+rgb8_bar_fader_out_skip
 	move.w	d0,bfo_rgb8_fader_angle(a3) 
 	MOVEF.W bf_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0	
@@ -2914,9 +2929,9 @@ bar_fader_out_skip
 	MOVEF.W bf_rgb8_colors_number-1,d7
 	bsr	if_rgb8_fader_loop
 	move.w	d6,bf_rgb8_colors_counter(a3) ; fader finished ?
-	bne.s	bar_fader_out_quit
+	bne.s	rgb8_bar_fader_out_quit
 	move.w	#FALSE,bfo_rgb8_active(a3)
-bar_fader_out_quit
+rgb8_bar_fader_out_quit
 	movem.l (a7)+,a4-a6
 	rts
 
@@ -2982,27 +2997,30 @@ mh_exit_demo
 	CNOP 0,4
 mh_exit_demo_skip1
 	move.w	d0,pt_music_fader_active(a3)
-	move.w	d0,ifo_rgb8_active(a3)
-	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
-	move.w	d0,if_rgb8_copy_colors_active(a3)
+; Image-Fader
 	tst.w	ifi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip2
 	move.w	d1,ifi_rgb8_active(a3)
 mh_exit_demo_skip2
-	move.w	d0,sprfo_rgb8_active(a3)
-	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
-	move.w	d0,sprf_rgb8_copy_colors_active(a3)
+	move.w	d0,ifo_rgb8_active(a3)
+	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
+	move.w	d0,if_rgb8_copy_colors_active(a3)
+; Sprites-Fader
 	tst.w	sprfi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip3
 	move.w	d1,sprfi_rgb8_active(a3)
 mh_exit_demo_skip3
-	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
-	move.w	d0,bf_rgb8_convert_colors_active(a3)
-	move.w	d0,bfo_rgb8_active(a3)
+	move.w	d0,sprfo_rgb8_active(a3)
+	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
+	move.w	d0,sprf_rgb8_copy_colors_active(a3)
+; Bar-Fader
 	tst.w	bfi_rgb8_active(a3)
 	bne.s	mh_exit_demo_skip4
 	move.w	d1,bfi_rgb8_active(a3)
 mh_exit_demo_skip4
+	move.w	d0,bfo_rgb8_active(a3)
+	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
+	move.w	d0,bf_rgb8_convert_colors_active(a3)
 	bra.s	mh_start_spaceship_quit
 	CNOP 0,4
 mh_start_spaceship
@@ -3013,7 +3031,7 @@ mh_start_spaceship
 	tst.w	msr_active(a3)
 	beq.s	mh_start_spaceship_quit
 	bsr	msl_copy_bitmaps
-	clr.w	msl_active(a3)		; start spaceship to left
+	move.w	d0,msl_active(a3)	; start spaceship to left
 	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90°
 mh_start_spaceship_quit
 	rts
@@ -3068,14 +3086,15 @@ pt_effects_handler_quit
 	CNOP 0,4
 pt_start_intro
 	moveq	#TRUE,d0
+; Image-Fader
 	move.w	d0,ifi_rgb8_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
-
+; Sprites-Fader
 	move.w	d0,sprfi_rgb8_active(a3)
 	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprf_rgb8_copy_colors_active(a3)
-
+; Bar-Fader
 	move.w	d0,bfi_rgb8_active(a3)
 	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
 	move.w	d0,bf_rgb8_convert_colors_active(a3)
