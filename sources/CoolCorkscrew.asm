@@ -1335,7 +1335,8 @@ init_main
 	bsr	init_CIA_timers
 
 	bsr	init_first_copperlist
-	bra	init_second_copperlist
+	bsr	init_second_copperlist
+	rts
 
 
 ; PT-Replay 
@@ -1872,7 +1873,8 @@ scs_set_pipe_loop
 	CNOP 0,4
 main
 	bsr.s	no_sync_routines
-	bra.s	beam_routines
+	bsr.s	beam_routines
+	rts
 
 
 	CNOP 0,4
@@ -2577,7 +2579,8 @@ move_spaceship_left_quit
 	CNOP 0,4
 msl_copy_bitmaps
 	lea	msl_image_data,a2
-	bra	ms_copy_image_data
+	bsr	ms_copy_image_data
+	rts
 
 
 	CNOP 0,4
@@ -3051,7 +3054,8 @@ vertb_interrupt_server
 ; PT-Replay
 	IFEQ pt_music_fader_enabled
 		bsr.s	pt_music_fader
-		bra.s	pt_PlayMusic
+		bsr.s	pt_PlayMusic
+		rts
 
 		PT_FADE_OUT_VOLUME stop_fx_active
 
