@@ -124,6 +124,7 @@
 
 
 PROTRACKER_VERSION_3		SET 1
+START_SECOND_COPPERLIST		SET 1
 
 
 	INCLUDE "macros.i"
@@ -1591,8 +1592,6 @@ init_second_copperlist
 		bsr	scs_set_color_gradients
 	ENDC
 	bsr	copy_second_copperlist
-	bsr	swap_second_copperlist
-	bsr	set_second_copperlist
 	rts
 
 
