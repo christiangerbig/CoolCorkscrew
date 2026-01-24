@@ -224,10 +224,10 @@ spr_x_size1			EQU 64
 spr_x_size2			EQU 64
 spr_depth			EQU 2
 spr_colors_number		EQU 16
-spr_odd_color_table_select	EQU 1
-spr_even_color_table_select	EQU 1
-vp2_spr_odd_color_table_select	EQU 2
-vp2_spr_even_color_table_select	EQU 2
+spr_odd_color_table_select	EQU 1	; COLOR16..COLOR31
+spr_even_color_table_select	EQU 1	; COLOR16..COLOR31
+vp2_spr_odd_color_table_select	EQU 2	; COLOR32..COLOR47
+vp2_spr_even_color_table_select	EQU 2	; COLOR32..COLOR47
 spr_used_number			EQU 8
 spr_swap_number			EQU 8
 
@@ -3275,7 +3275,7 @@ sb36_yz_coordinates
 ; Image-Fader 
 	CNOP 0,4
 ifi_rgb8_color_table
-	INCLUDE "CoolCorkscrew:colortables/256x30x16-Resistance.ct"
+	INCLUDE "CoolCorkscrew:colortables/256x30x16-Group-Logo.ct"
 
 	CNOP 0,4
 ifo_rgb8_color_table
@@ -3380,7 +3380,7 @@ pt_auddata			SECTION pt_audio,DATA_C
 
 ; Logo
 lg_image_data			SECTION lg_gfx,DATA
-	INCBIN "CoolCorkscrew:graphics/256x30x16-Resistance.rawblit"
+	INCBIN "CoolCorkscrew:graphics/256x30x16-Group-Logo.rawblit"
 
 ; Horiz-Charactersrolling 
 hcs_image_data			SECTION hcs_gfx,DATA
