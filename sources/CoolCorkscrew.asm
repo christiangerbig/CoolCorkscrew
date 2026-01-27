@@ -2981,62 +2981,63 @@ control_counters_quit
 	CNOP 0,4
 mouse_handler
 	btst	#CIAB_GAMEPORT0,CIAPRA(a4) ; LMB pressed ?
-	beq.s	mh_exit_demo
+	beq.s	mouse_handler_skip1
 	btst	#POTINPB_DATLY,POTINP-DMACONR(a6) ; RMB pressed ?
-	beq.s	mh_start_spaceship
+	beq.s	mouse_handler_skip6
+mouse_handler_quit
 	rts
 	CNOP 0,4
-mh_exit_demo
+mouse_handler_skip1
 	moveq	#FALSE,d1
 	move.w	d1,pt_effects_handler_active(a3)
 	moveq	#TRUE,d0
 	move.w	d1,mh_start_spaceship_active(a3)
 	tst.w	scs_active(a3)
-	bne.s	mh_exit_demo_skip1
+	bne.s	mouse_handler_skip2
 	move.w	#scs_stop_text-scs_text,scs_text_table_start(a3) ; end scrolltext
 	move.w	d0,exit_active(a3)	; intro should end after text stop
-	bra.s	mh_start_spaceship_quit
+	bra.s	mouse_handler_quit
 	CNOP 0,4
-mh_exit_demo_skip1
+mouse_handler_skip2
+; Music-Fader
 	move.w	d0,pt_music_fader_active(a3)
 ; Image-Fader
 	tst.w	ifi_rgb8_active(a3)
-	bne.s	mh_exit_demo_skip2
+	bne.s	mouse_handler_skip3
 	move.w	d1,ifi_rgb8_active(a3)
-mh_exit_demo_skip2
+mouse_handler_skip3
 	move.w	d0,ifo_rgb8_active(a3)
 	move.w	#if_rgb8_colors_number*3,if_rgb8_colors_counter(a3)
 	move.w	d0,if_rgb8_copy_colors_active(a3)
 ; Sprites-Fader
 	tst.w	sprfi_rgb8_active(a3)
-	bne.s	mh_exit_demo_skip3
+	bne.s	mouse_handler_skip4
 	move.w	d1,sprfi_rgb8_active(a3)
-mh_exit_demo_skip3
+mouse_handler_skip4
 	move.w	d0,sprfo_rgb8_active(a3)
 	move.w	#sprf_rgb8_colors_number*3,sprf_rgb8_colors_counter(a3)
 	move.w	d0,sprf_rgb8_copy_colors_active(a3)
 ; Bar-Fader
 	tst.w	bfi_rgb8_active(a3)
-	bne.s	mh_exit_demo_skip4
+	bne.s	mouse_handler_skip5
 	move.w	d1,bfi_rgb8_active(a3)
-mh_exit_demo_skip4
+mouse_handler_skip5
 	move.w	d0,bfo_rgb8_active(a3)
 	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
 	move.w	d0,bf_rgb8_convert_colors_active(a3)
-	bra.s	mh_start_spaceship_quit
+	bra.s	mouse_handler_quit
 	CNOP 0,4
-mh_start_spaceship
+mouse_handler_skip6
 	tst.w	mh_start_spaceship_active(a3)
-	bne.s	mh_start_spaceship_quit
+	bne.s	mouse_handler_quit
 	tst.w	msl_active(a3)
-	beq.s	mh_start_spaceship_quit
+	beq.s	mouse_handler_quit
 	tst.w	msr_active(a3)
-	beq.s	mh_start_spaceship_quit
+	beq	mouse_handler_quit
 	bsr	msl_copy_bitmaps
 	move.w	d0,msl_active(a3)	; start spaceship to left
 	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90°
-mh_start_spaceship_quit
-	rts
+	bra	mouse_handler_quit
 
 
 	INCLUDE "int-autovectors-handlers.i"
