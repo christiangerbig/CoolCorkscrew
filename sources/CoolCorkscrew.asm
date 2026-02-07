@@ -279,7 +279,6 @@ display_window_vstop		EQU VSTOP_256_LINES
 
 spr_pixel_per_datafetch		EQU 64	; 4x
 
-
 ; Vertical-Blank 1
 vb1_lines_number		EQU 81
 
@@ -333,7 +332,6 @@ vp2_pf_pixel_per_datafetch	EQU 64	; 4x
 ; Viewport 1
 ; Playfield 1
 extra_pf1_plane_width		EQU extra_pf1_x_size/8
-
 ; Viewport 2 
 ; Playfield 1 
 extra_pf2_plane_width		EQU extra_pf2_x_size/8
@@ -342,7 +340,6 @@ extra_pf2_plane_width		EQU extra_pf2_x_size/8
 ; Viewport 1 
 vp1_data_fetch_width		EQU vp1_pixel_per_line/8
 vp1_pf1_plane_moduli		EQU (extra_pf1_plane_width*(extra_pf1_depth-1))+extra_pf1_plane_width-vp1_data_fetch_width
-
 ; Viewport 2
 vp2_data_fetch_width		EQU vp2_pixel_per_line/8
 vp2_pf1_plane_moduli		EQU (extra_pf2_plane_width*(extra_pf2_depth-1))+extra_pf2_plane_width-vp2_data_fetch_width
@@ -795,11 +792,11 @@ cl2_ext6_BPL1MOD		RS.L 1
 cl2_ext6_BPL2MOD		RS.L 1
 cl2_ext6_BPLCON4		RS.L 1
 cl2_ext6_FMODE			RS.L 1
-cl2_ext6_COLOR00_high1		RS.L 1
-cl2_ext6_COLOR04_high1		RS.L 1
-cl2_ext6_BPLCON3_low1		RS.L 1
-cl2_ext6_COLOR00_low1		RS.L 1
-cl2_ext6_COLOR04_low1		RS.L 1
+cl2_ext6_COLOR00_high		RS.L 1
+cl2_ext6_COLOR04_high		RS.L 1
+cl2_ext6_BPLCON3_2		RS.L 1
+cl2_ext6_COLOR00_low		RS.L 1
+cl2_ext6_COLOR04_low		RS.L 1
 cl2_ext6_BPL1PTH		RS.L 1
 cl2_ext6_BPL1PTL		RS.L 1
 cl2_ext6_BPL2PTH		RS.L 1
