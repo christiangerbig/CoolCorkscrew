@@ -1,3 +1,3 @@
 CD CoolCorkscrew:sources
-OMA CoolCorkscrew.asm -o projects-exe-files:RSE-CoolCorkscrew -c c -m >RAM:make-output.txt
+OMA CoolCorkscrew.asm -o CoolCorkscrew:executables/RSE-CoolCorkscrew -c c -m >RAM:make-output.txt
 CD /

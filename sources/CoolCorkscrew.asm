@@ -4,6 +4,9 @@
 ; 3.0+
 
 
+; Code optimized for O.M.A. 2.0 Assembler
+
+
 ; History/Changes
 
 ; V.1.0 Beta
@@ -1332,8 +1335,8 @@ init_main
 
 	bsr	init_CIA_timers
 
-	bsr	init_first_copperlist
-	bsr	init_second_copperlist
+	bsr	cl1_init_copperlist
+	bsr	cl2_init_copperlist
 	rts
 
 
@@ -1527,7 +1530,7 @@ init_CIA_timers
 
 
 	CNOP 0,4
-init_first_copperlist
+cl1_init_copperlist
 	move.l	cl1_display(a3),a0
 ; View
 	bsr.s	cl1_init_playfield_props
@@ -1557,7 +1560,7 @@ cl1_init_colors
 
 
 	CNOP 0,4
-init_second_copperlist
+cl2_init_copperlist
 	move.l	cl2_construction2(a3),a0
 ; Vertical-Blank 1
 	bsr.s	cl2_vb1_init_bpldat
@@ -3167,7 +3170,7 @@ spr_rgb8_color_table
 
 	CNOP 0,4
 vp2_spr_rgb8_color_table
-	INCLUDE "CoolCorkscrew:colortables/64x32x16-Spaceship.ct"
+	INCLUDE "CoolCorkscrew:colorpalettes/64x32x16-Spaceship.ct"
 
 
 	CNOP 0,4
@@ -3232,15 +3235,15 @@ hcs_objects_x_coordinates
 ; Single-Corkscrew-Scroll
 	CNOP 0,4
 scs_color_gradient_front
-	INCLUDE "CoolCorkscrew:colortables/2x32-Colorgradient-Blue.hlct"
+	INCLUDE "CoolCorkscrew:colorpalettes/2x32-Colorgradient-Blue.hlct"
 
 	CNOP 0,4
 scs_color_gradient_back
-	INCLUDE "CoolCorkscrew:colortables/2x32-Colorgradient-Orchid.hlct"
+	INCLUDE "CoolCorkscrew:colorpalettes/2x32-Colorgradient-Orchid.hlct"
 
 	CNOP 0,4
 scs_color_gradient_outline
-	INCLUDE "CoolCorkscrew:colortables/2x32-Colorgradient-Grey.hlct"
+	INCLUDE "CoolCorkscrew:colorpalettes/2x32-Colorgradient-Grey.hlct"
 
 	CNOP 0,4
 scs_bar_color_table
@@ -3273,7 +3276,7 @@ sb36_yz_coordinates
 ; Image-Fader 
 	CNOP 0,4
 ifi_rgb8_color_table
-	INCLUDE "CoolCorkscrew:colortables/256x30x16-Group-Logo.ct"
+	INCLUDE "CoolCorkscrew:colorpalettes/256x30x16-Group-Logo.ct"
 
 	CNOP 0,4
 ifo_rgb8_color_table
@@ -3285,7 +3288,7 @@ ifo_rgb8_color_table
 ; Sprite-Fader 
 	CNOP 0,4
 sprfi_rgb8_color_table
-	INCLUDE "CoolCorkscrew:colortables/3x16x15x16-RSE.ct"
+	INCLUDE "CoolCorkscrew:colorpalettes/3x16x15x16-RSE.ct"
 
 	CNOP 0,4
 sprfo_rgb8_color_table
@@ -3297,7 +3300,7 @@ sprfo_rgb8_color_table
 ; Bar-Fader 
 	CNOP 0,4
 bfi_rgb8_color_table
-	INCLUDE "CoolCorkscrew:colortables/5-Colorgradient-Orchid.ct"
+	INCLUDE "CoolCorkscrew:colorpalettes/5-Colorgradient-Orchid.ct"
 
 	CNOP 0,4
 bfo_rgb8_color_table
