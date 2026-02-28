@@ -639,7 +639,7 @@ cl1_begin			RS.B 0
 
 cl1_COPJMP2			RS.L 1
 
-copperlist1_size		RS.B 0
+cl1_copperlist_size		RS.B 0
 
 
 	RSRESET
@@ -866,16 +866,16 @@ cl2_INTREQ			RS.L 1
 
 cl2_end				RS.L 1
 
-copperlist2_size		RS.B 0
+cl2_copperlist_size		RS.B 0
 
 
 cl1_size1			EQU 0
 cl1_size2			EQU 0
-cl1_size3			EQU copperlist1_size
+cl1_size3			EQU cl1_copperlist_size
 
 cl2_size1			EQU 0
-cl2_size2			EQU copperlist2_size
-cl2_size3			EQU copperlist2_size
+cl2_size2			EQU cl2_copperlist_size
+cl2_size3			EQU cl2_copperlist_size
 
 
 ; Sprite0 additional structure 
@@ -1567,7 +1567,7 @@ cl2_init_copperlist
 ; Viewport 1
 	bsr	cl2_vp1_init_playfield_props
 	bsr	cl2_vp1_init_colors
-	bsr	cl2_vp1_init_bitplane_pointers
+	bsr	cl2_vp1_init_plane_pointers
 	bsr	cl2_vp1_start_display
 	bsr	cl2_init_bplcon1_chunky
 ; Vertical-Blank 2
@@ -1576,14 +1576,15 @@ cl2_init_copperlist
 ; Viewport 2
 	bsr	cl2_vp2_init_playfield_props
 	bsr	cl2_vp2_init_colors
-	bsr	cl2_vp2_init_bitplane_pointers
+	bsr	cl2_vp2_init_plane_pointers
 	bsr	cl2_vp2_start_display
 	bsr	cl2_init_roller
 ; Copper-Interrupt
 	bsr	cl2_init_copper_interrupt
 	COP_LISTEND
-	bsr	cl2_vp1_set_bitplane_pointers
-	bsr	cl2_vp2_set_bitplane_pointers
+	bsr	cl2_vp1_set_plane_pointers
+	bsr	cl2_vp2_set_plane_pointers
+
 	bsr	scs_set_vert_compression
 	IFEQ scs_pipe_effect_enabled
 		bsr	scs_set_color_gradients
@@ -1591,7 +1592,8 @@ cl2_init_copperlist
 	ELSE
 		bsr	scs_set_color_gradients
 	ENDC
-	bsr	copy_second_copperlist
+
+	bsr	cl2_copy_copperlist
 	rts
 
 
@@ -1622,14 +1624,14 @@ cl2_vp1_init_colors
 	rts
 
 	CNOP 0,4
-cl2_vp1_init_bitplane_pointers
+cl2_vp1_init_plane_pointers
 	move.w	#BPL1PTH,d0
 	moveq	#(extra_pf1_depth*2)-1,d7
-cl2_vp1_init_bitplane_pointers_loop
+cl2_vp1_init_plane_pointers_loop
 	move.w	d0,(a0)			; BPLxPTH/L
 	addq.w	#WORD_SIZE,d0
 	addq.w	#LONGWORD_SIZE,a0
-	dbf	d7,cl2_vp1_init_bitplane_pointers_loop
+	dbf	d7,cl2_vp1_init_plane_pointers_loop
 	rts
 
 	CNOP 0,4
@@ -1639,16 +1641,16 @@ cl2_vp1_start_display
 	rts
 
 	CNOP 0,4
-cl2_vp1_set_bitplane_pointers
+cl2_vp1_set_plane_pointers
 	move.l	cl2_construction2(a3),a0 
 	ADDF.W	cl2_extension2_entry+cl2_ext2_BPL1PTH+WORD_SIZE,a0
 	move.l	extra_pf1(a3),a1
 	moveq	#extra_pf1_depth-1,d7
-cl2_vp1_set_bitplane_pointers_loop
+cl2_vp1_set_plane_pointers_loop
 	move.w	(a1)+,(a0)		; BPLxPTH
 	addq.w	#QUADWORD_SIZE,a0
 	move.w	(a1)+,LONGWORD_SIZE-QUADWORD_SIZE(a0) ; BPLxPTL
-	dbf	d7,cl2_vp1_set_bitplane_pointers_loop
+	dbf	d7,cl2_vp1_set_plane_pointers_loop
 	rts
 
 	COP_INIT_BPLCON1_CHUNKY cl2,cl2_hstart2,cl2_vstart2,cl2_display_x_size,vp1_visible_lines_number,vp1_bplcon1_bits
@@ -1689,14 +1691,14 @@ cl2_vp2_init_colors
 	rts
 
 	CNOP 0,4
-cl2_vp2_init_bitplane_pointers
+cl2_vp2_init_plane_pointers
 	move.w #BPL1PTH,d0
 	moveq	#(extra_pf2_depth*2*2)-1,d7
-cl2_vp2_init_bitplane_pointers_loop
+cl2_vp2_init_plane_pointers_loop
 	move.w	d0,(a0)			; BPLxPTH/L
 	addq.w	#WORD_SIZE,d0
 	addq.w	#LONGWORD_SIZE,a0
-	dbf	d7,cl2_vp2_init_bitplane_pointers_loop
+	dbf	d7,cl2_vp2_init_plane_pointers_loop
 	rts
 
 	CNOP 0,4
@@ -1714,7 +1716,7 @@ cl2_init_roller
 	move.l	#(BPLCON3<<16)+vp2_bplcon3_bits2,d3 ; color low
 	move.l	#COLOR02<<16,d4
 	move.l	#COLOR05<<16,d5
-	move.l	#1<<24,d6
+	move.l	#1<<24,d6		; next rasterline
 	move.l	#(BPL1MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a1
 	move.l	#(BPL2MOD<<16)|((-extra_pf2_plane_width+(extra_pf2_plane_width-vp2_data_fetch_width))&$ffff),a2
 	IFEQ scs_pipe_effect_enabled
@@ -1750,7 +1752,7 @@ cl2_init_roller_loop
 	subq.w	#LONGWORD_SIZE,a0
 	COP_WAIT CL_X_WRAPPING,CL_Y_WRAPPING ; patch cl
 cl2_init_roller_skip
-	add.l	d6,d0			; next line
+	add.l	d6,d0			; next rasterline
 	dbf	d7,cl2_init_roller_loop
 	movem.l (a7)+,a4-a6
 	rts
@@ -1760,33 +1762,33 @@ cl2_init_roller_skip
 
 
 	CNOP 0,4
-cl2_vp2_set_bitplane_pointers
+cl2_vp2_set_plane_pointers
 	MOVEF.L (extra_pf2_1_plane_x_offset/8)+(extra_pf2_1_plane_y_offset*extra_pf2_plane_width*extra_pf2_depth),d1 ; 2nd half
 	move.l	cl2_construction2(a3),a0
 	move.l	extra_pf2(a3),a2
 	lea	cl2_extension6_entry+cl2_ext6_BPL2PTH+WORD_SIZE(a0),a1
 	ADDF.W	cl2_extension6_entry+cl2_ext6_BPL1PTH+WORD_SIZE,a0
 	moveq	#extra_pf2_depth-1,d7
-cl2_vp2_set_bitplane_pointers_loop1
+cl2_vp2_set_plane_pointers_loop1
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
-	move.w	d0,LONGWORD_SIZE(a0)		; BPLxPTL
+	move.w	d0,LONGWORD_SIZE(a0)	; BPLxPTL
 	swap	d0
 	move.w	d0,(a0)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a0
-	dbf	d7,cl2_vp2_set_bitplane_pointers_loop1
+	dbf	d7,cl2_vp2_set_plane_pointers_loop1
 
 	MOVEF.L (extra_pf2_2_plane_x_offset/8)+(extra_pf2_2_plane_y_offset*extra_pf2_plane_width*extra_pf2_depth),d1 ; 2nd half
 	move.l	extra_pf2(a3),a2
 	moveq	#extra_pf2_depth-1,d7
-cl2_vp2_set_bitplane_pointers_loop2
+cl2_vp2_set_plane_pointers_loop2
 	move.l	(a2)+,d0		; bitplane address
 	add.l	d1,d0			; offset
-	move.w	d0,LONGWORD_SIZE(a1)		; BPLxPTL
+	move.w	d0,LONGWORD_SIZE(a1)	; BPLxPTL
 	swap	d0
 	move.w	d0,(a1)			; BPLxPTH
 	ADDF.W	QUADWORD_SIZE*2,a1
-	dbf	d7,cl2_vp2_set_bitplane_pointers_loop2
+	dbf	d7,cl2_vp2_set_plane_pointers_loop2
 	rts
 
 	CNOP 0,4
@@ -1803,7 +1805,7 @@ scs_set_vert_compression
 scs_set_vert_compression_loop
 	move.w	WORD_SIZE(a0,d1.w*4),d0	; sin(w)
 	muls.w	d3,d0			; yr*sin(w)
-	swap	d0			; y'=(yr*sin(w))/2^15
+	swap	d0			; y' = (yr*sin(w))/2^15
 	add.w	d4,d0			; y' + y center
 	mulu.w	d6,d0			; y offsert in cl
 	add.w	d7,cl2_ext7_BPL1MOD+WORD_SIZE(a1,d0.l) ; BPL1MOD
@@ -1884,8 +1886,8 @@ no_sync_routines
 	CNOP 0,4
 beam_routines
 	bsr	wait_copint
-	bsr	swap_second_copperlist
-	bsr	set_second_copperlist
+	bsr	cl2_swap_copperlist
+	bsr	cl2_set_copperlist
 	bsr	swap_sprite_structures
 	bsr	set_sprite_pointers
 	bsr	scs_horiz_scrolltext
@@ -1955,7 +1957,7 @@ scs_horiz_scrolltext
 	WAITBLIT
 	move.l	#(BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D = A
 	moveq	#-1,d5
-	move.l	d5,BLTAFWM-DMACONR(a6)
+	move.l	d5,BLTAFWM-DMACONR(a6)	; no mask
 	move.l	d0,BLTAPT-DMACONR(a6)	; character image
 	move.l	d1,BLTDPT-DMACONR(a6)	; playfield write
 	move.l	#((scs_image_plane_width-scs_text_char_width)<<16)|(extra_pf2_plane_width-scs_text_char_width),BLTAMOD-DMACONR(a6) ; A&D moduli
@@ -2005,6 +2007,7 @@ scs_check_control_codes
 	beq	scs_pause_scrolltext
 	cmp.b	#ASCII_CTRL_S,d0
 	beq	scs_stop_scrolltext
+scs_check_control_codes_quit
 	rts
 	CNOP 0,4
 scs_start_sine_bars232
@@ -2015,7 +2018,7 @@ scs_start_sine_bars232
 	move.w	d0,rfi_active(a3)
 	move.w	#1,rfi_delay_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_sine_bars36
 	move.w	#FALSE,sb232_active(a3)
@@ -2025,13 +2028,13 @@ scs_start_sine_bars36
 	move.w	d0,rfi_active(a3)
 	move.w	#1,rfi_delay_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_radius_fader_out
 	clr.w	rfo_active(a3)
 	move.w	#1,rfo_delay_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_spaceship
 	tst.w	msr_active(a3)		; spaceship movement to right ?
@@ -2042,23 +2045,23 @@ scs_start_spaceship_skip
 	clr.w	msl_active(a3)		; start movement to left
 	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90°
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_corkscrew
 	move.w	#scs_vert_scroll_speed1,scs_variable_vert_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_normal_scrolltext
 	move.w	#scs_vert_scroll_speed2,scs_variable_vert_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra	scs_check_control_codes_quit
 	CNOP 0,4
 scs_pause_scrolltext
 	move.w	#FALSE,scs_text_move_active(a3) ; pause text
 	move.w	#scs_text_delay,scs_text_delay_counter(a3)
 	moveq	#RETURN_OK,d0
-	rts
+	bra	scs_check_control_codes_quit
 	CNOP 0,4
 scs_stop_scrolltext
 	move.w	#FALSE,scs_active(a3)	; stop text
@@ -2093,7 +2096,7 @@ scs_stop_scrolltext_skip3
 	move.w	d0,bf_rgb8_convert_colors_active(a3)
 scs_stop_scrolltext_quit
 	moveq	#RETURN_OK,d0
-	rts
+	bra	scs_check_control_codes_quit
 
 
 	CNOP 0,4
@@ -2109,7 +2112,7 @@ scs_horiz_scroll
 	WAITBLIT
 	move.l	#((-scs_horiz_scroll_speed<<12)|BC0F_SRCA|BC0F_DEST|ANBNC|ANBC|ABNC|ABC)<<16,BLTCON0-DMACONR(a6) ; minterm D = A
 	moveq	#-1,d0
-	move.l	d0,BLTAFWM-DMACONR(a6)
+	move.l	d0,BLTAFWM-DMACONR(a6)	; no maskÜ
 	move.l	a0,BLTDPT-DMACONR(a6)
 	addq.w	#WORD_SIZE,a0		; skip 16 pixel
 	move.l	a0,BLTAPT-DMACONR(a6)
@@ -2551,6 +2554,7 @@ move_spaceship_left
 	bsr	msr_copy_bitmaps
 	clr.w	msr_active(a3)
 	move.w	#sine_table_length2/4,msr_x_angle(a3) ; 90°
+move_spaceship_left_quit
 	rts
 	CNOP 0,4
 move_spaceship_left_skip
@@ -2571,8 +2575,7 @@ move_spaceship_left_skip
 	move.w	d1,(a1)			; SPRxPOS
 	or.b	#SPRCTLF_ATT,d2
 	move.w	d2,spr_pixel_per_datafetch/8(a1) ; SPRxCTL
-move_spaceship_left_quit
-	rts
+	bra.s	move_spaceship_left_quit
 
 
 	CNOP 0,4
@@ -2596,6 +2599,7 @@ move_spaceship_right
 	cmp.w	#sine_table_length2/2,d2 ; 180° ?
 	ble.s	move_spaceship_right_skip
 	move.w	#FALSE,msr_active(a3)
+move_spaceship_right_quit
 	rts
 	CNOP 0,4
 move_spaceship_right_skip
@@ -2616,8 +2620,7 @@ move_spaceship_right_skip
 	move.w	d1,(a1)			; SPRxPOS
 	or.b	#SPRCTLF_ATT,d2
 	move.w	d2,spr_pixel_per_datafetch/8(a1) ; SPRxCTL
-move_spaceship_right_quit
-	rts
+	bra.s	move_spaceship_right_quit
 
 
 	CNOP 0,4
@@ -3100,33 +3103,36 @@ pt_start_intro
 	move.w	d0,bfi_rgb8_active(a3)
 	move.w	#bf_rgb8_colors_number*3,bf_rgb8_colors_counter(a3)
 	move.w	d0,bf_rgb8_convert_colors_active(a3)
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_get_z_planes_step
 	clr.w	hcs_get_horiz_step_active(a3)
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_increase_x_radius_angle_step
 	addq.w	#1,hsi_x_radius_angle_step(a3)
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_start_scrolltext
 	moveq	#TRUE,d0
 	move.w	d0,scs_active(a3)
 	move.w	d0,scs_text_table_start(a3)
-	rts
+	bra.s	pt_effects_handler_quit
 	CNOP 0,4
 pt_enable_spaceship
 	clr.w	mh_start_spaceship_active(a3)
-	rts
+	bra.s	pt_effects_handler_quit
+
 
 	CNOP 0,4
 ciab_tb_interrupt_server
 	PT_TIMER_INTERRUPT_SERVER
 
+
 	CNOP 0,4
 exter_interrupt_server
 	rts
+
 
 	CNOP 0,4
 nmi_interrupt_server
