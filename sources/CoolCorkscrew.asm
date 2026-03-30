@@ -57,8 +57,8 @@
 ; - Mouse-Handler: Out-Fader stops In-Fader
 ; - Lunix' icon included
 ; - Spaceship animation: If the user triggers the spaceship a flight to right
-;	 	 	     is aborted and the spaceship gfx are changed during
-;	 	 	     horizontal blank. Only SPR0 & SPR1 are used.
+;   is aborted and the spaceship gfx are changed during
+;   horizontal blank. Only SPR0 & SPR1 are used.
 ; - adf file created
 ; - Fader optimized
 
@@ -212,7 +212,7 @@ pf_depth			EQU pf1_depth3+pf2_depth3
 
 pf_extra_number			EQU 2
 ; Viewport 1
-; Playfield1
+; Playfield 1
 extra_pf1_x_size		EQU 320
 extra_pf1_y_size		EQU 30
 extra_pf1_depth			EQU 4
@@ -227,10 +227,10 @@ spr_x_size1			EQU 64
 spr_x_size2			EQU 64
 spr_depth			EQU 2
 spr_colors_number		EQU 16
-spr_odd_color_table_select	EQU 1	; COLOR16..COLOR31
-spr_even_color_table_select	EQU 1	; COLOR16..COLOR31
-vp2_spr_odd_color_table_select	EQU 2	; COLOR32..COLOR47
-vp2_spr_even_color_table_select	EQU 2	; COLOR32..COLOR47
+spr_odd_color_table_select	EQU 1	; characterscrolling: COLOR16..COLOR31
+spr_even_color_table_select	EQU 1	; characterscrolling: COLOR16..COLOR31
+vp2_spr_odd_color_table_select	EQU 2	; spaceship: COLOR32..COLOR47
+vp2_spr_even_color_table_select	EQU 2	; spaceship: COLOR32..COLOR47
 spr_used_number			EQU 8
 spr_swap_number			EQU 8
 
@@ -410,8 +410,8 @@ cl2_hstart5			EQU 0
 cl2_vstart5			EQU beam_position&CL_Y_WRAPPING
 
 
-sine_table_length1		EQU 256
-sine_table_length2		EQU 512
+sine_table_length		EQU 256
+sine_table_512_length		EQU 512
 
 ; Logo
 lg_image_x_size			EQU 256
@@ -500,7 +500,7 @@ scs_center_bar_height		EQU 10
 ; Roller-Effect
 scs_roller_y_radius		EQU vp2_visible_lines_number/2
 scs_roller_y_center		EQU vp2_visible_lines_number/2
-scs_roller_y_angle_step		EQU (sine_table_length1/2)/vp2_visible_lines_number
+scs_roller_y_angle_step		EQU (sine_table_length/2)/vp2_visible_lines_number
 
 ; Pipe-Effekt 
 scs_pipe_shift_x_radius		EQU scs_roller_y_radius
@@ -523,7 +523,7 @@ sb36_bars_number		EQU 4
 sb36_y_center			EQU (vp2_visible_lines_number-sb_bar_height)/2
 sb36_y_angle_speed		EQU 2
 sb36_y_distance_min		EQU 32
-sb36_y_distance_max		EQU sine_table_length1/sb36_bars_number
+sb36_y_distance_max		EQU sine_table_length/sb36_bars_number
 sb36_y_distance_radius		EQU ((sb36_y_distance_max-sb36_y_distance_min)/2)
 sb36_y_distance_center		EQU ((sb36_y_distance_max-sb36_y_distance_min)/2)+sb36_y_distance_min
 sb36_y_distance_speed		EQU 1
@@ -771,7 +771,6 @@ cl2_ext4_bplcon0		RS.L 1
 cl2_extension4_size		RS.B 0
 
 
-
 	RSRESET
 
 cl2_extension5			RS.B 0
@@ -878,7 +877,7 @@ cl2_size2			EQU cl2_copperlist_size
 cl2_size3			EQU cl2_copperlist_size
 
 
-; Sprite0 additional structure 
+; Sprite0 additional structures
 	RSRESET
 
 spr0_extension1			RS.B 0
@@ -909,7 +908,7 @@ spr0_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite0_size			RS.B 0
 
-; Sprite1 additional structure 
+; Sprite1 additional structures
 	RSRESET
 
 spr1_extension1			RS.B 0
@@ -921,7 +920,7 @@ spr1_extension1_size		RS.B 0
 
 	RSRESET
 
-spr1_extension2	RS.B 0
+spr1_extension2			RS.B 0
 
 spr1_ext2_header		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 spr1_ext2_planedata		RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)*ms_image_y_size
@@ -1041,7 +1040,6 @@ spr7_begin			RS.B 0
 spr7_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite7_size			RS.B 0
-
 
 spr0_x_size1			EQU spr_x_size1
 spr0_y_size1			EQU sprite0_size/(spr_x_size1/LONGWORD_SIZE)
@@ -1215,8 +1213,8 @@ init_main_variables
 
 ; Horiz-Character-Scrolling 
 	move.w	d0,hcs_get_horiz_speed_active(a3)
-	moveq	#sine_table_length1/4,d2
-	move.w	d2,hcs_horiz_speed_angle(a3) : 90°
+	moveq	#sine_table_length/4,d2
+	move.w	d2,hcs_horiz_speed_angle(a3) ; 90°
 	move.w	d0,hcs_horiz_speed(a3)
 	moveq	#FALSE,d1
 	move.w	d1,hcs_get_horiz_step_active(a3)
@@ -1251,11 +1249,11 @@ init_main_variables
 
 ; Move-Spaceship 
 	move.w	d1,msl_active(a3)
-	MOVEF.W sine_table_length2/4,d3
-	move.w	d3,msl_x_angle(a3)	;90°
+	MOVEF.W sine_table_512_length/4,d3
+	move.w	d3,msl_x_angle(a3)	; 90°
 
 	move.w	d1,msr_active(a3)
-	move.w	d3,msr_x_angle(a3)	;90°
+	move.w	d3,msr_x_angle(a3)	; 90°
 
 ; Radius-Fader-In 
 	move.w	d1,rfi_active(a3)
@@ -1283,7 +1281,7 @@ init_main_variables
 
 ; Sprite-Fader-In 
 	move.w	d1,sprfi_rgb8_active(a3)
-	MOVEF.W sine_table_length1/4,d2
+	MOVEF.W sine_table_length/4,d2
 	move.w	d2,sprfi_rgb8_fader_angle(a3) ; 90°
 
 ; Sprite-Fader-Out 
@@ -1296,7 +1294,7 @@ init_main_variables
 
 ; Bar-Fader-In 
 	move.w	d1,bfi_rgb8_active(a3)
-	MOVEF.W sine_table_length1/4,d2
+	MOVEF.W sine_table_length/4,d2
 	move.w	d2,bfi_rgb8_fader_angle(a3) ; 90°
 
 ; Bar-Fader-Out 
@@ -1317,24 +1315,16 @@ init_main
 	bsr	pt_InitAudTempStrucs
 	bsr	pt_ExamineSongStruc
 	bsr	pt_InitFtuPeriodTableStarts
-
 	bsr	lg_copy_image_to_bitplane
-
 	bsr	hsi_init_shift_table
-
 	bsr	scs_init_chars_offsets
 	IFEQ scs_pipe_effect_enabled
 		bsr	scs_init_x_shift_table
 	ENDC
-
 	bsr	bf_rgb8_init_color_table
-
 	bsr	init_colors
-
 	bsr	init_sprites
-
 	bsr	init_CIA_timers
-
 	bsr	cl1_init_copperlist
 	bsr	cl2_init_copperlist
 	rts
@@ -1377,7 +1367,7 @@ hsi_init_shift_table_loop
 scs_init_x_shift_table
 		moveq	#0,d1		; 1st y angle
 		moveq	#scs_pipe_shift_x_radius*2,d2
-		MOVEF.L sine_table_length1/2,d3 ; 180°
+		MOVEF.L sine_table_length/2,d3 ; 180°
 		divu.w	#scs_roller_y_radius*2,d3 ; steps in sine table
 		lea	sine_table(pc),a0
 		lea	scs_pipe_shift_x_table(pc),a1
@@ -1414,16 +1404,12 @@ init_colors
 	CNOP 0,4
 init_sprites
 	bsr.s	spr_init_pointers_table
-
 	bsr.s	hcs_init_xy_coordinates
 	bsr	hcs_init_sprites_bitmaps
-
 	bsr	spr_copy_structures
 	rts
 
-
 	INIT_SPRITE_POINTERS_TABLE
-
 
 ; Horiz-Characterscrolling 
 	CNOP 0,4
@@ -1449,7 +1435,7 @@ hcs_init_xy_coordinates_loop2
 	move.b	_CIAB+CIATODLOW,d1	; b
 	add.l	d1,d5			; (f(x)*a)+b
 	and.l	d3,d5			; only low word
-	divu.w	d4,d5			; f(x+1)=[(f(x)*a)+b]/mod
+	divu.w	d4,d5			; f(x+1) = [(f(x)*a)+b]/mod
 	swap	d5			; remainder
 	move.w	d5,d0
 	IFNE hcs_quick_x_max_restart_enabled
@@ -1458,7 +1444,7 @@ hcs_init_xy_coordinates_loop2
 	move.w	d0,(a5)+		; x coordinate
 	move.w	a4,d1			; y
 	bsr.s	hcs_init_sprite_header
-	ADDF.W	spr2_extension1_size,a0	; skip n bytes
+	ADDF.W	spr2_extension1_size,a0	; next sprite structure
 	ADDF.W	spr3_extension1_size,a1
 	ADDF.W	hcs_image_y_size+1,a4	; increase y
 	dbf	d6,hcs_init_xy_coordinates_loop2
@@ -1757,9 +1743,7 @@ cl2_init_roller_skip
 	movem.l (a7)+,a4-a6
 	rts
 
-
 	COP_INIT_COPINT cl2,cl2_hstart5,cl2_vstart5
-
 
 	CNOP 0,4
 cl2_vp2_set_plane_pointers
@@ -1793,10 +1777,10 @@ cl2_vp2_set_plane_pointers_loop2
 
 	CNOP 0,4
 scs_set_vert_compression
-	MOVEF.W	sine_table_length1/4,d1	; 1st y angle 90°
+	MOVEF.W	sine_table_length/4,d1	; 1st y angle 90°
 	moveq	#scs_roller_y_radius*2,d3
 	moveq	#scs_roller_y_center,d4
-	MOVEF.W (sine_table_length1/4)*3,d5 ; 270°
+	MOVEF.W (sine_table_length/4)*3,d5 ; 270°
 	moveq	#cl2_extension7_size,d6
 	lea	sine_table(pc),a0	
 	move.l	cl2_construction2(a3),a1
@@ -1866,7 +1850,6 @@ scs_set_pipe_loop
 		dbf	d7,scs_set_pipe_loop
 		rts
 	ENDC
-
 
 	COPY_COPPERLIST cl2,2
 
@@ -1981,9 +1964,7 @@ scs_horiz_scrolltext_skip3
 scs_horiz_scrolltext_quit
 	rts
 
-
 	GET_NEW_CHAR_IMAGE.W scs,scs_check_control_codes,NORESTART
-
 
 ; Input
 ; d0.b	ASCII code
@@ -2039,11 +2020,11 @@ scs_start_radius_fader_out
 scs_start_spaceship
 	tst.w	msr_active(a3)		; spaceship movement to right ?
 	bne.s	scs_start_spaceship_skip
-	move.w	#sine_table_length2/2,msr_x_angle(a3) ; 180°
+	move.w	#sine_table_512_length/2,msr_x_angle(a3) ; 180°
 scs_start_spaceship_skip
 	bsr	msl_copy_bitmaps
 	clr.w	msl_active(a3)		; start movement to left
-	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90°
+	move.w	#sine_table_512_length/4,msl_x_angle(a3) ; 90°
 	moveq	#RETURN_OK,d0
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
@@ -2142,7 +2123,7 @@ hcs_get_bplcon1_shifts_loop1
 	swap	d1
 	add.b	d5,d4			; next x radius angle
 	addq.w	#hsi_shift_values_number/4,d1 ; xr' + x center
-	moveq	#(sine_table_length1/4)-(2*hsi_x_angle_step),d2 ; 1st x angle
+	moveq	#(sine_table_length/4)-(2*hsi_x_angle_step),d2 ; 1st x angle
 	neg.w	d1
 	moveq	#cl2_display_width-1,d6	; number of entries in destination table
 hcs_get_bplcon1_shifts_loop2
@@ -2208,7 +2189,7 @@ hcs_get_horiz_speed
 	add.w	#hcs_horiz_speed_max*2,d0 ; add center
 	move.w	d0,hcs_horiz_speed(a3)
 	addq.w	#hcs_horiz_speed_angle_speed,d2
-	cmp.w	#sine_table_length1/2,d2 ; 180° ?
+	cmp.w	#sine_table_length/2,d2 ; 180° ?
 	ble.s	hcs_get_horiz_speed_skip
 	move.w	#FALSE,hcs_get_horiz_speed_active(a3)
 hcs_get_horiz_speed_skip
@@ -2229,7 +2210,7 @@ hcs_get_horiz_step
 	add.w	#(hcs_horiz_step_max*2)+1,d0 ; add center
 	move.w	d0,hcs_horiz_step(a3)
 	addq.w	#hcs_horiz_step_angle_speed,d2
-	cmp.w	#sine_table_length1/2,d2 ; 180° ?
+	cmp.w	#sine_table_length/2,d2 ; 180° ?
 	ble.s	hcs_get_horiz_step_skip
 	move.w	#FALSE,hcs_get_horiz_step_active(a3)
 hcs_get_horiz_step_skip
@@ -2395,7 +2376,7 @@ sb36_get_yz_coordinates
 	move.w	#sb36_y_distance_center,a4
 	moveq	#sb36_bars_number-1,d7
 sb36_get_yz_coordinates_loop
-	moveq	#-(sine_table_length1/4),d1 ; - 90°
+	moveq	#-(sine_table_length/4),d1 ; - 90°
 	move.w	WORD_SIZE(a0,d2.w*4),d0	; sin(w)
 	add.w	d2,d1			; y angle - 90°
 	ext.w	d1
@@ -2548,12 +2529,12 @@ move_spaceship_left
 	swap	d1
 	add.w	#ms_x_center*SHIRES_PIXEL_FACTOR,d1
 	addq.w	#msl_x_angle_speed,d2
-	cmp.w	#sine_table_length2/2,d2 ; 180° ?
+	cmp.w	#sine_table_512_length/2,d2 ; 180° ?
 	ble.s	move_spaceship_left_skip
 	move.w	#FALSE,msl_active(a3)
 	bsr	msr_copy_bitmaps
 	clr.w	msr_active(a3)
-	move.w	#sine_table_length2/4,msr_x_angle(a3) ; 90°
+	move.w	#sine_table_512_length/4,msr_x_angle(a3) ; 90°
 move_spaceship_left_quit
 	rts
 	CNOP 0,4
@@ -2577,7 +2558,6 @@ move_spaceship_left_skip
 	move.w	d2,spr_pixel_per_datafetch/8(a1) ; SPRxCTL
 	bra.s	move_spaceship_left_quit
 
-
 	CNOP 0,4
 msl_copy_bitmaps
 	lea	msl_image_data,a2
@@ -2596,7 +2576,7 @@ move_spaceship_right
 	swap	d1
 	add.w	#ms_x_center*SHIRES_PIXEL_FACTOR,d1 ; x' + x center
 	addq.w	#msr_x_angle_speed,d2
-	cmp.w	#sine_table_length2/2,d2 ; 180° ?
+	cmp.w	#sine_table_512_length/2,d2 ; 180° ?
 	ble.s	move_spaceship_right_skip
 	move.w	#FALSE,msr_active(a3)
 move_spaceship_right_quit
@@ -2621,7 +2601,6 @@ move_spaceship_right_skip
 	or.b	#SPRCTLF_ATT,d2
 	move.w	d2,spr_pixel_per_datafetch/8(a1) ; SPRxCTL
 	bra.s	move_spaceship_right_quit
-
 
 	CNOP 0,4
 msr_copy_bitmaps
@@ -2718,9 +2697,9 @@ image_fader_in
 	move.w	ifi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	ifi_rgb8_fader_angle_speed,d0
-	cmp.w	#sine_table_length1/2,d0 ; 180° ?
+	cmp.w	#sine_table_length/2,d0 ; 180° ?
 	ble.s	image_fader_in_skip
-	MOVEF.W sine_table_length1/2,d0
+	MOVEF.W sine_table_length/2,d0
 image_fader_in_skip
 	move.w	d0,ifi_rgb8_fader_angle(a3) 
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB counter
@@ -2755,9 +2734,9 @@ image_fader_out
 	move.w	ifo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	ifo_rgb8_fader_angle_speed,d0
-	cmp.w	#sine_table_length1/2,d0 ; 180° ?
+	cmp.w	#sine_table_length/2,d0 ; 180° ?
 	ble.s	image_fader_out_skip
-	MOVEF.W sine_table_length1/2,d0
+	MOVEF.W sine_table_length/2,d0
 image_fader_out_skip
 	move.w	d0,ifo_rgb8_fader_angle(a3) 
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB counter
@@ -2783,9 +2762,7 @@ image_fader_out_quit
 	movem.l (a7)+,a4-a6
 	rts
 
-
 	RGB8_COLOR_FADER if
-
 
 	COPY_RGB8_COLORS_TO_COPPERLIST if,pf1,cl2,cl2_ext2_COLOR00_high1,cl2_ext2_COLOR00_low1,cl2_extension2_entry
 
@@ -2798,9 +2775,9 @@ sprite_fader_in
 	move.w	sprfi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	sprfi_rgb8_fader_angle_speed,d0
-	cmp.w	#sine_table_length1/2,d0 ; 180° ?
+	cmp.w	#sine_table_length/2,d0 ; 180° ?
 	ble.s	sprite_fader_in_skip
-	MOVEF.W sine_table_length1/2,d0
+	MOVEF.W sine_table_length/2,d0
 sprite_fader_in_skip
 	move.w	d0,sprfi_rgb8_fader_angle(a3) 
 	MOVEF.W sprf_rgb8_colors_number*3,d6 ; RGB counter
@@ -2835,9 +2812,9 @@ sprite_fader_out
 	move.w	sprfo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	sprfo_rgb8_fader_angle_speed,d0
-	cmp.w	#sine_table_length1/2,d0 ; 180° ?
+	cmp.w	#sine_table_length/2,d0 ; 180° ?
 	ble.s	sprite_fader_out_skip
-	MOVEF.W sine_table_length1/2,d0
+	MOVEF.W sine_table_length/2,d0
 sprite_fader_out_skip
 	move.w	d0,sprfo_rgb8_fader_angle(a3) 
 	MOVEF.W sprf_rgb8_colors_number*3,d6 ; RGB counter
@@ -2863,7 +2840,6 @@ sprite_fader_out_quit
 	movem.l (a7)+,a4-a6
 	rts
 
-
 	COPY_RGB8_COLORS_TO_COPPERLIST sprf,spr,cl1,cl1_COLOR16_high1,cl1_COLOR16_low1
 
 
@@ -2875,9 +2851,9 @@ rgb8_bar_fader_in
 	move.w	bfi_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	bfi_rgb8_fader_angle_speed,d0
-	cmp.w	#sine_table_length1/2,d0 ; 180° ?
+	cmp.w	#sine_table_length/2,d0 ; 180° ?
 	ble.s	rgb8_bar_fader_in_skip
-	MOVEF.W sine_table_length1/2,d0
+	MOVEF.W sine_table_length/2,d0
 rgb8_bar_fader_in_skip
 	move.w	d0,bfi_rgb8_fader_angle(a3) 
 	MOVEF.W bf_rgb8_colors_number*3,d6 ; RGB counter
@@ -2912,9 +2888,9 @@ rgb8_bar_fader_out
 	move.w	bfo_rgb8_fader_angle(a3),d2
 	move.w	d2,d0
 	ADDF.W	bfo_rgb8_fader_angle_speed,d0
-	cmp.w	#sine_table_length1/2,d0 ; 180° ?
+	cmp.w	#sine_table_length/2,d0 ; 180° ?
 	ble.s	rgb8_bar_fader_out_skip
-	MOVEF.W sine_table_length1/2,d0
+	MOVEF.W sine_table_length/2,d0
 rgb8_bar_fader_out_skip
 	move.w	d0,bfo_rgb8_fader_angle(a3) 
 	MOVEF.W bf_rgb8_colors_number*3,d6 ; RGB counter
@@ -3039,11 +3015,12 @@ mouse_handler_skip6
 	beq	mouse_handler_quit
 	bsr	msl_copy_bitmaps
 	move.w	d0,msl_active(a3)	; start spaceship to left
-	move.w	#sine_table_length2/4,msl_x_angle(a3) ; 90°
+	move.w	#sine_table_512_length/4,msl_x_angle(a3) ; 90°
 	bra	mouse_handler_quit
 
 
 	INCLUDE "int-autovectors-handlers.i"
+
 
 	IFEQ pt_ciatiming_enabled
 		CNOP 0,4
