@@ -1455,9 +1455,10 @@ hcs_init_xy_coordinates_loop2
 ; Input
 ; d0.w	X
 ; d1.w	Y
-; a0.l	1st sprite structure
-; a1.l	2nd sprite structure
+; a0.l	Pointer structure 1st sprite data
+; a1.l	Pointer structure 2nd sprite data
 ; Result
+; no return value
 	CNOP 0,4
 hcs_init_sprite_header
 	moveq	#hcs_image_y_size,d2	; height
@@ -1810,7 +1811,7 @@ scs_set_color_gradients
 	ADDF.W	cl2_extension7_entry+cl2_ext7_COLOR00_high+WORD_SIZE,a2
 	lea	scs_color_gradient_outline(pc),a4
 	move.w	#cl2_extension7_size,a5
-	moveq	#vp2_visible_lines_number-1,d7 ; number of colors
+	moveq	#vp2_visible_lines_number-1,d7 ; number of colours
 scs_set_color_gradients_loop
 	move.w	d2,(a2)			; color high
 	move.w	d3,cl2_ext7_COLOR00_low-cl2_ext7_COLOR00_high(a2) ; color low
@@ -2610,8 +2611,9 @@ msr_copy_bitmaps
 
 
 ; Input
-; a2.l	image data
+; a2.l	Image data
 ; Result
+; no return value
 	CNOP 0,4
 ms_copy_image_data
 	movem.l d1/a0/a4-a6,-(a7)
