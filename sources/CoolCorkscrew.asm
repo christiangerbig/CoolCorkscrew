@@ -1110,12 +1110,12 @@ scs_image			RS.L 1
 scs_text_table_start		RS.W 1
 scs_text_char_x_shift		RS.W 1
 scs_text_char_y_offset		RS.W 1
-scs_variable_vert_scroll_speed	RS.W 1
+scsvert_scroll_speed	RS.W 1
 scs_text_delay_counter		RS.W 1
 scs_text_move_active		RS.W 1
 
 ; Sine-Bars 
-sb_variable_y_radius		RS.W 1
+sby_radius		RS.W 1
 
 ; Sine-Bars 2.3.2 
 sb232_active			RS.W 1
@@ -1229,13 +1229,13 @@ init_main_variables
 	move.w	d0,scs_text_table_start(a3)
 	move.w	d0,scs_text_char_x_shift(a3)
 	move.w	#scs_text_char_y_restart*extra_pf2_plane_width*scs_vert_scroll_window_depth,scs_text_char_y_offset(a3)
-	move.w	#scs_vert_scroll_speed2,scs_variable_vert_scroll_speed(a3)
+	move.w	#scs_vert_scroll_speed2,scsvert_scroll_speed(a3)
 	move.w	d1,scs_text_delay_counter(a3) ; counter inactive
 	move.w	d0,scs_text_move_active(a3)
 
 ; Sine-Bars 
 	move.w	d0,hcs_horiz_step_angle(a3) ; 0°
-	move.w	d0,sb_variable_y_radius(a3) ; 0°
+	move.w	d0,sby_radius(a3) ; 0°
 
 ; Sine-Bars 2.3.2 
 	move.w	d1,sb232_active(a3)
@@ -2029,12 +2029,12 @@ scs_start_spaceship_skip
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_corkscrew
-	move.w	#scs_vert_scroll_speed1,scs_variable_vert_scroll_speed(a3)
+	move.w	#scs_vert_scroll_speed1,scsvert_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_normal_scrolltext
-	move.w	#scs_vert_scroll_speed2,scs_variable_vert_scroll_speed(a3)
+	move.w	#scs_vert_scroll_speed2,scsvert_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
 	bra	scs_check_control_codes_quit
 	CNOP 0,4
@@ -2119,7 +2119,7 @@ hcs_get_bplcon1_shifts
 	moveq	#hsi_lines_number-1,d7
 hcs_get_bplcon1_shifts_loop1
 	move.l	(a0,d4.w*4),d1		; sin(w)
-	MULUF.L hsi_x_radius*2,d1,d0	; xr'=(xr*sin(w))/2^15
+	MULUF.L hsi_x_radius*2,d1,d0	; xr' = (xr*sin(w))/2^15
 	swap	d1
 	add.b	d5,d4			; next x radius angle
 	addq.w	#hsi_shift_values_number/4,d1 ; xr' + x center
@@ -2159,12 +2159,12 @@ scs_vert_scroll
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-(scs_vert_scroll_window_width))<<16)|(extra_pf2_plane_width-scs_vert_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
-	move.w	scs_variable_vert_scroll_speed(a3),d0
+	move.w	scsvert_scroll_speed(a3),d0
 	MULUF.W (scs_vert_scroll_window_depth)<<6,d0,d1
 	or.w	#scs_vert_scroll_window_x_size/16,d0
 	move.w	d0,BLTSIZE-DMACONR(a6)
 ; Vertical moving - scrolltext
-	move.w	scs_variable_vert_scroll_speed(a3),d0
+	move.w	scsvert_scroll_speed(a3),d0
 	MULUF.W extra_pf2_plane_width*extra_pf2_depth,d0,d1
 	lea	(vp2_pf_pixel_per_datafetch/8)(a2,d0.w),a0 ; 2nd or 3rd line, skip 64 pixel
 	lea	(vp2_pf_pixel_per_datafetch/8)(a2),a1 ; 1st line, skip 64 pixel
@@ -2308,7 +2308,7 @@ sb232_get_y_coordinates
 	movem.l a4-a6,-(a7)
 	tst.w	sb232_active(a3)
 	bne	sb232_get_y_coordinates_quit
-	tst.w	sb_variable_y_radius(a3) ; y radius = 0  ?
+	tst.w	sby_radius(a3) ; y radius = 0  ?
 	beq	sb232_get_y_coordinates_quit
 	move.w	sb232_y_radius_angle(a3),d3 ; 1st y radius angle
 	move.w	d3,d0
@@ -2326,7 +2326,7 @@ sb232_get_y_coordinates
 	moveq	#sb232_bars_number-1,d7
 sb232_get_y_coordinates_loop1
 	move.w	WORD_SIZE(a0,d3.w*4),d0	; sin(w)
-	muls.w	sb_variable_y_radius(a3),d0 ; yr' = (yr*sin(w))/2^15
+	muls.w	sby_radius(a3),d0 ; yr' = (yr*sin(w))/2^15
 	swap	d0
 	addq.b	#sb232_y_radius_angle_step,d3
 	muls.w	WORD_SIZE(a0,d4.w*4),d0	; y' = (yr'*sin(w))/2^15
@@ -2360,7 +2360,7 @@ sb36_get_yz_coordinates
 	move.l	a4,-(a7)
 	tst.w	sb36_active(a3)
 	bne.s	sb36_get_yz_coordinates_quit
-	tst.w	sb_variable_y_radius(a3)
+	tst.w	sby_radius(a3)
 	beq.s	sb36_get_yz_coordinates_quit
 	move.w	sb36_y_angle(a3),d2	; 1st y angle
 	move.w	d2,d0		
@@ -2381,7 +2381,7 @@ sb36_get_yz_coordinates_loop
 	add.w	d2,d1			; y angle - 90°
 	ext.w	d1
 	move.w	d1,(a1)+		; z vector
-	muls.w	sb_variable_y_radius(a3),d0 ; y' = (yr*sin(w))/2^15
+	muls.w	sby_radius(a3),d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	add.w	a2,d0			; y' + y center
 	MULUF.W cl2_extension7_size/4,d0,d1 ; y offset in cl
@@ -2403,7 +2403,7 @@ sb36_set_background_bars
 	move.l	a4,-(a7)
 	tst.w	sb36_active(a3)
 	bne.s	sb36_set_background_bars_quit
-	tst.w	sb_variable_y_radius(a3) ; y radius = 0 ?
+	tst.w	sby_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_background_bars_quit
 	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
@@ -2439,7 +2439,7 @@ sb36_set_foreground_bars
 	move.l	a4,-(a7)
 	tst.w	sb36_active(a3)
 	bne.s	sb36_set_foreground_bars_quit
-	tst.w	sb_variable_y_radius(a3)
+	tst.w	sby_radius(a3)
 	beq.s	sb36_set_foreground_bars_quit
 	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
@@ -2473,7 +2473,7 @@ sb36_set_foreground_bars_quit
 
 	CNOP 0,4
 scs_set_center_bar
-	tst.w	sb_variable_y_radius(a3)
+	tst.w	sby_radius(a3)
 	bne.s	scs_set_center_bar_quit
 	lea	scs_bar_color_table(pc),a0
 	move.l	cl2_construction2(a3),a1
@@ -2657,7 +2657,7 @@ radius_fader_in
 	subq.w	#rfi_delay_speed,rfi_delay_counter(a3)
 	bgt.s	radius_fader_in_quit
 	move.w	#rfi_delay,rfi_delay_counter(a3)
-	move.w	sb_variable_y_radius(a3),d0
+	move.w	sby_radius(a3),d0
 	cmp.w	#rf_max_y_radius,d0
 	blt.s	radius_fader_in_skip
 	move.w	#FALSE,rfi_active(a3)
@@ -2665,7 +2665,7 @@ radius_fader_in
 	CNOP 0,4
 radius_fader_in_skip
 	addq.w	#rfi_speed,d0		; increase y radius
-	move.w	d0,sb_variable_y_radius(a3) 
+	move.w	d0,sby_radius(a3) 
 radius_fader_in_quit
 	rts
 
@@ -2677,14 +2677,14 @@ radius_fader_out
 	subq.w	#rfo_delay_speed,rfo_delay_counter(a3)
 	bgt.s	radius_fader_out_quit
 	move.w	#rfo_delay,rfo_delay_counter(a3)
-	move.w	sb_variable_y_radius(a3),d0
+	move.w	sby_radius(a3),d0
 	bgt.s	radius_fader_out_skip
 	move.w	#FALSE,rfo_active(a3)
 	rts
 	CNOP 0,4
 radius_fader_out_skip
 	subq.w	#rfo_speed,d0		; decrease y radius
-	move.w	d0,sb_variable_y_radius(a3) 
+	move.w	d0,sby_radius(a3) 
 radius_fader_out_quit
 	rts
 
