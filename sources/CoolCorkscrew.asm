@@ -340,13 +340,15 @@ extra_pf1_plane_width		EQU extra_pf1_x_size/8
 extra_pf2_plane_width		EQU extra_pf2_x_size/8
 
 
-; Viewport 1 
+; Viewport 1
+vp1_pf1_plane_width		EQU extra_pf1_plane_width
 vp1_data_fetch_width		EQU vp1_pixel_per_line/8
-vp1_pf1_plane_moduli		EQU (extra_pf1_plane_width*(extra_pf1_depth-1))+extra_pf1_plane_width-vp1_data_fetch_width
+vp1_pf1_plane_moduli		EQU (vp1_pf1_plane_width*(vp1_pf1_depth-1))+vp1_pf1_plane_width-vp1_data_fetch_width
 ; Viewport 2
+vp2_pf1_plane_width		EQU extra_pf2_plane_width
 vp2_data_fetch_width		EQU vp2_pixel_per_line/8
-vp2_pf1_plane_moduli		EQU (extra_pf2_plane_width*(extra_pf2_depth-1))+extra_pf2_plane_width-vp2_data_fetch_width
-vp2_pf2_plane_moduli		EQU -((extra_pf2_plane_width*(extra_pf2_depth-1))+(extra_pf2_plane_width-vp2_data_fetch_width)+(2*vp2_data_fetch_width))
+vp2_pf1_plane_moduli		EQU (vp2_pf1_plane_width*(vp2_pf1_depth-1))+vp2_pf1_plane_width-vp2_data_fetch_width
+vp2_pf2_plane_moduli		EQU -((vp2_pf1_plane_width*(vp2_pf1_depth-1))+(vp2_pf1_plane_width-vp2_data_fetch_width)+(2*vp2_data_fetch_width))
 
 
 ; View 
@@ -508,7 +510,7 @@ scs_pipe_shift_x_center		EQU scs_roller_y_radius
 
 ; Sine-Bars 
 sb_bar_height			EQU 10
-sb_y_radius			EQU ((vp2_visible_lines_number-sb_bar_height)/2)-1
+sb_y_radius1			EQU ((vp2_visible_lines_number-sb_bar_height)/2)-1
 
 ; Sine-Bars 2.3.2 
 sb232_bars_number		EQU 8
@@ -547,7 +549,7 @@ msr_x_angle_speed		EQU 1
 msr_spaceship_y_position	EQU vp2_vstart+((vp2_visible_lines_number-ms_image_y_size)/2)
 
 ; Radius-Fader 
-rf_max_y_radius			EQU sb_y_radius*2
+rf_max_y_radius			EQU sb_y_radius1*2
 
 ; Radius-Fader-In 
 rfi_delay			EQU 4
@@ -660,7 +662,7 @@ cl2_ext2_DDFSTRT		RS.L 1
 cl2_ext2_DDFSTOP		RS.L 1
 cl2_ext2_BPLCON1		RS.L 1
 cl2_ext2_BPLCON2		RS.L 1
-cl2_ext2_BPLCON3_1		RS.L 1
+cl2_ext2_BPLCON3_colormap_high		RS.L 1
 cl2_ext2_BPL1MOD		RS.L 1
 cl2_ext2_BPL2MOD		RS.L 1
 cl2_ext2_BPLCON4		RS.L 1
@@ -681,7 +683,7 @@ cl2_ext2_COLOR12_high1		RS.L 1
 cl2_ext2_COLOR13_high1		RS.L 1
 cl2_ext2_COLOR14_high1		RS.L 1
 cl2_ext2_COLOR15_high1		RS.L 1
-cl2_ext2_BPLCON3_2		RS.L 1
+cl2_ext2_BPLCON3_colormap_low		RS.L 1
 cl2_ext2_COLOR00_low1		RS.L 1
 cl2_ext2_COLOR01_low1		RS.L 1
 cl2_ext2_COLOR02_low1		RS.L 1
@@ -789,14 +791,14 @@ cl2_ext6_DDFSTRT		RS.L 1
 cl2_ext6_DDFSTOP		RS.L 1
 cl2_ext6_BPLCON1		RS.L 1
 cl2_ext6_BPLCON2		RS.L 1
-cl2_ext6_BPLCON3_1		RS.L 1
+cl2_ext6_BPLCON3_colormap_high		RS.L 1
 cl2_ext6_BPL1MOD		RS.L 1
 cl2_ext6_BPL2MOD		RS.L 1
 cl2_ext6_BPLCON4		RS.L 1
 cl2_ext6_FMODE			RS.L 1
 cl2_ext6_COLOR00_high		RS.L 1
 cl2_ext6_COLOR04_high		RS.L 1
-cl2_ext6_BPLCON3_2		RS.L 1
+cl2_ext6_BPLCON3_colormap_low		RS.L 1
 cl2_ext6_COLOR00_low		RS.L 1
 cl2_ext6_COLOR04_low		RS.L 1
 cl2_ext6_BPL1PTH		RS.L 1
@@ -821,7 +823,7 @@ cl2_ext7_WAIT			RS.L 1
 	IFEQ scs_pipe_effect_enabled
 cl2_ext7_BPLCON1		RS.L 1
 	ENDC
-cl2_ext7_BPLCON3_1		RS.L 1
+cl2_ext7_BPLCON3_colormap_high		RS.L 1
 cl2_ext7_BPL1MOD		RS.L 1
 cl2_ext7_BPL2MOD		RS.L 1
 cl2_ext7_COLOR00_high		RS.L 1
@@ -829,7 +831,7 @@ cl2_ext7_COLOR01_high		RS.L 1
 cl2_ext7_COLOR02_high		RS.L 1
 cl2_ext7_COLOR05_high		RS.L 1
 cl2_ext7_COLOR06_high		RS.L 1
-cl2_ext7_BPLCON3_2		RS.L 1
+cl2_ext7_BPLCON3_colormap_low		RS.L 1
 cl2_ext7_COLOR00_low		RS.L 1
 cl2_ext7_COLOR01_low		RS.L 1
 cl2_ext7_COLOR02_low		RS.L 1
@@ -1041,6 +1043,7 @@ spr7_end			RS.L 1*(spr_pixel_per_datafetch/WORD_BITS)
 
 sprite7_size			RS.B 0
 
+
 spr0_x_size1			EQU spr_x_size1
 spr0_y_size1			EQU sprite0_size/(spr_x_size1/LONGWORD_SIZE)
 spr1_x_size1			EQU spr_x_size1
@@ -1110,12 +1113,12 @@ scs_image			RS.L 1
 scs_text_table_start		RS.W 1
 scs_text_char_x_shift		RS.W 1
 scs_text_char_y_offset		RS.W 1
-scsvert_scroll_speed	RS.W 1
+scs_vert_scroll_speed		RS.W 1
 scs_text_delay_counter		RS.W 1
 scs_text_move_active		RS.W 1
 
 ; Sine-Bars 
-sby_radius		RS.W 1
+sb_y_radius			RS.W 1
 
 ; Sine-Bars 2.3.2 
 sb232_active			RS.W 1
@@ -1229,13 +1232,13 @@ init_main_variables
 	move.w	d0,scs_text_table_start(a3)
 	move.w	d0,scs_text_char_x_shift(a3)
 	move.w	#scs_text_char_y_restart*extra_pf2_plane_width*scs_vert_scroll_window_depth,scs_text_char_y_offset(a3)
-	move.w	#scs_vert_scroll_speed2,scsvert_scroll_speed(a3)
+	move.w	#scs_vert_scroll_speed2,scs_vert_scroll_speed(a3)
 	move.w	d1,scs_text_delay_counter(a3) ; counter inactive
 	move.w	d0,scs_text_move_active(a3)
 
 ; Sine-Bars 
 	move.w	d0,hcs_horiz_step_angle(a3) ; 0°
-	move.w	d0,sby_radius(a3) ; 0°
+	move.w	d0,sb_y_radius(a3) ; 0°
 
 ; Sine-Bars 2.3.2 
 	move.w	d1,sb232_active(a3)
@@ -1394,10 +1397,10 @@ bf_rgb8_init_color_table
 	CNOP 0,4
 init_colors
 	CPU_SELECT_COLOR_HIGH_BANK 1
-	CPU_INIT_COLOR_HIGH COLOR00,16,vp2_spr_rgb8_color_table
+	CPU_LOAD_COLORMAP_HIGH COLOR00,16,vp2_spr_rgb8_color_table
 
 	CPU_SELECT_COLOR_LOW_BANK 1
-	CPU_INIT_COLOR_LOW COLOR00,16,vp2_spr_rgb8_color_table
+	CPU_LOAD_COLORMAP_LOW COLOR00,16,vp2_spr_rgb8_color_table
 	rts
 
 
@@ -1537,10 +1540,10 @@ cl1_init_copperlist
 
 	CNOP 0,4
 cl1_init_colors
-	COP_INIT_COLOR_HIGH COLOR16,16,spr_rgb8_color_table
+	COP_LOAD_COLORMAP_HIGH COLOR16,16,spr_rgb8_color_table
 
 	COP_SELECT_COLOR_LOW_BANK 0
-	COP_INIT_COLOR_LOW COLOR16,16,spr_rgb8_color_table
+	COP_LOAD_COLORMAP_LOW COLOR16,16,spr_rgb8_color_table
 	rts
 
 	COP_SET_SPRITE_POINTERS cl1,display,spr_number
@@ -1555,16 +1558,16 @@ cl2_init_copperlist
 	bsr	cl2_vp1_init_playfield_props
 	bsr	cl2_vp1_init_colors
 	bsr	cl2_vp1_init_plane_pointers
-	bsr	cl2_vp1_start_display
+	bsr	cl2_vp1_init_start_display
 	bsr	cl2_init_bplcon1_chunky
 ; Vertical-Blank 2
-	bsr	cl2_vb2_start_blank
+	bsr	cl2_vb2_init_start_blank
 	bsr	cl2_vb2_init_bpldat
 ; Viewport 2
 	bsr	cl2_vp2_init_playfield_props
 	bsr	cl2_vp2_init_colors
 	bsr	cl2_vp2_init_plane_pointers
-	bsr	cl2_vp2_start_display
+	bsr	cl2_vp2_init_start_display
 	bsr	cl2_init_roller
 ; Copper-Interrupt
 	bsr	cl2_init_copper_interrupt
@@ -1604,10 +1607,10 @@ cl2_vb1_init_bpldat_loop
 
 	CNOP 0,4
 cl2_vp1_init_colors
-	COP_INIT_COLOR_HIGH COLOR00,16,vp1_pf1_rgb8_color_table
+	COP_LOAD_COLORMAP_HIGH COLOR00,16,vp1_pf1_rgb8_color_table
 
 	COP_SELECT_COLOR_LOW_BANK 0
-	COP_INIT_COLOR_LOW COLOR00,16,vp1_pf1_rgb8_color_table
+	COP_LOAD_COLORMAP_LOW COLOR00,16,vp1_pf1_rgb8_color_table
 	rts
 
 	CNOP 0,4
@@ -1622,7 +1625,7 @@ cl2_vp1_init_plane_pointers_loop
 	rts
 
 	CNOP 0,4
-cl2_vp1_start_display
+cl2_vp1_init_start_display
 	COP_WAIT vp1_hstart,vp1_vstart
 	COP_MOVEQ vp1_bplcon0_bits1,BPLCON0
 	rts
@@ -1645,7 +1648,7 @@ cl2_vp1_set_plane_pointers_loop
 
 ; Vertical-Blank 2
 	CNOP 0,4
-cl2_vb2_start_blank
+cl2_vb2_init_start_blank
 	COP_WAIT vb2_hstart,vb2_vstart
 	COP_MOVEQ vp1_bplcon0_bits2,BPLCON0
 	rts
@@ -1669,12 +1672,12 @@ cl2_vb2_init_bpldat_loop
 
 	CNOP 0,4
 cl2_vp2_init_colors
-	COP_INIT_COLOR_HIGH COLOR00,1,vp2_pf1_rgb8_color_table
-	COP_INIT_COLOR_HIGH COLOR04,1,vp2_pf2_rgb8_color_table
+	COP_LOAD_COLORMAP_HIGH COLOR00,1,vp2_pf1_rgb8_color_table
+	COP_LOAD_COLORMAP_HIGH COLOR04,1,vp2_pf2_rgb8_color_table
 
 	COP_SELECT_COLOR_LOW_BANK 0
-	COP_INIT_COLOR_LOW COLOR00,1,vp2_pf1_rgb8_color_table
-	COP_INIT_COLOR_LOW COLOR04,1,vp2_pf2_rgb8_color_table
+	COP_LOAD_COLORMAP_LOW COLOR00,1,vp2_pf1_rgb8_color_table
+	COP_LOAD_COLORMAP_LOW COLOR04,1,vp2_pf2_rgb8_color_table
 	rts
 
 	CNOP 0,4
@@ -1689,7 +1692,7 @@ cl2_vp2_init_plane_pointers_loop
 	rts
 
 	CNOP 0,4
-cl2_vp2_start_display
+cl2_vp2_init_start_display
 	COP_WAIT vp2_hstart,vp2_vstart
 	COP_MOVEQ vp2_bplcon0_bits1,BPLCON0
 	rts
@@ -2030,12 +2033,12 @@ scs_start_spaceship_skip
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_corkscrew
-	move.w	#scs_vert_scroll_speed1,scsvert_scroll_speed(a3)
+	move.w	#scs_vert_scroll_speed1,scs_vert_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_normal_scrolltext
-	move.w	#scs_vert_scroll_speed2,scsvert_scroll_speed(a3)
+	move.w	#scs_vert_scroll_speed2,scs_vert_scroll_speed(a3)
 	moveq	#RETURN_OK,d0
 	bra	scs_check_control_codes_quit
 	CNOP 0,4
@@ -2160,12 +2163,12 @@ scs_vert_scroll
 	move.l	a0,BLTAPT-DMACONR(a6)	; source
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-(scs_vert_scroll_window_width))<<16)|(extra_pf2_plane_width-scs_vert_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
-	move.w	scsvert_scroll_speed(a3),d0
+	move.w	scs_vert_scroll_speed(a3),d0
 	MULUF.W (scs_vert_scroll_window_depth)<<6,d0,d1
 	or.w	#scs_vert_scroll_window_x_size/16,d0
 	move.w	d0,BLTSIZE-DMACONR(a6)
 ; Vertical moving - scrolltext
-	move.w	scsvert_scroll_speed(a3),d0
+	move.w	scs_vert_scroll_speed(a3),d0
 	MULUF.W extra_pf2_plane_width*extra_pf2_depth,d0,d1
 	lea	(vp2_pf_pixel_per_datafetch/8)(a2,d0.w),a0 ; 2nd or 3rd line, skip 64 pixel
 	lea	(vp2_pf_pixel_per_datafetch/8)(a2),a1 ; 1st line, skip 64 pixel
@@ -2309,7 +2312,7 @@ sb232_get_y_coordinates
 	movem.l a4-a6,-(a7)
 	tst.w	sb232_active(a3)
 	bne	sb232_get_y_coordinates_quit
-	tst.w	sby_radius(a3) ; y radius = 0  ?
+	tst.w	sb_y_radius(a3) ; y radius = 0  ?
 	beq	sb232_get_y_coordinates_quit
 	move.w	sb232_y_radius_angle(a3),d3 ; 1st y radius angle
 	move.w	d3,d0
@@ -2327,7 +2330,7 @@ sb232_get_y_coordinates
 	moveq	#sb232_bars_number-1,d7
 sb232_get_y_coordinates_loop1
 	move.w	WORD_SIZE(a0,d3.w*4),d0	; sin(w)
-	muls.w	sby_radius(a3),d0 ; yr' = (yr*sin(w))/2^15
+	muls.w	sb_y_radius(a3),d0 ; yr' = (yr*sin(w))/2^15
 	swap	d0
 	addq.b	#sb232_y_radius_angle_step,d3
 	muls.w	WORD_SIZE(a0,d4.w*4),d0	; y' = (yr'*sin(w))/2^15
@@ -2361,7 +2364,7 @@ sb36_get_yz_coordinates
 	move.l	a4,-(a7)
 	tst.w	sb36_active(a3)
 	bne.s	sb36_get_yz_coordinates_quit
-	tst.w	sby_radius(a3)
+	tst.w	sb_y_radius(a3)
 	beq.s	sb36_get_yz_coordinates_quit
 	move.w	sb36_y_angle(a3),d2	; 1st y angle
 	move.w	d2,d0		
@@ -2382,7 +2385,7 @@ sb36_get_yz_coordinates_loop
 	add.w	d2,d1			; y angle - 90°
 	ext.w	d1
 	move.w	d1,(a1)+		; z vector
-	muls.w	sby_radius(a3),d0 ; y' = (yr*sin(w))/2^15
+	muls.w	sb_y_radius(a3),d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	add.w	a2,d0			; y' + y center
 	MULUF.W cl2_extension7_size/4,d0,d1 ; y offset in cl
@@ -2404,7 +2407,7 @@ sb36_set_background_bars
 	move.l	a4,-(a7)
 	tst.w	sb36_active(a3)
 	bne.s	sb36_set_background_bars_quit
-	tst.w	sby_radius(a3) ; y radius = 0 ?
+	tst.w	sb_y_radius(a3) ; y radius = 0 ?
 	beq.s	sb36_set_background_bars_quit
 	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
@@ -2440,7 +2443,7 @@ sb36_set_foreground_bars
 	move.l	a4,-(a7)
 	tst.w	sb36_active(a3)
 	bne.s	sb36_set_foreground_bars_quit
-	tst.w	sby_radius(a3)
+	tst.w	sb_y_radius(a3)
 	beq.s	sb36_set_foreground_bars_quit
 	MOVEF.L cl2_extension7_size,d5
 	lea	sb36_yz_coordinates(pc),a0
@@ -2474,7 +2477,7 @@ sb36_set_foreground_bars_quit
 
 	CNOP 0,4
 scs_set_center_bar
-	tst.w	sby_radius(a3)
+	tst.w	sb_y_radius(a3)
 	bne.s	scs_set_center_bar_quit
 	lea	scs_bar_color_table(pc),a0
 	move.l	cl2_construction2(a3),a1
@@ -2659,7 +2662,7 @@ radius_fader_in
 	subq.w	#rfi_delay_speed,rfi_delay_counter(a3)
 	bgt.s	radius_fader_in_quit
 	move.w	#rfi_delay,rfi_delay_counter(a3)
-	move.w	sby_radius(a3),d0
+	move.w	sb_y_radius(a3),d0
 	cmp.w	#rf_max_y_radius,d0
 	blt.s	radius_fader_in_skip
 	move.w	#FALSE,rfi_active(a3)
@@ -2667,7 +2670,7 @@ radius_fader_in
 	CNOP 0,4
 radius_fader_in_skip
 	addq.w	#rfi_speed,d0		; increase y radius
-	move.w	d0,sby_radius(a3) 
+	move.w	d0,sb_y_radius(a3)
 radius_fader_in_quit
 	rts
 
@@ -2679,14 +2682,14 @@ radius_fader_out
 	subq.w	#rfo_delay_speed,rfo_delay_counter(a3)
 	bgt.s	radius_fader_out_quit
 	move.w	#rfo_delay,rfo_delay_counter(a3)
-	move.w	sby_radius(a3),d0
+	move.w	sb_y_radius(a3),d0
 	bgt.s	radius_fader_out_skip
 	move.w	#FALSE,rfo_active(a3)
 	rts
 	CNOP 0,4
 radius_fader_out_skip
 	subq.w	#rfo_speed,d0		; decrease y radius
-	move.w	d0,sby_radius(a3) 
+	move.w	d0,sb_y_radius(a3)
 radius_fader_out_quit
 	rts
 
