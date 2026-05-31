@@ -1114,7 +1114,7 @@ scs_text_table_start		RS.W 1
 scs_text_char_x_shift		RS.W 1
 scs_text_char_y_offset		RS.W 1
 scs_vert_scroll_speed		RS.W 1
-scs_text_delay_counter		RS.W 1
+scs_text_counter		RS.W 1
 scs_text_move_active		RS.W 1
 
 ; Sine-Bars 
@@ -1140,11 +1140,11 @@ msr_x_angle			RS.W 1
 
 ; Radius-Fader-In 
 rfi_active			RS.W 1
-rfi_delay_counter		RS.W 1
+rfi_counter		RS.W 1
 
 ; Radius-Fader-Out 
 rfo_active			RS.W 1
-rfo_delay_counter		RS.W 1
+rfo_counter		RS.W 1
 
 ; Image-Fader 
 if_rgb8_colors_counter		RS.W 1
@@ -1233,7 +1233,7 @@ init_main_variables
 	move.w	d0,scs_text_char_x_shift(a3)
 	move.w	#scs_text_char_y_restart*extra_pf2_plane_width*scs_vert_scroll_window_depth,scs_text_char_y_offset(a3)
 	move.w	#scs_vert_scroll_speed2,scs_vert_scroll_speed(a3)
-	move.w	d1,scs_text_delay_counter(a3) ; counter inactive
+	move.w	d1,scs_text_counter(a3) ; counter inactive
 	move.w	d0,scs_text_move_active(a3)
 
 ; Sine-Bars 
@@ -1260,11 +1260,11 @@ init_main_variables
 
 ; Radius-Fader-In 
 	move.w	d1,rfi_active(a3)
-	move.w	d0,rfi_delay_counter(a3)
+	move.w	d0,rfi_counter(a3)
 
 ; Radius-Fader-Out
 	move.w	d1,rfo_active(a3)
-	move.w	d0,rfo_delay_counter(a3)
+	move.w	d0,rfo_counter(a3)
 
 ; Image-Fader 
 	move.w	d0,if_rgb8_colors_counter(a3)
@@ -2001,7 +2001,7 @@ scs_start_sine_bars232
 	move.w	d0,sb232_y_angle(a3)	; 0°
 	move.w	d0,sb232_active(a3)
 	move.w	d0,rfi_active(a3)
-	move.w	#1,rfi_delay_counter(a3) ; activate counter
+	move.w	#1,rfi_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
@@ -2011,13 +2011,13 @@ scs_start_sine_bars36
 	move.w	d0,sb36_y_angle(a3)	; 0°
 	move.w	d0,sb36_active(a3)
 	move.w	d0,rfi_active(a3)
-	move.w	#1,rfi_delay_counter(a3) ; activate counter
+	move.w	#1,rfi_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
 scs_start_radius_fader_out
 	clr.w	rfo_active(a3)
-	move.w	#1,rfo_delay_counter(a3) ; activate counter
+	move.w	#1,rfo_counter(a3) ; activate counter
 	moveq	#RETURN_OK,d0
 	bra.s	scs_check_control_codes_quit
 	CNOP 0,4
@@ -2044,7 +2044,7 @@ scs_start_normal_scrolltext
 	CNOP 0,4
 scs_pause_scrolltext
 	move.w	#FALSE,scs_text_move_active(a3) ; pause text
-	move.w	#scs_text_delay,scs_text_delay_counter(a3)
+	move.w	#scs_text_delay,scs_text_counter(a3)
 	moveq	#RETURN_OK,d0
 	bra	scs_check_control_codes_quit
 	CNOP 0,4
@@ -2659,9 +2659,9 @@ ms_copy_image_data_loop
 radius_fader_in
 	tst.w	rfi_active(a3)
 	bne.s	radius_fader_in_quit
-	subq.w	#rfi_delay_speed,rfi_delay_counter(a3)
+	subq.w	#rfi_delay_speed,rfi_counter(a3)
 	bgt.s	radius_fader_in_quit
-	move.w	#rfi_delay,rfi_delay_counter(a3)
+	move.w	#rfi_delay,rfi_counter(a3)
 	move.w	sb_y_radius(a3),d0
 	cmp.w	#rf_max_y_radius,d0
 	blt.s	radius_fader_in_skip
@@ -2679,9 +2679,9 @@ radius_fader_in_quit
 radius_fader_out
 	tst.w	rfo_active(a3)
 	bne.s	radius_fader_out_quit
-	subq.w	#rfo_delay_speed,rfo_delay_counter(a3)
+	subq.w	#rfo_delay_speed,rfo_counter(a3)
 	bgt.s	radius_fader_out_quit
-	move.w	#rfo_delay,rfo_delay_counter(a3)
+	move.w	#rfo_delay,rfo_counter(a3)
 	move.w	sb_y_radius(a3),d0
 	bgt.s	radius_fader_out_skip
 	move.w	#FALSE,rfo_active(a3)
@@ -2950,14 +2950,14 @@ bf_rgb8_convert_colors_quit
 
 	CNOP 0,4
 control_counters
-	move.w	scs_text_delay_counter(a3),d0
+	move.w	scs_text_counter(a3),d0
 	bmi.s	control_counters_quit
 	subq.w	#1,d0
 	bpl.s	control_counters_skip
 	clr.w	scs_text_move_active(a3)
 	moveq	#FALSE,d0		; stop counter
 control_counters_skip
-	move.w	d0,scs_text_delay_counter(a3) 
+	move.w	d0,scs_text_counter(a3) 
 control_counters_quit
 	rts
 
