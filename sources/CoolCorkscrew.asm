@@ -1318,6 +1318,7 @@ init_main
 	bsr	pt_InitAudTempStrucs
 	bsr	pt_ExamineSongStruc
 	bsr	pt_InitFtuPeriodTableStarts
+	bsr	init_CIA_timers
 	bsr	lg_copy_image_to_bitplane
 	bsr	hsi_init_shift_table
 	bsr	scs_init_chars_offsets
@@ -1327,7 +1328,6 @@ init_main
 	bsr	bf_rgb8_init_color_table
 	bsr	init_colors
 	bsr	init_sprites
-	bsr	init_CIA_timers
 	bsr	cl1_init_copperlist
 	bsr	cl2_init_copperlist
 	rts
@@ -1343,6 +1343,14 @@ init_main
 	PT_EXAMINE_SONG_STRUCTURE
 
 	PT_INIT_FINETUNE_TABLE_STARTS
+
+
+	CNOP 0,4
+init_CIA_timers
+
+; PT-Replay 
+	PT_INIT_TIMERS
+	rts
 
 
 ; Logo
@@ -1509,14 +1517,6 @@ hcs_init_sprites_bitmaps_loop3
 	rts
 
 	COPY_SPRITE_STRUCTURES
-
-
-	CNOP 0,4
-init_CIA_timers
-
-; PT-Replay 
-	PT_INIT_TIMERS
-	rts
 
 
 	CNOP 0,4
