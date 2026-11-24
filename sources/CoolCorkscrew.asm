@@ -2123,7 +2123,7 @@ hcs_get_bplcon1_shifts
 	moveq	#hsi_lines_number-1,d7
 hcs_get_bplcon1_shifts_loop1
 	move.l	(a0,d4.w*4),d1		; sin(w)
-	MULUF.L hsi_x_radius*2,d1,d0	; xr' = (xr*sin(w))/2^15
+	MULUF.L hsi_x_radius*2,d1	; xr' = (xr*sin(w))/2^15
 	swap	d1
 	add.b	d5,d4			; next x radius angle
 	addq.w	#hsi_shift_values_number/4,d1 ; xr' + x center
@@ -2164,7 +2164,7 @@ scs_vert_scroll
 	move.l	a1,BLTDPT-DMACONR(a6)	; destination
 	move.l	#((extra_pf2_plane_width-(scs_vert_scroll_window_width))<<16)|(extra_pf2_plane_width-scs_vert_scroll_window_width),BLTAMOD-DMACONR(a6) ; A&D moduli
 	move.w	scs_vert_scroll_speed(a3),d0
-	MULUF.W (scs_vert_scroll_window_depth)<<6,d0,d1
+	MULUF.W (scs_vert_scroll_window_depth)<<6,d0
 	or.w	#scs_vert_scroll_window_x_size/16,d0
 	move.w	d0,BLTSIZE-DMACONR(a6)
 ; Vertical moving - scrolltext
@@ -2209,7 +2209,7 @@ hcs_get_horiz_step
 	move.w	hcs_horiz_step_angle(a3),d2
 	lea	sine_table(pc),a0
 	move.l	(a0,d2.w*4),d0		; cos(w)
-	MULUF.L hcs_horiz_step_max*2*2,d0,d1 ; s' = (cos(w)*r)/2^15
+	MULUF.L hcs_horiz_step_max*2*2,d0 ; s' = (cos(w)*r)/2^15
 	swap	d0
 	add.w	#(hcs_horiz_step_max*2)+1,d0 ; add center
 	move.w	d0,hcs_horiz_step(a3)
@@ -2390,7 +2390,7 @@ sb36_get_yz_coordinates_loop
 	add.w	a2,d0			; y' + y center
 	MULUF.W cl2_extension7_size/4,d0,d1 ; y offset in cl
 	move.l	(a0,d4.w*4),d3		; sin(w)
-	MULUF.L sb36_y_distance_radius*2,d3,d1 ; y' = (yr*sin(w))/2^15
+	MULUF.L sb36_y_distance_radius*2,d3 ; y' = (yr*sin(w))/2^15
 	swap	d3
 	move.w	d0,(a1)+		; y coordinate
 	add.w	a4,d3			; y' + y distance center
@@ -2710,7 +2710,7 @@ image_fader_in_skip
 	MOVEF.W if_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0	
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L ifi_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
+	MULUF.L ifi_rgb8_fader_radius*2,d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	ifi_rgb8_fader_center,d0
 	lea	pf1_rgb8_color_table+(if_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
@@ -2788,7 +2788,7 @@ sprite_fader_in_skip
 	MOVEF.W sprf_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0	
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L sprfi_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
+	MULUF.L sprfi_rgb8_fader_radius*2,d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	sprfi_rgb8_fader_center,d0
 	lea	spr_rgb8_color_table+(sprf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
@@ -2825,7 +2825,7 @@ sprite_fader_out_skip
 	MOVEF.W sprf_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0	
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L sprfo_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
+	MULUF.L sprfo_rgb8_fader_radius*2,d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	sprfo_rgb8_fader_center,d0
 	lea	spr_rgb8_color_table+(sprf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
@@ -2864,7 +2864,7 @@ rgb8_bar_fader_in_skip
 	MOVEF.W bf_rgb8_colors_number*3,d6 ; RGB counter
 	lea	sine_table(pc),a0	
 	move.l	(a0,d2.w*4),d0		; sin(w)
-	MULUF.L bfi_rgb8_fader_radius*2,d0,d1 ; y' = (yr*sin(w))/2^15
+	MULUF.L bfi_rgb8_fader_radius*2,d0 ; y' = (yr*sin(w))/2^15
 	swap	d0
 	ADDF.W	bfi_rgb8_fader_center,d0
 	lea	bf_rgb8_color_cache+(bf_rgb8_color_table_offset*LONGWORD_SIZE)(pc),a0 ; colors buffer
